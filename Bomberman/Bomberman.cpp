@@ -1,11 +1,21 @@
-// Bomberman.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
-#include <iostream>
+#include <SFML/Graphics.hpp>
 
 int main()
 {
-    std::cout << "Goodbye World!\n";
-}
+    sf::RenderWindow window(sf::VideoMode({ 200, 200 }), "SFML works!");
+    sf::CircleShape shape(100.f);
+    shape.setFillColor(sf::Color::Green);
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+    while (window.isOpen())
+    {
+        while (const std::optional event = window.pollEvent())
+        {
+            if (event->is<sf::Event::Closed>())
+                window.close();
+        }
+
+        window.clear();
+        window.draw(shape);
+        window.display();
+    }
+}
