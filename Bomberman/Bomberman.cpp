@@ -1,4 +1,4 @@
-#include <SFML/Graphics.hpp> //can we work please
+#include <SFML/Graphics.hpp> //stuff
 
 int main()
 {
