@@ -2,7 +2,14 @@
 
 Game::Game()
 {
-    sf::RenderWindow window(sf::VideoMode({ 200, 200 }), "Game");
+    window = sf::RenderWindow(sf::VideoMode({ 800, 600 }), "Game");
+    window.setFramerateLimit(60);
+}
+
+Game::~Game() {}
+
+void Game::run()
+{
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
 
@@ -18,6 +25,5 @@ Game::Game()
         window.draw(shape);
         window.display();
     }
-}
 
-Game::~Game() {}
+}

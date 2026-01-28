@@ -7,5 +7,8 @@ public:
 	Game();
 	~Game();
 
+	void run();
 
+private:
+	sf::RenderWindow window;
 };
