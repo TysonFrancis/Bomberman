@@ -2,6 +2,8 @@
 
 Game::Game()
 {
+
+
     window = sf::RenderWindow(sf::VideoMode({ 800, 600 }), "Game");
     window.setFramerateLimit(60);
 }
