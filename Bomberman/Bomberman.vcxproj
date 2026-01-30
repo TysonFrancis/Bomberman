@@ -134,19 +134,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bomberman.cpp" />
-	  <ClInclude Include="Player.cpp" />
-	  <ClInclude Include="Bomb.cpp" />
-	  <ClInclude Include="Enemy.cpp" />
-	  <ClInclude Include="Squares.cpp" />
-	  <ClInclude Include="Animations.cpp" />
-	  <ClInclude Include="Game.cpp" />
+    <ClCompile Include="Game.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="Bomb.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="Squares.h" />
-    <ClInclude Include="Animations.h" />
     <ClInclude Include="Game.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
