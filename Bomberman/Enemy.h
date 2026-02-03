@@ -9,4 +9,3 @@ public:
 private:
 	int type;
 };
-
