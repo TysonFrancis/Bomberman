@@ -7,8 +7,10 @@ public:
 	Player();
 	~Player();
 
-private:
-	sf::Sprite sprite;
-	sf::Texture texture;
-};
+	void tick();
 
+private:
+	//sf::Sprite sprite;
+	//sf::Texture texture;
+	float joyX, joyY;
+};
