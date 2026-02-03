@@ -27,7 +27,7 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Squares.cpp">
+    <ClCompile Include="Pod.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Bomb.cpp">
@@ -47,7 +47,7 @@
     <ClInclude Include="Enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Squares.h">
+    <ClInclude Include="Pod.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Bomb.h">
