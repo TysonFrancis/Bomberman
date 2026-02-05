@@ -30,26 +30,7 @@ void Game::run()
             if (event->is<sf::Event::Closed>() || sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape))
                 window.close();
 
-
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up))
-                bomber.setTextureRect(sf::IntRect({ 16 * count + 48, 16 }, { 16, 16 }));
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down))
-                bomber.setTextureRect(sf::IntRect({ 16 * count + 48, 0 }, { 16, 16 }));
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Left))
-                bomber.setTextureRect(sf::IntRect({ 16 * count, 0 }, { 16, 16 }));
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Right))
-                bomber.setTextureRect(sf::IntRect({ 16 * count, 16 }, { 16, 16 }));
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::D))
-            {
-                alive = false;
-                for (int i = 0; i < 7; i++)
-                {
-                    bomber.setTextureRect(sf::IntRect({ 16 * i, 32 }, { 16, 16 }));
-                    window.draw(bomber);
-                    window.display();
-                    Sleep(100);
-                }
-            }
+        player.tick();
 
             window.clear();
             window.draw(bomber);

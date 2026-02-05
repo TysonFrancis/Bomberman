@@ -4,7 +4,7 @@
 class Enemy : public Entity
 {
 public:
-	Enemy();
+	Enemy(int);
 	~Enemy();
 	void move();
 
