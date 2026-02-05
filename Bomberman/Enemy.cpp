@@ -37,5 +37,5 @@ void Enemy::move()
 
 	case 8: //pontan, alwyays chases, speed 6, moves through soft blocks
 		break;
-
+	}
 }
