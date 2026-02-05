@@ -3,7 +3,7 @@
 using namespace sf::Keyboard;
 
 
-Player::Player()
+Player::Player(sf::Texture& text) : sprite(text)
 {
 	sf::RectangleShape tempDisplay({ 25, 25 });
 
@@ -12,7 +12,6 @@ Player::Player()
 }
 
 Player::~Player() {}
-
 
 void Player::tick()
 {

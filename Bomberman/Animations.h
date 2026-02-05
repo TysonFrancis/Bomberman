@@ -5,13 +5,20 @@
 class Animations
 {
 public:
-	void update(float dt);
-	void draw(sf::RenderWindow& window);
+	Animations();
 
+	void draw(sf::RenderWindow& window);
 	void setPosition(float x, float y);
 	void setScale(float x, float y);
 
+	sf::Texture getEntities();
+	sf::Texture getBackground();
+	sf::Texture getMisc();
+	sf::Texture getTitle();
+
 private:
-	sf::Texture texture;
-	sf::Sprite sprite;
+	sf::Texture entities;
+	sf::Texture background;
+	sf::Texture misc;
+	sf::Texture title;
 };

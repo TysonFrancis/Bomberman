@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "Entity.h"
 
-class Bomb
+class Bomb : public Entity
 {
 public:
 	Bomb(float, float, bool, int[10][10]);

@@ -1,41 +1,63 @@
 #include "Game.h"
-#include "Animations.h"
 
-Game::Game()
+Game::Game() : bomber(Entity::animations.getEntities())
 {
     sf::Image tempImage("Textures/temp.jpg");
-
     window = sf::RenderWindow(sf::VideoMode({ 256, 256 }), "Game");
     window.setIcon(tempImage);
     window.setFramerateLimit(60);
+    
+    count = 0;
+    alive = true;
 
-    //sf::View view = window.getDefaultView();
-    //view.setSize(view.getSize() / 4.f); // zoom in 4×
-    //window.setView(view);
 
-    //bomber.setScale(16.f, 16.f);
-    //bomber.setPosition(256.f, 256.f);
+
+    bomber.getAnimation().setScale({ 16.f, 16.f });
+    
+
+    bomber.getAnimation().setPosition({ 0.f, 0.f });
 }
 
 void Game::run()
 {
     while (window.isOpen())
-        tick();
-}
-
-void Game::tick()
-{
-
-    while (const std::optional event = window.pollEvent())
     {
-        //bomber.setTextureRect(sf::IntRect({ 0, 0 }, { 16, 16 }));
+        while (const std::optional event = window.pollEvent())
+        {
+            if (count == 3)
+                count = 0;
 
-        if (event->is<sf::Event::Closed>())
-            window.close();
+            if (event->is<sf::Event::Closed>() || sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape))
+                window.close();
 
-        player.tick();
 
-        window.clear(sf::Color::Black);
-        window.display();
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up))
+                bomber.setTextureRect(sf::IntRect({ 16 * count + 48, 16 }, { 16, 16 }));
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down))
+                bomber.setTextureRect(sf::IntRect({ 16 * count + 48, 0 }, { 16, 16 }));
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Left))
+                bomber.setTextureRect(sf::IntRect({ 16 * count, 0 }, { 16, 16 }));
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Right))
+                bomber.setTextureRect(sf::IntRect({ 16 * count, 16 }, { 16, 16 }));
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::D))
+            {
+                alive = false;
+                for (int i = 0; i < 7; i++)
+                {
+                    bomber.setTextureRect(sf::IntRect({ 16 * i, 32 }, { 16, 16 }));
+                    window.draw(bomber);
+                    window.display();
+                    Sleep(100);
+                }
+            }
+
+            window.clear();
+            window.draw(bomber);
+            window.display();
+
+            if(alive)
+                count++;
+            Sleep(50);
+        }
     }
 }

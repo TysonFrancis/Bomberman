@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "Player.h"
+#include "Animations.h"
+#include "Windows.h"
 #pragma once
 
 class Game
@@ -9,11 +11,11 @@ public:
 	Game();
 
 	void run();
-	void tick();
-
-	Player player;
 
 private:
 	sf::RenderWindow window;
-	sf::Clock clock;
+	Player bomber;
+
+	bool alive;
+	int count;
 };

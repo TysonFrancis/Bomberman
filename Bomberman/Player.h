@@ -1,16 +1,16 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "Entity.h"
 
-class Player
+class Player : public Entity
 {
 public:
-	Player();
+	Player(sf::Texture&);
 	~Player();
 
 	void tick();
 
 private:
-	//sf::Sprite sprite;
-	//sf::Texture texture;
+	sf::Sprite sprite;
 	float joyX, joyY;
 };
