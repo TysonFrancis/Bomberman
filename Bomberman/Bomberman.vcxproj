@@ -138,6 +138,7 @@
     <ClCompile Include="Bomberman.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Tile.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Pod.cpp" />
   </ItemGroup>
@@ -146,6 +147,7 @@
     <ClInclude Include="Bomb.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Tile.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Pod.h" />
   </ItemGroup>
