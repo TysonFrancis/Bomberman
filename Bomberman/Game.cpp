@@ -10,11 +10,7 @@ Game::Game() : bomber(Entity::animations.getEntities())
     count = 0;
     alive = true;
 
-
-
     bomber.getAnimation().setScale({ 16.f, 16.f });
-    
-
     bomber.getAnimation().setPosition({ 0.f, 0.f });
 }
 
@@ -29,8 +25,6 @@ void Game::run()
 
             if (event->is<sf::Event::Closed>() || sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape))
                 window.close();
-
-        player.tick();
 
             window.clear();
             window.draw(bomber);

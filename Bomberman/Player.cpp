@@ -14,7 +14,7 @@ Player::Player(sf::Texture& text) : sprite(text)
 Player::~Player() {}
 
 
-void Player::tick()
+void Player::tick(sf::RenderWindow& window)
 {
 	joyX = isKeyPressed(Scan::D) - isKeyPressed(Scan::A);
 	joyY = isKeyPressed(Scan::S) - isKeyPressed(Scan::W); //might need reversed idk can't test
