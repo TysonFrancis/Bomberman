@@ -8,7 +8,7 @@ public:
 	~Player();
 
 	void tick();
-
+	sf::CircleShape shape;
 private:
 	//sf::Sprite sprite;
 	//sf::Texture texture;

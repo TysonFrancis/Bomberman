@@ -5,7 +5,7 @@ using namespace sf::Keyboard;
 
 Player::Player()
 {
-	sf::RectangleShape tempDisplay({ 25, 25 });
+	sf::CircleShape player(20);
 
 	joyX = 0;
 	joyY = 0;
