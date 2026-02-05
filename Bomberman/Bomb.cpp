@@ -1,7 +1,7 @@
 #include "Bomb.h"
 
 Bomb::Bomb(float xPosition, float yPosition, bool timer,
-	int pods[10][10], int d)
+	int pods[10][10], int d) : Tile(BOMB)
 {
 	//timer is a bool that will show if the player has the remote control power up
 	if (timer)

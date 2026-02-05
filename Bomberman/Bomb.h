@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "Tile.h"
 
-class Bomb
+class Bomb : public Tile
 {
 public:
 	Bomb(float, float, bool, int[10][10], int); //Temporary array

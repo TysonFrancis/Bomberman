@@ -7,10 +7,11 @@ public:
 	Player();
 	~Player();
 
-	void tick();
+	void tick(sf::RenderWindow&);
 
 private:
 	//sf::Sprite sprite;
 	//sf::Texture texture;
 	float joyX, joyY;
+	sf::RectangleShape tempDisplay;
 };

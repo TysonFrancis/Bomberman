@@ -3,10 +3,18 @@
 Pod::Pod()
 {
 	tile = nullptr;
-	obstruction = false;
 }
 
 Pod::~Pod() {}
+
+
+bool Pod::isObstructed()
+{
+	if (tile = nullptr)
+		return false;
+	else
+		return tile->isObstruction();
+}
 
 
 void Pod::setTile(Tile* newTile)

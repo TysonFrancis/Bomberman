@@ -6,6 +6,18 @@ TODO: actually impliment */
 class Tile
 {
 public:
-	Tile();
+	Tile(int);
 	~Tile();
+	bool isObstruction() const;
+
+	enum Type
+	{
+		HARD_WALL,
+		SOFT_WALL,
+		BOMB
+		//ETC
+	};
+private:
+	//Whether the movement/explosions should be blocked by this tile
+	bool obstruction;
 };

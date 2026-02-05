@@ -33,7 +33,7 @@ void Game::tick()
         if (event->is<sf::Event::Closed>())
             window.close();
 
-        player.tick();
+        player.tick(window);
 
         window.clear(sf::Color::Black);
         window.display();
