@@ -1,7 +1,7 @@
 #include "Game.h"
 #include "Animations.h"
 
-Game::Game()// : bomber("Textures/Entities.png", 16, 16, 4, 0.15f)
+Game::Game()
 {
     sf::Image tempImage("Textures/temp.jpg");
 
