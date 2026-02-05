@@ -8,9 +8,10 @@ public:
 	Player(sf::Texture&);
 	~Player();
 
-	void tick();
+	void tick(sf::RenderWindow&);
 
 private:
 	sf::Sprite sprite;
 	float joyX, joyY;
+	sf::RectangleShape tempDisplay;
 };
