@@ -1,18 +1,24 @@
 #include "Bomb.h"
 
 Bomb::Bomb(float xPosition, float yPosition, bool timer,
-	int pods [10][10] )
+	int pods[10][10], int d)
 {
-	//timer is bool that will show if the player has the remote control power up
+	//timer is a bool that will show if the player has the remote control power up
 	if (timer)
-	{
-		sf::sleep(sf::seconds(3.0f));
-		explode(pods);
-	}
+		tick(pods);
+	distance = d;
 }
 
 
 Bomb::~Bomb() {}
+
+
+void Bomb::tick(int pods [10][10])
+{
+	ticks++;
+	if (ticks >= 180) //3 seconds
+		explode(pods);
+}
 
 
 void Bomb::explode(int pods [10][10])
