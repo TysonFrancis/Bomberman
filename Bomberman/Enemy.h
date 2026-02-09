@@ -4,10 +4,18 @@
 class Enemy : public Entity
 {
 public:
-	Enemy(int);
-	~Enemy();
+	Enemy(sf::Texture&, int);
+
 	void move();
+
+	void update();
+	void die();
+
+	bool isAlive();
+
+	sf::FloatRect getBounds() const;
 
 private:
 	int type;
+	float speed;
 };

@@ -1,11 +1,7 @@
 #include "Pod.h"
 
-Pod::Pod()
-{
-	tile = nullptr;
-}
-
-Pod::~Pod() {}
+Pod::Pod() : tile(nullptr) {}
+Pod::~Pod() { delete tile; }
 
 
 bool Pod::isObstructed()
@@ -16,14 +12,5 @@ bool Pod::isObstructed()
 		return tile->isObstruction();
 }
 
-
-void Pod::setTile(Tile* newTile)
-{
-	tile = newTile;
-}
-
-
-Tile* Pod::getTile()
-{
-	return tile;
-}
+void Pod::setTile(Tile* newTile) { tile = newTile; }
+Tile* Pod::getTile() { return tile; }

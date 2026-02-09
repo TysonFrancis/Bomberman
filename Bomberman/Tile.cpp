@@ -1,20 +1,17 @@
 #include "Tile.h"
 
-Tile::Tile(int type)
+Tile::Tile(int type) : obstruction(false)
 {
 	switch (type)
 	{
-	case HARD_WALL:
-	case SOFT_WALL:
-	case BOMB:
-		obstruction = true;
+		case HARD_WALL:
+			break;
+		case SOFT_WALL:
+			break;
+		case BOMB:
+			obstruction = true;
+			break;
 	}
 }
 
-Tile::~Tile() {}
-
-
-bool Tile::isObstruction() const
-{
-	return obstruction;
-}
+bool Tile::isObstruction() const { return obstruction; }
