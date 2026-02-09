@@ -6,7 +6,7 @@ Pod::~Pod() { delete tile; }
 
 bool Pod::isObstructed()
 {
-	if (tile = nullptr)
+	if (tile == nullptr)
 		return false;
 	else
 		return tile->isObstruction();

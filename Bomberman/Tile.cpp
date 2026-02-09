@@ -8,6 +8,21 @@ Tile::Tile(int type) : obstruction(false)
 		case SOFT_WALL:
 		case BOMB:
 			obstruction = true;
+		case BOMB:
+			obstruction = true;
+			break;
+		case BOMB:
+			obstruction = true;
+			break;
+		case BOMB:
+			obstruction = true;
+			break;
+		case BOMB:
+			obstruction = true;
+			break;
+		case BOMB:
+			obstruction = true;
+			break;
 	}
 }
 
