@@ -16,8 +16,6 @@ public:
 
 	void update();
 
-	sf::FloatRect getBounds() const;
-
 private:
 	float joyX, joyY;
 	float speed;

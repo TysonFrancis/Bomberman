@@ -7,6 +7,7 @@
 	separate spritesheet as well as game console icon.
 
 	Entity frames are 16 x 16 unless otherwise noted:
+tional
 
 		Player at (0, 0), death at (0, 32),
 

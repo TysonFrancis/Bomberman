@@ -28,26 +28,26 @@ void Player::update()
 	{
 		if (isKeyPressed(Scancode::Up))
 		{
-			sprite.setTextureRect(sf::IntRect({ myFrame * 16 + 48, 16 }, { 16, 16 }));
-			sprite.move({ 0, -speed,});
+			setTexture(sf::IntRect({ myFrame * 16 + 48, 16 }, { 16, 16 }));
+			move({ 0, -speed, });
 		}
 
 		else if (isKeyPressed(Scancode::Down))
 		{
-			sprite.setTextureRect(sf::IntRect({ myFrame * 16 + 48, 0 }, { 16, 16 }));
-			sprite.move({ 0, speed,});
+			setTexture(sf::IntRect({ myFrame * 16 + 48, 0 }, { 16, 16 }));
+			move({ 0, speed, });
 		}
 
 		if (isKeyPressed(Scancode::Left))
 		{
-			sprite.setTextureRect(sf::IntRect({ myFrame * 16, 0 }, { 16, 16 }));
-			sprite.move({ -speed, 0 });
+			setTexture(sf::IntRect({ myFrame * 16, 0 }, { 16, 16 }));
+			move({ -speed, 0 });
 		}
 
 		else if (isKeyPressed(Scancode::Right))
 		{
-			sprite.setTextureRect(sf::IntRect({ myFrame * 16, 16 }, { 16, 16 }));
-			sprite.move({ speed, 0 });
+			setTexture(sf::IntRect({ myFrame * 16, 16 }, { 16, 16 }));
+			move({ speed, 0 });
 		}
 
 		// Used to kill player, mainly just for death animation testing
@@ -59,10 +59,8 @@ void Player::update()
 	}
 
 	else										// Death animation
-		sprite.setTextureRect(sf::IntRect({ myFrame * 16, 32 }, { 16, 16 }));
+		setTexture(sf::IntRect({ myFrame * 16, 32 }, { 16, 16 }));
 }
-
-sf::FloatRect Player::getBounds() const { return sprite.getGlobalBounds(); }
 
 //joyX = isKeyPressed(Scan::D) - isKeyPressed(Scan::A);
 //joyY = isKeyPressed(Scan::S) - isKeyPressed(Scan::W); //might need reversed idk can't test

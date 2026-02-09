@@ -3,6 +3,8 @@
 
 #include "Animations.h"
 
+using sf::Vector2f;
+
 /*
 	Entity class, parent to Player, Enemies, and Bombs, 
 	anything that needs a texture and life state.
@@ -20,9 +22,18 @@ public:
 	void setLife(bool);
 	bool getLife();
 
+	void move(Vector2f);
+	void setScale(Vector2f);
+	void setPosition(Vector2f);
+	void setOrigin(Vector2f);
+
+	void setTexture(const sf::IntRect&);
+
+	bool intersects(Entity*);
+
 protected:
 	sf::Sprite sprite;
 	bool alive;
-	int myFrame;
+	int myFrame; 
 	int myTick;
 };
