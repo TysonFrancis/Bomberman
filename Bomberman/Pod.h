@@ -8,11 +8,11 @@ public:
 	~Pod();
 
 	bool isObstructed();
+	void setTile(int);
+	Tile* getTile();
+	void deleteTile();
 
 private:
 	//The object occupying the pod
 	Tile* tile;
-
-	void setTile(Tile*);
-	Tile* getTile();
 };

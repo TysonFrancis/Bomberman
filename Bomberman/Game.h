@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Bomb.h"
 #include "Enemy.h"
+#include "Pod.h"
 
 /*
 	Main class handling game logic and display,
