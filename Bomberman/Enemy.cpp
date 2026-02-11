@@ -1,15 +1,8 @@
 #include "Enemy.h"
 
+Enemy::Enemy(sf::Texture& tex, int input) : Entity(tex), type(input), speed(4.f) {}
 
-Enemy::Enemy(int input)
-{
-	type = input;
-}
-
-
-Enemy::~Enemy() {}
-
-
+/*
 void Enemy::move()
 {
 	switch (type)
@@ -38,4 +31,126 @@ void Enemy::move()
 	case 8: //pontan, alwyays chases, speed 6, moves through soft blocks
 		break;
 	}
+}
+*/
+
+void Enemy::update()
+{
+    // *** Animation timing ***
+	myTick++;                                   // Increment tick counter every game frame
+
+    if (alive)								    // If alive,
+    {
+        if (myTick % 5 == 0)				        // Update frame every 5 ticks, 60fps -> 12 frames per second
+            myFrame = (myFrame + 1) % 3;	        // Loop through frames for waling animation, 3 frames total
+    }
+        
+    else                                        // Else,
+    {
+        if (myTick % 5 == 0)                        // Update frame every 5 ticks, but don't loop
+            myFrame++;
+        if (myFrame >= 7)
+            myFrame = 7;                            // Freeze on empty frame once finished
+    }
+
+    // *** Sprite movement and texture updates ***
+	if (type == 1)                              // Balloon enemy, WSAD controls
+    {
+		if (alive)                                  // Living animations + movement
+        {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W))
+                move({ 0, -speed });
+
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S))
+                move({ 0, speed });
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::A))
+            {
+                setTexture(sf::IntRect({ myFrame * 16 + 48, 240 }, { 16, 16 }));
+                move({ -speed, 0 });
+            }
+
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::D))
+            {
+                setTexture(sf::IntRect({ myFrame * 16, 240 }, { 16, 16 }));
+                move({ speed, 0 });
+            }
+        }
+
+        else                                        // Death animation
+            setTexture(sf::IntRect({ myFrame * 16 + 96, 240 }, { 16, 16 }));
+    }
+
+    if (type == 2)                              // Ice Cream enemy, TFGH controls
+    {
+        if (alive)                                  // Living animations + movement
+        {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::T))
+                move({ 0, -speed });
+
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::G))
+                move({ 0, speed });
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::F))
+            {
+                setTexture(sf::IntRect({ myFrame * 16 + 48, 256 }, { 16, 16 }));
+                move({ -speed, 0 });
+            }
+
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::H))
+            {
+                setTexture(sf::IntRect({ myFrame * 16, 256 }, { 16, 16 }));
+                move({ speed, 0 });
+            }
+        }
+
+        else 									    // Death animation
+        {
+            if (myFrame == 0)                            // If frame is 0, show first frame
+                setTexture(sf::IntRect({ 96, 256 }, { 16, 16 }));
+            else                                        // Else, continue with purple frames
+                setTexture(sf::IntRect({ myFrame * 16 + 112, 288 }, { 16, 16 }));
+        }
+    }
+
+    if (type == 6)                              // Ghost enemy, IJKL controls
+    {
+        if (alive)                                  // Living animations + movement
+        {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::I))
+                move({ 0, -speed });
+
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::K))
+                move({ 0, speed });
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::J))
+            {
+                setTexture(sf::IntRect({ myFrame * 16 + 48, 320 }, { 16, 16 }));
+                move({ -speed, 0 });
+            }
+
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::L))
+            {
+                setTexture(sf::IntRect({ myFrame * 16, 320 }, { 16, 16 }));
+                move({ speed, 0 });
+            }
+        }
+
+		else 									    // Death animation
+        {
+            if(myFrame == 0)                            // If frame is 0, show first frame
+                setTexture(sf::IntRect({ 96, 320 }, { 16, 16 }));
+			else                                        // Else, continue with purple frames
+                setTexture(sf::IntRect({ myFrame * 16 + 112, 272 }, { 16, 16 }));
+        }
+    }
+}
+
+void Enemy::die()
+{
+    if (!alive)
+        return;
+
+    alive = false;
+	myFrame = myTick = 0;
 }

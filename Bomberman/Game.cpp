@@ -1,85 +1,118 @@
 #include "Game.h"
-#include "Animations.h"
+#include <iostream>
 
-Game::Game()
+using namespace sf::Keyboard;
+
+Game::Game() : title(animations.getTitle()),                // Load title sprite
+background(animations.getBackground()),                     // Load background sprite
+bomber(animations.getEntities()),                           // Load bomber sprite
+windowWidth(1984), windowHeight(832),                       // Define window size parameters
+window(sf::VideoMode({ windowWidth, windowHeight }),        // Create window with title and size
+    "Bomberman", sf::Style::Titlebar | sf::Style::Close),
+    state(GameState::Title), frame(0),                      // Set state to title screen and frame counter to 0
+
+    enemy1(animations.getEntities(), 1), enemy2(animations.getEntities(), 2),        // Temporary player objects to test sprites and such
+    enemy3(animations.getEntities(), 6)
 {
-    sf::Image tempImage("Textures/temp.jpg");
-
-    window = sf::RenderWindow(sf::VideoMode({ 750, 750 }), "Game");
-    window.setIcon(tempImage);
+    //Set window icon and framerate
+    window.setIcon(animations.getIcon());
     window.setFramerateLimit(60);
 
-    //sf::View view = window.getDefaultView();
-    //view.setSize(view.getSize() / 4.f); // zoom in 4×
-    //window.setView(view);
+    //Set title sprite on right texture, scale to fit and position in middle of window
+    title.setTexture(sf::IntRect({ 0, 0 }, { 256, 240 }));
+    title.setScale({ 3.5f, 3.5f });
+    title.setOrigin({ 128.f, 120.f });
+    title.setPosition({ windowWidth / 2.f, windowHeight / 2.f });
 
-    //bomber.setScale(16.f, 16.f);
-    //bomber.setPosition(256.f, 256.f);
+    //Set background sprite on right texture and scale to fit window
+    background.setTexture(sf::IntRect({ 0, 0 }, { 496, 208 }));
+    background.setScale({ 4.f, 4.f });
 
+    //Set bomber sprite on starting texture and scale to see better
+    bomber.setTexture(sf::IntRect({ 64, 0 }, { 16, 16 }));
+    bomber.setScale({ 4.f, 4.f });
+    bomber.setPosition({ 64.f, 64.f });
 
-    //Defining pods
-    for (int i = 0; i < num1; i++)
-    {
-        sf::RectangleShape square({ 50,50 });
-        if (i % (width + x) < width)
-        {
-            square.setPosition(sf::Vector2f((((i - (x * (i / (x + width)))) % width) * 50),
-                (((i - (x * (i / (x + width)))) / width) * 100)));
-        }
-        else
-        {
-            square.setPosition(sf::Vector2f((((i - (width * (i / (x + width))) - width) % x) * 100), 
-                (i - (width * (i / (x + width))) - width) / x * 100 + 50));
-        }
-        Pod temp(square);
+    // ********** TEMPORARY **********
+    enemy1.setTexture(sf::IntRect({ 0, 240 }, { 16, 16 }));
+    enemy1.setScale({ 4.f, 4.f });
+    enemy1.setPosition({ 320.f, 256.f });
 
-        temp.filled = (rand() % 4 == 0);
-        pods.push_back(temp);
+    enemy2.setTexture(sf::IntRect({ 0, 256 }, { 16, 16 }));
+    enemy2.setScale({ 4.f, 4.f });
+    enemy2.setPosition({ 576.f, 512.f });
 
-    }
-    for (int i = 0; i < num2; i++)
-    {
-        sf::RectangleShape square({ 50,50 });
-        square.setFillColor(sf::Color(255, 0, 0));
-        square.setPosition(sf::Vector2f(i % (x - 1) * 100 + 50, i / (x - 1) * 100 + 50));
-        Pod temp(square);
-        walls.push_back(temp);
-    }
+    enemy3.setTexture(sf::IntRect({ 0, 320 }, { 16, 16 }));
+    enemy3.setScale({ 4.f, 4.f });
+    enemy3.setPosition({ 832.f, 320.f });
 }
 
+// Holds main game loop, all actions passed
+// to supplementary methods for cleanliness
 void Game::run()
 {
     while (window.isOpen())
-        tick();
+    {
+        events();
+        update();
+        render();
+    }
 }
 
-void Game::tick()
+// Handles window events like game starting and closing
+void Game::events()
 {
-
     while (const std::optional event = window.pollEvent())
     {
-        //bomber.setTextureRect(sf::IntRect({ 0, 0 }, { 16, 16 }));
-
-        if (event->is<sf::Event::Closed>())
+        if (event->is<sf::Event::Closed>() || isKeyPressed(Scancode::Escape))
             window.close();
-        window.clear(sf::Color::Black);
-
-        player.tick();
-
-        //drawing pods
-        for (int i = 0; i < num1; i++)
-        {
-            if (pods.at(i).filled)
-            {
-                window.draw(pods.at(i).shape);
-            }
-        }
-        for (int i = 0; i < num2; i++)
-        {
-            window.draw(walls.at(i).shape);
-
-        }
-        
-        window.display();
     }
+
+    // If on title screen and enter is pressed, start game
+    if (state == GameState::Title && isKeyPressed(Scancode::Enter))
+        state = GameState::Playing;
+}
+
+// Sprite updater, calls each sprites update method
+// with cuurent frame and increments frame counter
+void Game::update()
+{
+    if (state != GameState::Playing)
+        return;
+
+    bomber.update();
+
+    // Automatic death animation testing if bomber collides with enemies
+    enemy1.update();
+    if (enemy1.intersects(&bomber))
+        enemy1.die();
+
+    enemy2.update();
+    if (enemy2.intersects(&bomber))
+        enemy2.die();
+
+    enemy3.update();
+    if (enemy3.intersects(&bomber))
+        enemy3.die();
+
+    frame++;
+}
+
+// Handles all drawing and window render things
+void Game::render()
+{
+    window.clear();
+
+    if (state == GameState::Title)            // If not started, draw title
+        window.draw(title.getSprite());
+    else                                      // Else, draw other sprites
+    {
+        window.draw(background.getSprite());
+        window.draw(bomber.getSprite());
+        window.draw(enemy1.getSprite());
+        window.draw(enemy2.getSprite());
+        window.draw(enemy3.getSprite());
+    }
+
+    window.display();
 }

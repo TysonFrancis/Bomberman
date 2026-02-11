@@ -1,11 +1,17 @@
 #pragma once
-class Enemy
+#include "Entity.h"
+
+class Enemy : public Entity
 {
 public:
-	Enemy(int);
-	~Enemy();
-	void move();
+	Enemy(sf::Texture&, int);
+
+	//void move();
+
+	void update();
+	void die();
 
 private:
 	int type;
+	float speed;
 };

@@ -1,15 +1,18 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-#include <vector>
-
+#include "Tile.h"
 
 class Pod
 {
 public:
-	Pod(sf::RectangleShape);
+	Pod();
 	~Pod();
-	void fill();
-	int filled;
 
-	sf::RectangleShape shape;
+	bool isObstructed();
+
+private:
+	//The object occupying the pod
+	Tile* tile;
+
+	void setTile(Tile*);
+	Tile* getTile();
 };
