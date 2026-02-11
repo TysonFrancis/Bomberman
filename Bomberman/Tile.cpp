@@ -9,10 +9,6 @@ Tile::Tile(int type) : obstruction(false)
 	case BOMB:
 		obstruction = true;
 		break;
-	default:
-		// unreachable but compiler won't stfu about uninitialized variables
-		// if anyone knows how to suppress that please do so we can delete this
-		obstruction = false;
 	}
 }
 
