@@ -29,7 +29,7 @@ public:
 
 	void setTexture(const sf::IntRect&);
 
-	bool intersects(Entity*);
+	bool intersects(Entity&);
 
 protected:
 	sf::Sprite sprite;

@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Bomb.h"
 #include "Enemy.h"
+#include "Pod.h"
 
 /*
 	Main class handling game logic and display,
@@ -33,6 +34,22 @@ public:
 	void update();
 	void render();
 
+	// ********** TYSON LOGIC STUFF ********** START ********** //
+	sf::CircleShape player;
+
+	std::vector<Pod> pods;
+	std::vector<Pod> walls;
+	int playindex = 0;
+
+	//setting game size numbers
+	int width = 11;
+	int depth = 9;
+	int x = width / 2 + 1;
+	int y = depth / 2;
+	int num1 = (x + width) * y + width;
+	int num2 = (x - 1) * (y);
+	// ********** END ********** //
+
 private:
 	Animations animations;		// Animations MUST be declared before all entity
 	Entity title;				// objects so textures are loaded before entity
@@ -44,9 +61,4 @@ private:
 
 	GameState state;
 	int frame;
-
-	// ********** Temporary enemy objects to test sprites **********
-	Enemy enemy1;
-	Enemy enemy2;
-	Enemy enemy3;
 };

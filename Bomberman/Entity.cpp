@@ -15,10 +15,10 @@ void Entity::setOrigin(Vector2f origin) { sprite.setOrigin(origin); }
 
 void Entity::setTexture(const sf::IntRect& rect) { sprite.setTextureRect(rect); }
 
-bool Entity::intersects(Entity* other)
+bool Entity::intersects(Entity& other)
 {
 	if (this->getSprite().getGlobalBounds().
-		findIntersection(other->getSprite().getGlobalBounds()))
+		findIntersection(other.getSprite().getGlobalBounds()))
 		return true;
 	return false;
 }
