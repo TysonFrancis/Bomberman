@@ -16,7 +16,6 @@ public:
 	// Returns true if the pod is impassable.
 	bool isObstructed();
 	void setTile(int);
-	Tile* getTile();
 	void deleteTile();
 
 private:
