@@ -7,12 +7,16 @@ public:
 	Pod();
 	~Pod();
 
+	// Sets the object occupying the pod.
+	void setTile(Tile*);
+
+	// Returns the object occupying the pod.
+	Tile* getTile();
+
+	// Returns true if the pod is impassable.
 	bool isObstructed();
 
 private:
-	//The object occupying the pod
+	// The object occupying the pod. Null by default.
 	Tile* tile;
-
-	void setTile(Tile*);
-	Tile* getTile();
 };

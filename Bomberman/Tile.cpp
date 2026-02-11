@@ -1,14 +1,15 @@
 #include "Tile.h"
 
-Tile::Tile(int type) : obstruction(false)
+Tile::Tile(int type) : type(type), obstruction(false)
 {
 	switch (type)
 	{
 	case HARD_WALL:
 	case SOFT_WALL:
 	case BOMB:
+		// Because the above tiles block movement
 		obstruction = true;
-		break;
+		// No need to specify tiles that don't because that's the default
 	}
 }
 
