@@ -189,7 +189,7 @@ void Game::events()
 }
 
 // Sprite updater, calls each sprites update method
-// with cuurent frame and increments frame counter
+// with current frame and increments frame counter
 void Game::update()
 {
     if (state != GameState::Playing)
