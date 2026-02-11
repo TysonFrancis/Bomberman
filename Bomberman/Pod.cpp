@@ -42,3 +42,4 @@ void Pod::fill()
 {
 	filled = true;
 	shape.setFillColor(sf::Color(0, 125, 125));
+}
