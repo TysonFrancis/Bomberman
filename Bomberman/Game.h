@@ -14,6 +14,7 @@
 	has all necessary items for sfml viewing and
 	different sprites. Methods to run the game loop,
 	handle events, update sprites, and render the sprites.
+	Destructs game at window close and/or game win or lose.
 	GameState enum to determine what to update and render.
 */
 
@@ -33,9 +34,10 @@ public:
 	void events();
 	void update();
 	void render();
+	void closeGame();
 
 	// ********** TYSON LOGIC STUFF ********** START ********** //
-	sf::CircleShape player;
+	sf::RectangleShape player;
 
 	std::vector<Pod> pods;
 	std::vector<Pod> walls;

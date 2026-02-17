@@ -6,7 +6,7 @@ using namespace sf::Keyboard;
 Game::Game() : title(animations.getTitle()),                // Load title sprite
 background(animations.getBackground()),                     // Load background sprite
 bomber(animations.getEntities()),                           // Load bomber sprite
-windowWidth(750), windowHeight(750),                        // Define window size parameters, 1984 x 832 original
+windowWidth(750), windowHeight(750),                        // Define window size parameters, 1984 x 832 scaled 4x
 window(sf::VideoMode({ windowWidth, windowHeight }),        // Create window with title and size
     "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     state(GameState::Title), frame(0)                       // Set state to title screen and frame counter to 0
@@ -31,9 +31,13 @@ window(sf::VideoMode({ windowWidth, windowHeight }),        // Create window wit
     bomber.setPosition({ 64.f, 64.f });
 
     // ********** TYSON LOGIC STUFF ********** START ********** //
-    player.setRadius(20);
-    player.setOrigin({ 20, 20 });
-    player.setPosition({ 20, 20 });
+    int wide = 20, tall = 20;
+    player.setSize(sf::Vector2f(wide, tall));
+    player.setOrigin(sf::Vector2f(wide / 2, tall / 2));
+    player.setPosition(sf::Vector2f(wide / 2, tall / 2));
+    player.setTexture(&animations.getEntities());
+    player.setTextureRect(sf::IntRect({ 0, 0 }, { 16, 16 }));
+    //player.setScale({ 4, 4 });
 
     // Regualar tiles creation
     for (int i = 0; i < num1; i++)
@@ -76,7 +80,7 @@ void Game::run()
         update();
         render();
     }*/
-
+    
     // ********** TYSON LOGIC STUFF ********** START ********** //
     while (window.isOpen())
     {
@@ -171,17 +175,15 @@ void Game::run()
         window.display();
     }
 
-    // ********** END ********** //
+    // ********** END ********** //*/
 }
 
 // Handles window events like game starting and closing
 void Game::events()
 {
     while (const std::optional event = window.pollEvent())
-    {
         if (event->is<sf::Event::Closed>() || isKeyPressed(Scancode::Escape))
-            window.close();
-    }
+            closeGame();
 
     // If on title screen and enter is pressed, start game
     if (state == GameState::Title && isKeyPressed(Scancode::Enter))
@@ -200,7 +202,7 @@ void Game::update()
     frame++;
 }
 
-// Handles all drawing and window render things
+// Handles all drawing and window render things.
 void Game::render()
 {
     window.clear();
@@ -214,4 +216,12 @@ void Game::render()
     }
 
     window.display();
+}
+
+// Called when window is closed, used to
+// ensure necessary things are destructed
+// Currently nothing to destruct, but will be in future
+void Game::closeGame()
+{
+    window.close();
 }
