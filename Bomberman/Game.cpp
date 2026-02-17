@@ -55,9 +55,7 @@ window(sf::VideoMode({ windowWidth, windowHeight }),        // Create window wit
                pods[j][i].fill();
 		   }
 	   }
-        
     }
-
     // ********** END ********** //
 }
 
@@ -70,12 +68,11 @@ void Game::run()
         events();
         update();
         render();
-    }*/
+    }
 
-    // ********** TYSON LOGIC STUFF ********** START ********** //
+    /* ********** TYSON LOGIC STUFF ********** START ********** //
     while (window.isOpen())
     {
-        /*
         events();
         //Movement. Also collision
         //If player is colliding with a pod that is filled, it will stop player movement. Only checks the pod directly next to or above so it will
@@ -169,7 +166,7 @@ void Game::run()
 
     // ********** END ********** //*/
 }
-    // ********** END ********** //
+
 // Handles window events like game starting and closing
 void Game::events()
 {
