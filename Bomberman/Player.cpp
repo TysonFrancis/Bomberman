@@ -26,28 +26,30 @@ void Player::update()
 	// *** Sprite movement and texture updates ***
 	if (alive)									// Living animations + movement
 	{
-		if (isKeyPressed(Scancode::Up))
-		{
-			setTexture(sf::IntRect({ myFrame * 16 + 48, 16 }, { 16, 16 }));
-			move({ 0, -speed, });
-		}
+		// Determine total direction held and move accordingly
+		// vv TODO: ADD COLLISION HERE!!!1! vv
+		joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
+		joyY = isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up);
+		move({ joyX * speed, joyY * speed });
 
-		else if (isKeyPressed(Scancode::Down))
+		// Update texture if moving
+		if (joyX != 0 || joyY != 0)
 		{
-			setTexture(sf::IntRect({ myFrame * 16 + 48, 0 }, { 16, 16 }));
-			move({ 0, speed, });
-		}
+			// Texture offsets. Irrelevant to movement or input axes.
+			int xOffset = 0, yOffset = 0;
 
-		if (isKeyPressed(Scancode::Left))
-		{
-			setTexture(sf::IntRect({ myFrame * 16, 0 }, { 16, 16 }));
-			move({ -speed, 0 });
-		}
+			// Determine the correct texture offset based on input direction
+			if (joyY != 0)
+			{
+				xOffset = 48;
+				if (joyY == -1)
+					yOffset = 16;
+			}
+			else if (joyX == 1)
+				yOffset = 16;
 
-		else if (isKeyPressed(Scancode::Right))
-		{
-			setTexture(sf::IntRect({ myFrame * 16, 16 }, { 16, 16 }));
-			move({ speed, 0 });
+			// Apply selected texture
+			setTexture(sf::IntRect({ myFrame * 16 + xOffset, yOffset}, {16, 16}));
 		}
 
 		// Used to kill player, mainly just for death animation testing
@@ -61,6 +63,3 @@ void Player::update()
 	else										// Death animation
 		setTexture(sf::IntRect({ myFrame * 16, 32 }, { 16, 16 }));
 }
-
-//joyX = isKeyPressed(Scan::D) - isKeyPressed(Scan::A);
-//joyY = isKeyPressed(Scan::S) - isKeyPressed(Scan::W); //might need reversed idk can't test

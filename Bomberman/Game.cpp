@@ -68,7 +68,7 @@ void Game::run()
         render();
     }
 
-    // ********** TYSON LOGIC STUFF ********** START ********** //
+    /********** TYSON LOGIC STUFF ********** START ********** //
     while (window.isOpen())
     {
         /*
@@ -163,8 +163,7 @@ void Game::run()
         window.display();
     }
 
-    // ********** END ********** //*/
-    }
+    // ********** END **********/
 }
 
 // Handles window events like game starting and closing
