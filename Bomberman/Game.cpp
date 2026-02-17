@@ -36,33 +36,24 @@ window(sf::VideoMode({ windowWidth, windowHeight }),        // Create window wit
     player.setPosition({ 20, 20 });
 
     // Regualar tiles creation
-    for (int i = 0; i < num1; i++)
+    for (int i = 0; i < 29; i++)
     {
-        sf::RectangleShape square({ 50,50 });
-        if (i % (width + x) < width)
-        {
-            square.setPosition(sf::Vector2f((((i - (x * (i / (x + width)))) % width) * 50), (((i - (x * (i / (x + width)))) / width) * 100)));
-        }
-        else
-        {
-            square.setPosition(sf::Vector2f((((i - (width * (i / (x + width))) - width) % x) * 100), (i - (width * (i / (x + width))) - width) / x * 100 + 50));
-        }
-
-        Pod temp(square, (int)(square.getPosition().x) % 50, (int)(square.getPosition().y) % 50);
-
-        temp.filled = (rand() % 6 == 0);
-        pods.push_back(temp);
+       for(int j= 0; j < 11; j++)
+       {
+           sf::RectangleShape square({ 50,50 });
+           square.setFillColor(sf::Color(255, 255, 255));
+           square.setPosition(sf::Vector2f(i * 50, j * 50));
+           Pod temp(square, i, j);
+           pods[j][i] = temp;
+           // Unbreakable walls creation
+           if (j%2 == 1 && i%2 == 1)
+           {
+               pods[j][i].fill();
+		   }
+	   }
+        
     }
 
-    // Unbreakable walls creation
-    for (int i = 0; i < num2; i++)
-    {
-        sf::RectangleShape square({ 50,50 });
-        square.setFillColor(sf::Color(255, 0, 0));
-        square.setPosition(sf::Vector2f(i % (x - 1) * 100 + 50, i / (x - 1) * 100 + 50));
-        Pod temp(square, 0, 0);
-        walls.push_back(temp);
-    }
     // ********** END ********** //
 }
 
@@ -70,16 +61,17 @@ window(sf::VideoMode({ windowWidth, windowHeight }),        // Create window wit
 // to supplementary methods for cleanliness
 void Game::run()
 {
-    /*while (window.isOpen())
+    while (window.isOpen())
     {
         events();
         update();
         render();
-    }*/
+    }
 
     // ********** TYSON LOGIC STUFF ********** START ********** //
     while (window.isOpen())
     {
+        /*
         events();
         //Movement. Also collision
         //If player is colliding with a pod that is filled, it will stop player movement. Only checks the pod directly next to or above so it will
@@ -171,7 +163,8 @@ void Game::run()
         window.display();
     }
 
-    // ********** END ********** //
+    // ********** END ********** //*/
+    }
 }
 
 // Handles window events like game starting and closing

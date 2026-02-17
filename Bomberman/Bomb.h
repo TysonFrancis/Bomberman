@@ -1,15 +1,15 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-
 #include "Tile.h"
+#include "Pod.h"
 
 class Bomb : public Tile
 {
 public:
-	Bomb(float, float, bool, int[10][10], int); //Temporary array
+	Bomb(int, int, bool, Pod [11][29], int); //Temporary array
 	~Bomb();
-	void tick(int[10][10]);
-	void explode(int[10][10]);
+	void tick();
+	void explode();
 
 private:
 	int ticks;
