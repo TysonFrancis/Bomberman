@@ -8,7 +8,7 @@ sf::Sprite& Entity::getSprite() { return sprite; }
 void Entity::setLife(bool life) { alive = life; }
 bool Entity::getLife() { return alive; }
 
-void Entity::move(Vector2f move) { sprite.move(move); }
+void Entity::move(Vector2f dir) { sprite.move(dir); }
 void Entity::setScale(Vector2f scale) { sprite.setScale(scale); }
 void Entity::setPosition(Vector2f pos) { sprite.setPosition(pos); }
 void Entity::setOrigin(Vector2f origin) { sprite.setOrigin(origin); }

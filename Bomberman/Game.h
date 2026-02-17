@@ -39,17 +39,9 @@ public:
 	// ********** TYSON LOGIC STUFF ********** START ********** //
 	sf::RectangleShape player;
 
-	std::vector<Pod> pods;
-	std::vector<Pod> walls;
+	Pod pods[11][29]; //Array of Pods , 11 rows, 29 columns, 
 	int playindex = 0;
 
-	//setting game size numbers
-	int width = 11;
-	int depth = 9;
-	int x = width / 2 + 1;
-	int y = depth / 2;
-	int num1 = (x + width) * y + width;
-	int num2 = (x - 1) * (y);
 	// ********** END ********** //
 
 private:
