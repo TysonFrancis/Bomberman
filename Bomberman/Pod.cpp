@@ -1,8 +1,8 @@
 #include "Pod.h"
 
-Pod::Pod() {};
+Pod::Pod() {}
 
-Pod::~Pod() {};
+Pod::~Pod() { delete tile; }
 
 bool Pod::isObstructed()
 {
@@ -12,22 +12,19 @@ bool Pod::isObstructed()
 		return tile->isObstruction();
 }
 
-void Pod::setTile(int newType) //Makes a new tile in this pod
-{
-	new Tile(newType);
-	tile = new Tile(newType); //WILL NEED TO DEALLOCATE MEMORY LATER
-}
+// Makes a new tile in this pod
+void Pod::setTile(Tile* newTile) { tile = newTile; }
 
-Tile* Pod::getTile()
-{
-	return tile;
-}
+Tile* Pod::getTile() { return tile; }
 
 void Pod:: deleteTile()
 {
 	delete tile;
 	tile = nullptr;
 }
+
+
+// TYSON STUFF BELOW THIS POINT
 
 Pod::Pod(sf::RectangleShape shapes, int ex, int why)
 {

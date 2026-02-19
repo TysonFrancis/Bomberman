@@ -14,10 +14,14 @@ public:
 	// Returns the object occupying the pod.
 	Tile* getTile();
 
+	// Removes the tile from the pod.
+	void deleteTile();
+
 	// Returns true if the pod is impassable.
 	bool isObstructed();
-	void setTile(int);
-	void deleteTile();
+
+
+	// ***** TYSON START *****
 
 	Pod(sf::RectangleShape, int, int);
 	void fill();
@@ -25,6 +29,8 @@ public:
 	sf::RectangleShape shape;
 	bool filled;
 	int x, y;
+
+	// ***** TYSON END *****
 
 private:
 	// The object occupying the pod. Null by default.

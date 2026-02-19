@@ -49,6 +49,7 @@ window(sf::VideoMode({ windowWidth, windowHeight }),        // Create window wit
            square.setPosition(sf::Vector2f(i * 50, j * 50));
            Pod temp(square, i, j);
            pods[j][i] = temp;
+
            // Unbreakable walls creation
            if (j%2 == 1 && i%2 == 1)
            {
