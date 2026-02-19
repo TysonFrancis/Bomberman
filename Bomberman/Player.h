@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-
+#include"Pod.h"
 #include "Entity.h"
 
 /*
@@ -12,11 +12,13 @@
 class Player : public Entity
 {
 public:
-	Player(sf::Texture&);
+	Player(sf::Texture&, Pod[11][29]);
 
 	void update();
 
 private:
+	Pod pods[11][29];
 	float joyX, joyY;
 	float speed;
+	int x, y;
 };

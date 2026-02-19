@@ -5,7 +5,7 @@ using namespace sf::Keyboard;
 
 Game::Game() : title(animations.getTitle()),                // Load title sprite
 background(animations.getBackground()),                     // Load background sprite
-bomber(animations.getEntities()),                           // Load bomber sprite
+bomber(animations.getEntities(),pods),                      // Load bomber sprite
 windowWidth(750), windowHeight(750),                        // Define window size parameters, 1984 x 832 scaled 4x
 window(sf::VideoMode({ windowWidth, windowHeight }),        // Create window with title and size
     "Bomberman", sf::Style::Titlebar | sf::Style::Close),
