@@ -13,4 +13,6 @@ Tile::Tile(int type) : type(type), obstruction(false)
 	}
 }
 
+int Tile::getType() const { return type; }
+
 bool Tile::isObstruction() const { return obstruction; }

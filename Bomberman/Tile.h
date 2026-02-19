@@ -10,6 +10,9 @@ public:
 
 	~Tile() {}
 
+	int getType() const;
+
+	// True if this tile type should block movement
 	bool isObstruction() const;
 
 	enum Type

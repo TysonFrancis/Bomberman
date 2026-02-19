@@ -1,6 +1,6 @@
 #include "Pod.h"
 
-Pod::Pod() {}
+Pod::Pod() : tile(nullptr) {}
 
 Pod::~Pod() { delete tile; }
 
