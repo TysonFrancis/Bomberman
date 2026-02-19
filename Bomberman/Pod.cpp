@@ -1,7 +1,5 @@
 #include "Pod.h"
 
-Pod::Pod() {}
-
 Pod::~Pod() { delete tile; }
 
 bool Pod::isObstructed()
@@ -24,15 +22,18 @@ void Pod:: deleteTile()
 }
 
 
-// TYSON STUFF BELOW THIS POINT
+void Pod::setColor(sf::Color color)
+{
+	shape.setFillColor(color);
+}
 
-Pod::Pod(sf::RectangleShape shapes, int ex, int why)
+
+// TYSON STUFF BELOW THIS POINT
+Pod::Pod(sf::RectangleShape shapes, int x, int y)
 {
 	shape = shapes;
 	filled = true;
-	x = ex;
-	y = why;
-
+	shape.setPosition(sf::Vector2f(x, y));
 }
 
 void Pod::fill()

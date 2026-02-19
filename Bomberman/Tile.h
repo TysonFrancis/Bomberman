@@ -11,6 +11,8 @@ public:
 	~Tile() {}
 
 	bool isObstruction() const;
+	bool isDestructible() const;
+	
 
 	enum Type
 	{
