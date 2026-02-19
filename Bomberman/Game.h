@@ -8,6 +8,8 @@
 #include "Bomb.h"
 #include "Enemy.h"
 #include "Pod.h"
+#include "HardWall.h"
+#include "SoftWall.h"
 
 /*
 	Main class handling game logic and display,

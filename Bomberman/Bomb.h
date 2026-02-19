@@ -14,6 +14,6 @@ public:
 private:
 	int ticks;
 	int distance;
-	int xPosition;
-	int yPosition;
+	int x;
+	int y;
 };

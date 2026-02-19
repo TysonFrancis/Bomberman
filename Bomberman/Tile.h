@@ -14,6 +14,8 @@ public:
 
 	// True if this tile type should block movement
 	bool isObstruction() const;
+	bool isDestructible() const;
+	
 
 	enum Type
 	{

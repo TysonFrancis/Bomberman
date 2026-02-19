@@ -5,7 +5,8 @@
 class Pod
 {
 public:
-	Pod();
+	Pod(sf::RectangleShape, int, int);
+	Pod() : tile(nullptr) {}
 	~Pod();
 
 	// Sets the object occupying the pod.
@@ -20,10 +21,12 @@ public:
 	// Returns true if the pod is impassable.
 	bool isObstructed();
 
+	void setColor(sf::Color);//Used to test bomb
+
 
 	// ***** TYSON START *****
 
-	Pod(sf::RectangleShape, int, int);
+	
 	void fill();
 
 	sf::RectangleShape shape;
