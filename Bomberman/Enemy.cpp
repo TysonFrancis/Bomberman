@@ -1,6 +1,7 @@
 #include "Enemy.h"
 
-Enemy::Enemy(sf::Texture& tex, int input) : Entity(tex), type(input), speed(4.f) {}
+Enemy::Enemy(const sf::Texture& tex, int input) :
+	Entity(tex), type(input), speed(4.f) {}
 
 void Enemy::move()
 {

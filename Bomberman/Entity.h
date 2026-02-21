@@ -15,12 +15,12 @@ using sf::Vector2f;
 class Entity
 {
 public:
-	Entity(sf::Texture&);
+	Entity(const sf::Texture&);
 
-	sf::Sprite& getSprite();
+	const sf::Sprite& getSprite() const;
+	bool getLife() const;
 
 	void setLife(bool);
-	bool getLife();
 
 	void move(Vector2f);
 	void setScale(Vector2f);

@@ -1,12 +1,12 @@
 #include "Entity.h"
 
-Entity::Entity(sf::Texture& tex) :
+Entity::Entity(const sf::Texture& tex) :
 	sprite(tex), alive(true), myFrame(0), myTick(0) {}
 
-sf::Sprite& Entity::getSprite() { return sprite; }
+const sf::Sprite& Entity::getSprite() const { return sprite; }
+bool Entity::getLife() const { return alive; }
 
 void Entity::setLife(bool life) { alive = life; }
-bool Entity::getLife() { return alive; }
 
 void Entity::move(Vector2f dir) { sprite.move(dir); }
 void Entity::setScale(Vector2f scale) { sprite.setScale(scale); }

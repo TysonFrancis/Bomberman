@@ -1,7 +1,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+
 #include"Pod.h"
 #include "Entity.h"
+#include "Constants.h"
+
+using namespace Constants;
 
 /*
 	Player class that extends entity not owning its own sprite,
@@ -12,12 +16,15 @@
 class Player : public Entity
 {
 public:
-	Player(sf::Texture&, Pod[11][29]);
+	Player(const sf::Texture&, Pod (&pod)[_rows][_cols]);
 
 	void update();
 
+	// For testing purposes, prints the player's position
+	friend std::ostream& operator<<(std::ostream&, const Player&);
+
 private:
-	Pod pods[11][29];
+	Pod (&pods)[_rows][_cols];
 	float joyX, joyY;
 	float speed;
 	int x, y;

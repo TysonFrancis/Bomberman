@@ -1,8 +1,10 @@
 #include "Player.h"
+#include <iostream>
 
 using namespace sf::Keyboard;
 
-Player::Player(sf::Texture& tex,Pod pod[11][29]) : Entity(tex), joyX(0.f), joyY(0.f), speed(4.f) {}
+Player::Player(const sf::Texture& tex, Pod (&pod)[_rows][_cols]) :
+	Entity(tex), pods(pod), joyX(0.f), joyY(0.f), speed(4.f), x(0), y(0) {}
 
 void Player::update()
 {
@@ -24,7 +26,7 @@ void Player::update()
 	}
 
 	// *** Sprite movement and texture updates ***
-	if (alive)									// Living animations + movement
+	if (alive)									// Living animations + movement + collision
 	{
 		// Determine total direction held and move accordingly
 		joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
@@ -47,20 +49,23 @@ void Player::update()
 				yOffset = 16;
 
 			// Apply selected texture
-			setTexture(sf::IntRect({ myFrame * 16 + xOffset, yOffset}, {16, 16}));
+			setTexture(sf::IntRect({ myFrame * 16 + xOffset, yOffset }, { _tileSize, _tileSize }));
+
 			//check if colliding with wall or bomb
 			//Current bug:stops player prematurely, needs to wait for actual collision first
+			 
 			//collide right
-			if (joyX > 0&&x<29)
+			if (joyX > 0 && x < _cols)
 			{
-				if(pods[y][x+1].getTile()!=nullptr)
+				if (pods[y][x + 1].getTile() != nullptr)
 				{
 					if (pods[y][x + 1].getTile()->getType() < 3/*add player intersection with pod*/)
 						joyX = 0;
 				}
 			}
+
 			//collide left
-			if (joyX < 0&& x > 0)
+			if (joyX < 0 && x > 0)
 			{
 				if (pods[y][x - 1].getTile() != nullptr)
 				{
@@ -68,8 +73,9 @@ void Player::update()
 						joyX = 0;
 				}
 			}
+
 			//collide down
-			if (joyY > 0 && y < 11)
+			if (joyY > 0 && y < _rows)
 			{
 				if (pods[y + 1][x].getTile() != nullptr)
 				{
@@ -77,8 +83,9 @@ void Player::update()
 						joyY = 0;
 				}
 			}
+
 			//collide up
-			if (joyY < 0 && y >0)
+			if (joyY < 0 && y > 0)
 			{
 				if (pods[y - 1][x].getTile() != nullptr)
 				{
@@ -87,13 +94,12 @@ void Player::update()
 				}
 			}
 		}
+
 		//move player and check what pod they are now in
 		move({ joyX * speed, joyY * speed });
-		int tempX, tempY;
-		tempX = getSprite().getPosition().x -8;
-		tempY = getSprite().getPosition().y -8;
-		x = tempX / 16;
-		y = tempY / 16;
+
+		x = getSprite().getPosition().x / _scaledTile;
+		y = getSprite().getPosition().y / _scaledTile;
 
 		// Used to kill player, mainly just for death animation testing
 		if (isKeyPressed(Scancode::X))
@@ -104,5 +110,11 @@ void Player::update()
 	}
 
 	else										// Death animation
-		setTexture(sf::IntRect({ myFrame * 16, 32 }, { 16, 16 }));
+		setTexture(sf::IntRect({ myFrame * 16, 32 }, { _tileSize, _tileSize }));
+}
+
+std::ostream& operator<<(std::ostream& os, const Player& player)
+{
+	return os << "Position: (" << player.x << ", " << player.y << ")\t"
+		<< "JoyX: " << player.joyX << "\tJoyY : " << player.joyY << "\n";
 }

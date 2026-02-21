@@ -15,8 +15,8 @@ Animations::Animations()
 		std::cerr << "Error loading from file Bomb Icon.png!\n";
 }
 
-sf::Texture& Animations::getEntities() { return entities; }
-sf::Texture& Animations::getBackground() { return background; }
-sf::Texture& Animations::getMisc() { return misc; }
-sf::Texture& Animations::getTitle() { return title; }
-sf::Image& Animations::getIcon() { return icon; }
+const sf::Texture& Animations::getEntities() const  { return entities; }
+const sf::Texture& Animations::getBackground() const  { return background; }
+const sf::Texture& Animations::getMisc() const  { return misc; }
+const sf::Texture& Animations::getTitle() const  { return title; }
+const sf::Image& Animations::getIcon() const  { return icon; }

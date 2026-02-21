@@ -60,11 +60,11 @@ class Animations
 public:
 	Animations();
 
-	sf::Texture& getEntities();
-	sf::Texture& getBackground();
-	sf::Texture& getMisc();
-	sf::Texture& getTitle();
-	sf::Image& getIcon();
+	const sf::Texture& getEntities() const;
+	const sf::Texture& getBackground() const;
+	const sf::Texture& getMisc() const;
+	const sf::Texture& getTitle() const;
+	const sf::Image& getIcon() const;
 
 private:
 	sf::Texture entities;

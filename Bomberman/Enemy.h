@@ -4,7 +4,7 @@
 class Enemy : public Entity
 {
 public:
-	Enemy(sf::Texture&, int);
+	Enemy(const sf::Texture&, int);
 
 	void move();
 	void update();

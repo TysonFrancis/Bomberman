@@ -13,7 +13,7 @@ public:
 	void setTile(Tile*);
 
 	// Returns the object occupying the pod.
-	Tile* getTile();
+	Tile* getTile() const;
 
 	// Removes the tile from the pod.
 	void deleteTile();
