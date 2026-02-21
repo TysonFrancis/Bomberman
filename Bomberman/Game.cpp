@@ -2,14 +2,14 @@
 #include <iostream>
 
 using namespace sf::Keyboard;
+using namespace Constants;
 
-Game::Game() : title(animations.getTitle()),                // Load title sprite
-background(animations.getBackground()),                     // Load background sprite
-bomber(animations.getEntities(),pods),                      // Load bomber sprite
-windowWidth(750), windowHeight(750),                        // Define window size parameters, 1984 x 832 scaled 4x
-window(sf::VideoMode({ windowWidth, windowHeight }),        // Create window with title and size
-    "Bomberman", sf::Style::Titlebar | sf::Style::Close),
-    state(GameState::Title), frame(0)                       // Set state to title screen and frame counter to 0
+Game::Game() : title(animations.getTitle()),                    // Load title sprite
+    background(animations.getBackground()),                     // Load background sprite
+    bomber(animations.getEntities(), pods),                     // Load bomber sprite
+    window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
+        "Bomberman", sf::Style::Titlebar | sf::Style::Close),
+    state(GameState::Title), frame(0)                           // Set state to title screen and frame count to 0 
 {
     //Set window icon and framerate
     window.setIcon(animations.getIcon());
@@ -17,46 +17,38 @@ window(sf::VideoMode({ windowWidth, windowHeight }),        // Create window wit
 
     //Set title sprite on right texture, scale to fit and position in middle of window
     title.setTexture(sf::IntRect({ 0, 0 }, { 256, 240 }));
-    title.setScale({ 3.5f, 3.5f });
     title.setOrigin({ 128.f, 120.f });
-    title.setPosition({ windowWidth / 2.f, windowHeight / 2.f });
+    title.setScale({ 0.875f * _scale, 0.875f * _scale}); // Best ratio fit for title screen
+    title.setPosition({ _windowWidth / 2.f, _windowHeight / 2.f });
 
     //Set background sprite on right texture and scale to fit window
     background.setTexture(sf::IntRect({ 0, 0 }, { 496, 208 }));
-    background.setScale({ 4.f, 4.f });
+    background.setScale({ _scale, _scale });
 
     //Set bomber sprite on starting texture and scale to see better
     bomber.setTexture(sf::IntRect({ 64, 0 }, { 16, 16 }));
-    bomber.setScale({ 4.f, 4.f });
-    bomber.setPosition({ 64.f, 64.f });
+    bomber.setOrigin({ 8.f, 8.f });
+    bomber.setScale({ _scale, _scale });
+    bomber.setPosition({ _scaledTile + 8.f * _scale, _scaledTile + 8.f * _scale });
 
-    // ********** TYSON LOGIC STUFF ********** START ********** //
-    int wide = 20, tall = 20;
-    player.setSize(sf::Vector2f(wide, tall));
-    player.setOrigin(sf::Vector2f(wide / 2, tall / 2));
-    player.setPosition(sf::Vector2f(wide / 2, tall / 2));
-    player.setTexture(&animations.getEntities());
-    player.setTextureRect(sf::IntRect({ 0, 0 }, { 16, 16 }));
-    //player.setScale({ 4, 4 });
+    // Create pod system of walls and border
+    for (int row = 0; row < _rows; row++)
+        for (int col = 0; col < 31; col++)
+        {
+            pods[row][col] = Pod(sf::RectangleShape({ _scaledTile, _scaledTile }), col * _scaledTile, row * _scaledTile);
 
-    // Regualar tiles creation
-    for (int i = 0; i < 29; i++)
-    {
-       for(int j= 0; j < 11; j++)
-       {
-           Pod newPod(sf::RectangleShape({ 50, 50 }), i * 50, j * 50);
-           pods[j][i] = newPod;
-           pods[j][i].setColor(sf::Color(125, 125, 255));
+			bool isInnerWall = col % 2 == 0 && row % 2 == 0;
+			bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
 
-           // Unbreakable walls creation
-           if (j % 2 == 1 && i % 2 == 1)
-           {
-               pods[j][i].setTile(new HardWall);
-               pods[j][i].setColor(sf::Color(125, 125, 125));
-           }
-	   }
-    }
-    // ********** END ********** //
+            if (isInnerWall || isBorder)    // Set border
+            {
+				pods[row][col].setTile(new HardWall);           // Tile* deleted in pod desturctor, so no memory leak
+                pods[row][col].setColor(sf::Color(125, 125, 255));
+            }
+
+            else                            // Set inner
+                pods[row][col].setColor(sf::Color(125, 125, 125));
+        }
 }
 
 // Holds main game loop, all actions passed
@@ -187,6 +179,8 @@ void Game::update()
         return;
 
     bomber.update();
+    std::cout << bomber;
+
     frame++;
 }
 
@@ -194,12 +188,18 @@ void Game::update()
 void Game::render()
 {
     window.clear();
-
     if (state == GameState::Title)            // If not started, draw title
         window.draw(title.getSprite());
     else                                      // Else, draw other sprites
     {
         window.draw(background.getSprite());
+
+		//* Displays pods for testing
+        for (int row = 0; row < _rows; row++)
+            for (int col = 0; col < _cols; col++)
+                window.draw(pods[row][col].shape);
+		//*/
+
         window.draw(bomber.getSprite());
     }
 

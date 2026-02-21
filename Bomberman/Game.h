@@ -10,6 +10,7 @@
 #include "Pod.h"
 #include "HardWall.h"
 #include "SoftWall.h"
+#include "Constants.h"
 
 /*
 	Main class handling game logic and display,
@@ -26,7 +27,6 @@ enum class GameState
 	Playing
 };
 
-
 class Game
 {
 public:
@@ -38,21 +38,19 @@ public:
 	void render();
 	void closeGame();
 
-	// ********** TYSON LOGIC STUFF ********** START ********** //
+	// Old Tyson stuff
 	sf::RectangleShape player;
-
-	Pod pods[11][29]; //Array of Pods , 11 rows, 29 columns, 
 	int playindex = 0;
-
-	// ********** END ********** //
+	//
 
 private:
-	Animations animations;		// Animations MUST be declared before all entity
-	Entity title;				// objects so textures are loaded before entity
-	Entity background;			// creation. Best practice is to match initialization
-	Player bomber;				// list order with class declaration order.
+	Animations animations;
+	Entity title;
+	Entity background;
+	Player bomber;
 
-	unsigned int windowWidth, windowHeight;
+	Pod pods[_rows][_cols]; // Array of Pods, 13 rows, 31 columns
+
 	sf::RenderWindow window;
 
 	GameState state;
