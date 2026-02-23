@@ -54,43 +54,127 @@ void Player::update()
 			//check if colliding with wall or bomb
 			//Current bug:stops player prematurely, needs to wait for actual collision first
 			 
-			//collide right
+			//collide while moving right
 			if (joyX > 0 && x < _cols)
 			{
+				//check pod directly next for collisions and stop
 				if (pods[y][x + 1].getTile() != nullptr)
 				{
-					if (pods[y][x + 1].getTile()->getType() < 3&&getSprite().getGlobalBounds().findIntersection(pods[y][x+1].shape.getGlobalBounds()).has_value())
-						joyX = 0;
+					if (getSprite().getGlobalBounds().findIntersection(pods[y][x+1].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y][x + 1].getTile()->getType() < 3)
+							joyX = 0;
+					}
+				}
+				//If colliding on diagonals, autocorrect
+				if (pods[y+1][x + 1].getTile() != nullptr)
+				{
+					if (getSprite().getGlobalBounds().findIntersection(pods[y+1][x + 1].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y + 1][x + 1].getTile()->getType() < 3)
+							joyY = -1;
+					}
+				}
+				if (pods[y-1][x + 1].getTile() != nullptr)
+				{
+					if (getSprite().getGlobalBounds().findIntersection(pods[y-1][x + 1].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y - 1][x + 1].getTile()->getType() < 3)
+							joyY = 1;
+					}
 				}
 			}
 
-			//collide left
+			//collide while moving left
 			if (joyX < 0 && x > 0)
 			{
+				//Check next pod if colliding stop
 				if (pods[y][x - 1].getTile() != nullptr)
 				{
-					if (pods[y][x - 1].getTile()->getType() < 3&&getSprite().getGlobalBounds().findIntersection(pods[y][x - 1].shape.getGlobalBounds()).has_value())
-						joyX = 0;
+					if (getSprite().getGlobalBounds().findIntersection(pods[y][x - 1].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y][x - 1].getTile()->getType() < 3)
+							joyX = 0;
+					}
+				}
+				//If colliding on diagonals, autocorrect
+				if (pods[y+1][x - 1].getTile() != nullptr)
+				{
+					if (getSprite().getGlobalBounds().findIntersection(pods[y+1][x - 1].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y + 1][x - 1].getTile()->getType() < 3)
+							joyY = -1;
+					}
+				}
+				if (pods[y-1][x - 1].getTile() != nullptr)
+				{
+					if (getSprite().getGlobalBounds().findIntersection(pods[y-1][x - 1].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y - 1][x - 1].getTile()->getType() < 3)
+							joyY = 1;
+					}
 				}
 			}
 
-			//collide down
+			//collide while moving down
 			if (joyY > 0 && y < _rows)
 			{
+				//Check the pod directly next to it, if colliding stop
 				if (pods[y + 1][x].getTile() != nullptr)
 				{
-					if (pods[y + 1][x].getTile()->getType() < 3&& getSprite().getGlobalBounds().findIntersection(pods[y+1][x].shape.getGlobalBounds()).has_value())
-						joyY = 0;
+					if (getSprite().getGlobalBounds().findIntersection(pods[y+1][x].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y + 1][x].getTile()->getType() < 3)
+							joyY = 0;
+					}
+				}
+				//If colliding on diagonals, autocorrect
+				if (pods[y + 1][x+1].getTile() != nullptr)
+				{
+					if (getSprite().getGlobalBounds().findIntersection(pods[y + 1][x+1].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y + 1][x + 1].getTile()->getType() < 3)
+							joyX = -1;
+					}
+				}
+				if (pods[y + 1][x-1].getTile() != nullptr)
+				{
+					if (getSprite().getGlobalBounds().findIntersection(pods[y + 1][x-1].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y + 1][x - 1].getTile()->getType() < 3)
+							joyX = 1;
+					}
 				}
 			}
 
-			//collide up
+			//collide while moving up
 			if (joyY < 0 && y > 0)
 			{
+				//Check pod directly next to, if colliding stop
 				if (pods[y - 1][x].getTile() != nullptr)
 				{
-					if (pods[y - 1][x].getTile()->getType() < 3&& getSprite().getGlobalBounds().findIntersection(pods[y-1][x ].shape.getGlobalBounds()).has_value())
-						joyY = 0;
+					if (getSprite().getGlobalBounds().findIntersection(pods[y-1][x ].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y - 1][x].getTile()->getType() < 3)
+							joyY = 0;
+					}
+				}
+				//If colliding on diagonals, autocorrect
+				if (pods[y - 1][x+1].getTile() != nullptr)
+				{
+					if (getSprite().getGlobalBounds().findIntersection(pods[y - 1][x+1].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y - 1][x + 1].getTile()->getType() < 3)
+							joyX = -1;
+					}
+				}
+				if (pods[y - 1][x-1].getTile() != nullptr)
+				{
+					if (getSprite().getGlobalBounds().findIntersection(pods[y - 1][x-1].shape.getGlobalBounds()).has_value())
+					{
+						if(pods[y - 1][x - 1].getTile()->getType() < 3)
+							joyX = 1;
+					}
 				}
 			}
 		}
