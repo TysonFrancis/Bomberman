@@ -49,9 +49,9 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
 				pods[row][col].setTile(new HardWall);           // Tile* deleted in pod desturctor, so no memory leak
                 pods[row][col].setColor(sf::Color(125, 125, 255));
             }
-            else if (isSoft)
+            else if (isSoft)                //Set breakable blocks
             {
-                pods[row][col].setTile(new SoftWall);
+                pods[row][col].setTile(new SoftWall);           // Tile* deleted in pod desturctor, so no memory leak
                 pods[row][col].setColor(sf::Color(125, 125, 200));
             }
             else                            // Set inner
