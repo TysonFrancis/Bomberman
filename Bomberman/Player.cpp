@@ -59,7 +59,7 @@ void Player::update()
 			{
 				if (pods[y][x + 1].getTile() != nullptr)
 				{
-					if (pods[y][x + 1].getTile()->getType() < 3/*add player intersection with pod*/)
+					if (pods[y][x + 1].getTile()->getType() < 3&&getSprite().getGlobalBounds().findIntersection(pods[y][x+1].shape.getGlobalBounds()).has_value())
 						joyX = 0;
 				}
 			}
@@ -69,7 +69,7 @@ void Player::update()
 			{
 				if (pods[y][x - 1].getTile() != nullptr)
 				{
-					if (pods[y][x - 1].getTile()->getType() < 3)
+					if (pods[y][x - 1].getTile()->getType() < 3&&getSprite().getGlobalBounds().findIntersection(pods[y][x - 1].shape.getGlobalBounds()).has_value())
 						joyX = 0;
 				}
 			}
@@ -79,7 +79,7 @@ void Player::update()
 			{
 				if (pods[y + 1][x].getTile() != nullptr)
 				{
-					if (pods[y + 1][x].getTile()->getType() < 3)
+					if (pods[y + 1][x].getTile()->getType() < 3&& getSprite().getGlobalBounds().findIntersection(pods[y+1][x].shape.getGlobalBounds()).has_value())
 						joyY = 0;
 				}
 			}
@@ -89,7 +89,7 @@ void Player::update()
 			{
 				if (pods[y - 1][x].getTile() != nullptr)
 				{
-					if (pods[y - 1][x].getTile()->getType() < 3)
+					if (pods[y - 1][x].getTile()->getType() < 3&& getSprite().getGlobalBounds().findIntersection(pods[y-1][x ].shape.getGlobalBounds()).has_value())
 						joyY = 0;
 				}
 			}
