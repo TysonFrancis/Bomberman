@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <iostream>
+#include "time.h"
 
 using namespace sf::Keyboard;
 using namespace Constants;
@@ -11,6 +12,8 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     state(GameState::Title), frame(0)                           // Set state to title screen and frame count to 0 
 {
+    srand(time(NULL));
+
     //Set window icon and framerate
     window.setIcon(animations.getIcon());
     window.setFramerateLimit(60);
@@ -39,13 +42,18 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
 
 			bool isInnerWall = col % 2 == 0 && row % 2 == 0;
 			bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
+            bool isSoft = (rand() % 5 == 0&&row*col!=1);
 
             if (isInnerWall || isBorder)    // Set border
             {
 				pods[row][col].setTile(new HardWall);           // Tile* deleted in pod desturctor, so no memory leak
                 pods[row][col].setColor(sf::Color(125, 125, 255));
             }
-
+            else if (isSoft)
+            {
+                pods[row][col].setTile(new SoftWall);
+                pods[row][col].setColor(sf::Color(125, 125, 200));
+            }
             else                            // Set inner
                 pods[row][col].setColor(sf::Color(125, 125, 125));
         }
@@ -55,6 +63,7 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
 // to supplementary methods for cleanliness
 void Game::run()
 {
+    
     while (window.isOpen())
     {
         events();
@@ -62,101 +71,6 @@ void Game::run()
         render();
     }
 
-    /* ********** TYSON LOGIC STUFF ********** START ********** //
-    while (window.isOpen())
-    {
-        events();
-        //Movement. Also collision
-        //If player is colliding with a pod that is filled, it will stop player movement. Only checks the pod directly next to or above so it will
-        //not stop if a player places a bomb. Issue is that the pod above and below are hard to check as they are a different distance away from playindex
-        //I will work on a function that returns distance above and below
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) && player.getPosition().x > 20)
-        {
-            player.move(sf::Vector2f(-2, 0));
-            if (playindex > 0)
-            {
-                if (pods.at(playindex - (1)).shape.getGlobalBounds().findIntersection(player.getGlobalBounds()).has_value() && pods.at(playindex - 1).filled)
-                    player.move(sf::Vector2f(2, 0));
-            }
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) && player.getPosition().x < width * 50 - 20)
-        {
-            player.move(sf::Vector2f(2, 0));
-            if (playindex < num1)
-            {
-                if (pods.at(playindex + (1)).shape.getGlobalBounds().findIntersection(player.getGlobalBounds()).has_value() && pods.at(playindex + 1).filled)
-                    player.move(sf::Vector2f(-2, 0));
-            }
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) && player.getPosition().y < depth * 50 - 20)
-        {
-            player.move(sf::Vector2f(0, 2));
-            if (playindex < num1 - width)
-            {
-                if (pods.at(playindex + (width + x)).shape.getGlobalBounds().findIntersection(player.getGlobalBounds()).has_value() && pods.at(playindex).filled)
-                    player.move(sf::Vector2f(0, -2));
-            }
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) && player.getPosition().y > 20)
-        {
-            player.move(sf::Vector2f(0, -2));
-            if (playindex > width - x)
-            {
-                if (pods.at(playindex - (width + x)).shape.getGlobalBounds().findIntersection(player.getGlobalBounds()).has_value() && pods.at(playindex - (width + x)).filled)
-                    player.move(sf::Vector2f(0, 2));
-            }
-        }
-        //Place a bomb
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
-        {
-            if (pods.at(playindex).filled == false)
-                pods.at(playindex).fill();
-        }
-        window.clear();
-        //If a pod is filled, draw it and make sure player does not collide with it
-        for (int i = 0; i < num1; i++)
-        {
-            if (pods.at(i).filled)
-            {
-                window.draw(pods.at(i).shape);
-            }
-            if (pods.at(i).shape.getGlobalBounds().contains(player.getPosition()))
-            {
-                playindex = i;
-            }
-
-        }
-
-        //Make sure player isn't colliding with a wall, also draw the wall bc no background
-        for (int i = 0; i < num2; i++)
-        {
-            window.draw(walls.at(i).shape);
-            if (player.getGlobalBounds().findIntersection((walls.at(i).shape.getGlobalBounds())).has_value())
-            {
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-                {
-                    player.move(sf::Vector2f(2, 0));
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-                {
-                    player.move(sf::Vector2f(-2, 0));
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-                {
-                    player.move(sf::Vector2f(0, -2));
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-                {
-                    player.move(sf::Vector2f(0, 2));
-                }
-            }
-        }
-        window.draw(player);
-        std::cout << playindex;
-        window.display();
-    }
-
-    // ********** END ********** //*/
 }
 
 // Handles window events like game starting and closing
