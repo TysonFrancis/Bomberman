@@ -1,9 +1,10 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-#include"Pod.h"
+#include "Pod.h"
 #include "Entity.h"
 #include "Constants.h"
+#include "Bomb.h"
 
 using namespace Constants;
 

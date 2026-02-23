@@ -31,7 +31,7 @@ void Player::update()
 		// Determine total direction held and move accordingly
 		joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
 		joyY = isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up);
-		
+
 		// Update texture if moving
 		if (joyX != 0 || joyY != 0)
 		{
@@ -106,6 +106,14 @@ void Player::update()
 		{
 			alive = false;
 			myFrame = myTick = 0;
+		}
+
+		//Spawn a bomb
+		if (isKeyPressed(Scancode::Z))
+		{
+			if (pods[y][x].getTile() == nullptr)
+				pods[y][x].setTile(new Bomb(true, 3));
+			pods[y][x].setColor(sf::Color::Red); //Used for testing
 		}
 	}
 

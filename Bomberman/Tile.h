@@ -16,6 +16,8 @@ public:
 	bool isObstruction() const;
 	bool isDestructible() const;
 	
+	void tick() { ticks++; };
+	int getTicks() const { return ticks; };
 
 	enum Type
 	{
@@ -25,10 +27,12 @@ public:
 		//ETC
 	};
 
+	
 private:
 	// Whether the movement/explosions should be blocked by this tile
 	bool obstruction;
 
 	// Identifies the child class
-	int type;
+	int type; 
+	int ticks;
 };

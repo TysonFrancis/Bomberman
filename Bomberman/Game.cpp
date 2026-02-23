@@ -180,7 +180,26 @@ void Game::update()
 
     bomber.update();
     std::cout << bomber;
-
+    
+    //Check bombs and update them, also check if they need to explode
+    for (int i = 0; i < _rows; i++)
+    {
+        for (int j = 0; j < _cols; j++)
+        {
+            if (pods[i][j].getTile() != nullptr)
+            {
+                if (pods[i][j].getTile()->getType() == Tile::BOMB)
+                {
+                    pods[i][j].getTile()->tick();
+                    if (pods[i][j].getTile()->getTicks() >= 60) //3 seconds at 60fps
+                    {
+                        pods[i][j].setColor(sf::Color::Black);
+						pods[i][j].deleteTile(); //Deletes bomb tile, but could be used to set explosion tile instead
+                    }
+                }
+            }
+        }
+    }
     frame++;
 }
 
