@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Animations.h"
+#include "Pod.h"
 
 using sf::Vector2f;
 
@@ -26,10 +27,10 @@ public:
 	void setScale(Vector2f);
 	void setPosition(Vector2f);
 	void setOrigin(Vector2f);
-
 	void setTexture(const sf::IntRect&);
 
-	bool intersects(Entity&);
+	bool intersects(Entity&) const;
+	bool intersects(Pod&) const;
 
 protected:
 	sf::Sprite sprite;

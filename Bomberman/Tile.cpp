@@ -1,6 +1,6 @@
 #include "Tile.h"
 
-Tile::Tile(int type) : type(type), obstruction(false)
+Tile::Tile(int type) : type(type), obstruction(false), ticks(0)
 {
 	switch (type)
 	{
@@ -9,7 +9,6 @@ Tile::Tile(int type) : type(type), obstruction(false)
 	case BOMB:
 		// Because the above tiles block movement
 		obstruction = true;
-		ticks = 0;
 		// No need to specify tiles that don't because that's the default
 	}
 }

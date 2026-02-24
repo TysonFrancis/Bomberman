@@ -26,7 +26,6 @@ public:
 
 private:
 	Pod (&pods)[_rows][_cols];
-	float joyX, joyY;
-	float speed;
+	float speed, joyX, joyY;
 	int x, y;
 };
