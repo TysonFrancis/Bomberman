@@ -188,11 +188,12 @@ void Game::update()
 void Game::render()
 {
     window.clear();
+
     if (state == GameState::Title)            // If not started, draw title
-        window.draw(title.getSprite());
+        window.draw(title);
     else                                      // Else, draw other sprites
     {
-        window.draw(background.getSprite());
+        window.draw(background);
 
 		//* Displays pods for testing
         for (int row = 0; row < _rows; row++)
@@ -200,7 +201,7 @@ void Game::render()
                 window.draw(pods[row][col].shape);
 		//*/
 
-        window.draw(bomber.getSprite());
+        window.draw(bomber);
     }
 
     window.display();

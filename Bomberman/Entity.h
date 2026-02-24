@@ -12,7 +12,7 @@ using sf::Vector2f;
 	Accepts a texture to apply to sprite, given from an animation object.
 */
 
-class Entity
+class Entity : public sf::Drawable
 {
 public:
 	Entity(const sf::Texture&);
@@ -26,10 +26,12 @@ public:
 	void setScale(Vector2f);
 	void setPosition(Vector2f);
 	void setOrigin(Vector2f);
-
 	void setTexture(const sf::IntRect&);
 
 	bool intersects(Entity&);
+
+	// So game can just draw with entitiy instead of entity.sprite()
+	void draw(sf::RenderTarget&, sf::RenderStates) const override;
 
 protected:
 	sf::Sprite sprite;

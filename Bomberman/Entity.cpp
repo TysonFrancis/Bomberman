@@ -12,7 +12,6 @@ void Entity::move(Vector2f dir) { sprite.move(dir); }
 void Entity::setScale(Vector2f scale) { sprite.setScale(scale); }
 void Entity::setPosition(Vector2f pos) { sprite.setPosition(pos); }
 void Entity::setOrigin(Vector2f origin) { sprite.setOrigin(origin); }
-
 void Entity::setTexture(const sf::IntRect& rect) { sprite.setTextureRect(rect); }
 
 bool Entity::intersects(Entity& other)
@@ -22,3 +21,5 @@ bool Entity::intersects(Entity& other)
 		return true;
 	return false;
 }
+
+void Entity::draw(sf::RenderTarget& target, sf::RenderStates states) const { target.draw(sprite, states); }
