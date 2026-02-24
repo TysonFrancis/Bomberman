@@ -38,11 +38,6 @@ public:
 	void render();
 	void closeGame();
 
-	// Old Tyson stuff
-	sf::RectangleShape player;
-	int playindex = 0;
-	//
-
 private:
 	Animations animations;
 	Entity title;

@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Animations.h"
+#include "Pod.h"
 
 using sf::Vector2f;
 
@@ -28,7 +29,8 @@ public:
 	void setOrigin(Vector2f);
 	void setTexture(const sf::IntRect&);
 
-	bool intersects(Entity&);
+	bool intersects(Entity&) const;
+	bool intersects(Pod&) const;
 
 	// So game can just draw with entitiy instead of entity.sprite()
 	void draw(sf::RenderTarget&, sf::RenderStates) const override;

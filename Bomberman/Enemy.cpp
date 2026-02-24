@@ -1,37 +1,51 @@
 #include "Enemy.h"
 
-Enemy::Enemy(const sf::Texture& tex, int input) :
-	Entity(tex), type(input), speed(4.f) {}
+using ET = EnemyType;
 
-void Enemy::move()
+Enemy::Enemy(const sf::Texture& tex, EnemyType input) :
+	Entity(tex), type(input)
 {
 	switch (type)
 	{
-	case 1: //ballom, random movement, speed 2
+	case ET::Ballom: speed = 2.f; break;
+	case ET::Onil:	 speed = 3.f; break;
+	case ET::Dahl:	 speed = 3.f; break;
+	case ET::Minvo:	 speed = 4.f; break;
+	case ET::Doria:	 speed = 1.f; break;
+	case ET::Ovape:	 speed = 2.f; break;
+	case ET::Pass:	 speed = 5.f; break;
+	case ET::Pontan: speed = 6.f; break;
+	}
+}
+
+void Enemy::update()
+{
+	switch (type)
+	{
+	case ET::Ballom: //ballom, random movement
 		break;
 
-	case 2: //onil, chases player if close, speed 3
+	case ET::Onil: //onil, chases player if close
 		break;
 
-	case 3: //dahl, random movement,speed 3
+	case ET::Dahl: //dahl, random movement
 		break;
 
-	case 4: //minvo, chases player, speed 4
+	case ET::Minvo: //minvo, chases player
 		break;
 
-	case 5: //doria, chases, avoids bombs, speed 1, moves through soft blocks
+	case ET::Doria: //doria, chases, avoids bombs, moves through soft blocks
 		break;
 
-	case 6: //ovape, random movement, speed 2, moves through soft blocks
+	case ET::Ovape: //ovape, random movement, moves through soft blocks
 		break;
 
-	case 7: //pass, always chases if encountered, speed 5
+	case ET::Pass: //pass, always chases if encountered
 		break;
 
-	case 8: //pontan, alwyays chases, speed 6, moves through soft blocks
+	case ET::Pontan: //pontan, alwyays chases, moves through soft blocks
 		break;
 	}
 }
 
-void Enemy::update() {}
 void Enemy::die() {}

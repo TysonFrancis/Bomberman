@@ -1,9 +1,10 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-#include"Pod.h"
+#include "Pod.h"
 #include "Entity.h"
 #include "Constants.h"
+#include "Bomb.h"
 
 using namespace Constants;
 
@@ -25,7 +26,6 @@ public:
 
 private:
 	Pod (&pods)[_rows][_cols];
-	float joyX, joyY;
-	float speed;
+	float speed, joyX, joyY;
 	int x, y;
 };

@@ -1,7 +1,10 @@
 #pragma once
 
-/* Not to be confused with Pod, this abstract class
-parents a wall, bomb, or item contained within a Pod */
+/*
+	Not to be confused with Pod, this abstract class
+	parents a wall, bomb, or item contained within a Pod
+*/
+
 class Tile
 {
 public:
@@ -16,19 +19,21 @@ public:
 	bool isObstruction() const;
 	bool isDestructible() const;
 	
+	void tick() { ticks++; }
+	int getTicks() const { return ticks; }
 
 	enum Type
 	{
 		HARD_WALL,
 		SOFT_WALL,
 		BOMB
-		//ETC
 	};
-
+	
 private:
 	// Whether the movement/explosions should be blocked by this tile
 	bool obstruction;
 
 	// Identifies the child class
-	int type;
+	int type; 
+	int ticks;
 };

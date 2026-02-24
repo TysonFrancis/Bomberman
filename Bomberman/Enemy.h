@@ -1,16 +1,27 @@
 #pragma once
 #include "Entity.h"
 
+enum class EnemyType
+{
+	Ballom,
+	Onil,
+	Dahl,
+	Minvo,
+	Doria,
+	Ovape,
+	Pass,
+	Pontan
+};
+
 class Enemy : public Entity
 {
 public:
-	Enemy(const sf::Texture&, int);
+	Enemy(const sf::Texture&, EnemyType);
 
-	void move();
 	void update();
 	void die();
 
 private:
-	int type;
+	EnemyType type;
 	float speed;
 };
