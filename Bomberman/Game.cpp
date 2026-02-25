@@ -104,7 +104,7 @@ void Game::update()
     // is it expensive to check this every frame?
     switch (state)
     {
-    case GameState::RoundStart:
+    case GameState::Playing:
 
     bomber.update();
 
