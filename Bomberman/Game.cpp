@@ -79,23 +79,28 @@ void Game::events()
 
     // If on title screen and enter is pressed, start game
     if (state == GameState::Title && isKeyPressed(Scancode::Enter))
-        state = GameState::Playing;
+        startRound();
 }
 
 // Sprite updater, calls each sprites update method
 // with current frame and increments frame counter
 void Game::update()
 {
-    if (state != GameState::Playing)
-        return;
+    // is it expensive to check this every frame?
+    switch (state)
+    {
+    case GameState::RoundStart:
 
-    bomber.update();
-    
-    for (int row = 0; row < _rows; row++)
-        for (int col = 0; col < _cols; col++)
-            pods[row][col].update();
+        break;
+    case GameState::Playing:
+        bomber.update();
 
-    frame++;
+        for (int row = 0; row < _rows; row++)
+            for (int col = 0; col < _cols; col++)
+                pods[row][col].update();
+
+        frame++;
+    }
 }
 
 // Handles all drawing and window render things
@@ -119,6 +124,24 @@ void Game::render()
     }
 
     window.display();
+}
+
+void Game::startRound()
+{
+    state = GameState::RoundStart;
+    audio.getRoundStart().play(); // Play silly music
+
+    // There's a problem with the audio not playing fully
+    // I think the issue is with the file itself idk I'll fix it later
+
+    // Wait for music to finish
+    while (audio.getRoundStart().getStatus() != sf::SoundSource::Status::Stopped)
+    {
+        window.clear();
+        window.display(); // So it doesn't hang lol
+    }
+
+    state = GameState::Playing;
 }
 
 // Called when window is closed, used to

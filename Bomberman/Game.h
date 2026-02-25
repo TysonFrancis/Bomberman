@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Animations.h"
+#include "Audio.h"
 #include "Entity.h"
 #include "Player.h"
 #include "Bomb.h"
@@ -24,6 +25,7 @@
 enum class GameState
 {
 	Title,
+	RoundStart,
 	Playing
 };
 
@@ -36,10 +38,12 @@ public:
 	void events();
 	void update();
 	void render();
+	void startRound();
 	void closeGame();
 
 private:
 	Animations animations;
+	Audio audio;
 	Entity title;
 	Entity background;
 	Player bomber;
