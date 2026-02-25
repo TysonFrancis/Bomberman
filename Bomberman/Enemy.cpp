@@ -17,6 +17,7 @@ Enemy::Enemy(const sf::Texture& tex, Pod (&pod)[_rows][_cols], Type input) :
 	case Type::Pass:	speed = 5.f; break;
 	case Type::Pontan:  speed = 6.f; break;
 	}
+	direct = rand() % 4;
 }
 
 void Enemy::update()
@@ -40,9 +41,83 @@ void Enemy::update()
 
 	if (alive)
 	{
+		int x = getSprite().getPosition().x / _scaledTile;
+		int y = getSprite().getPosition().y / _scaledTile;
+		bool pause = (rand() % 9 == 0);
+		if ((int)(sprite.getPosition().x) % _scaledTile == 0 || (int)(getSprite().getPosition().y) % _scaledTile == 0)
+			pause = false;
+		int moveX = 0;
+		int moveY = 0;
+
 		switch (type)
 		{
 		case Type::Ballom: //ballom, random movement
+			if (!pause)
+			{
+				switch (direct)
+				{
+				case 0:
+					moveX = speed;
+					if (pods[y][x + 1].getTile() != nullptr)
+					{
+						if (intersects(pods[y][x + 1]))
+						{
+							if (pods[y][x + 1].getTile()->getType() < 3)
+							{
+								moveX = 0;
+								direct = rand() % 4;
+							}
+						}
+					}
+					break;
+				case 1:
+					moveY = -speed;
+					if (pods[y - 1][x].getTile() != nullptr)
+					{
+						if (intersects(pods[y - 1][x]))
+						{
+							if (pods[y - 1][x].getTile()->getType() < 3)
+							{
+								moveY = 0;
+								direct = rand() % 4;
+							}
+						}
+					}
+					break;
+				case 2:
+					moveX = -speed;
+					if (pods[y][x - 1].getTile() != nullptr)
+					{
+						if (intersects(pods[y][x - 1]))
+						{
+							if (pods[y][x - 1].getTile()->getType() < 3)
+							{
+								moveX = 0;
+								direct = rand() % 4;
+							}
+						}
+					}
+					break;
+				case 3:
+					moveY = speed;
+					if (pods[y + 1][x].getTile() != nullptr)
+					{
+						if (intersects(pods[y + 1][x]))
+						{
+							if (pods[y + 1][x].getTile()->getType() < 3)
+							{
+								moveY = 0;
+								direct = rand() % 4;
+							}
+						}
+					}
+					break;
+				}
+			}
+			else
+			{
+				direct = rand() % 4;
+			}
 			break;
 
 		case Type::Onil: //onil, chases player if close

@@ -29,4 +29,5 @@ private:
 	Pod (&pods)[_rows][_cols];
 	Type type;
 	float speed;
+	int direct;
 };

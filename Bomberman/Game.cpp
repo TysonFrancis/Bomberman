@@ -17,7 +17,7 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
 
     // Set window icon and framerate
     window.setIcon(animations.getIcon());
-    window.setFramerateLimit(2);
+    window.setFramerateLimit(60);
 
     // Set title sprite on right texture, scale to fit and position in middle of window
     title.setTexture(sf::IntRect({ 0, 0 }, { 256, 240 }));
