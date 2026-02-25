@@ -36,6 +36,8 @@ bool Pod::isObstructed()
 // Makes a new tile in this pod
 void Pod::setTile(Tile* newTile)
 {
+	//tile = nullptr;
+	delete tile;
 	tile = newTile;
 	
 	if(tile != nullptr) // If has a pointer value,

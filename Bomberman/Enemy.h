@@ -1,27 +1,32 @@
 #pragma once
 #include "Entity.h"
+#include "Constants.h"
+#include "Pod.h"
 
-enum class EnemyType
-{
-	Ballom,
-	Onil,
-	Dahl,
-	Minvo,
-	Doria,
-	Ovape,
-	Pass,
-	Pontan
-};
+using namespace Constants;
 
 class Enemy : public Entity
 {
 public:
-	Enemy(const sf::Texture&, EnemyType);
+	enum class Type
+	{
+		Ballom,
+		Onil,
+		Dahl,
+		Minvo,
+		Doria,
+		Ovape,
+		Pass,
+		Pontan
+	};
+
+	Enemy(const sf::Texture&, Pod(&pod)[_rows][_cols], Type);
 
 	void update();
 	void die();
 
 private:
-	EnemyType type;
+	Pod (&pods)[_rows][_cols];
+	Type type;
 	float speed;
 };

@@ -43,6 +43,7 @@ private:
 	Entity title;
 	Entity background;
 	Player bomber;
+	std::vector<Enemy> enemies;
 
 	Pod pods[_rows][_cols]; // Array of Pods, 13 rows, 31 columns
 
