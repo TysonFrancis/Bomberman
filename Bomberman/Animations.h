@@ -7,7 +7,6 @@
 	separate spritesheet as well as game console icon.
 
 	Entity frames are 16 x 16 unless otherwise noted:
-tional
 
 		Player at (0, 0), death at (0, 32),
 
@@ -15,14 +14,14 @@ tional
 		explosions at (0, 64)	-	-	-	-	-	-	-	-	-	-	80 x 80,
 		powerups + secrets at (0, 224),
 
-		balloon enemy at (0, 240), death at (96, 240),
-		ice cream enemy at (0, 256), death at (96, 256),
-		barrell enemy at (0, 272), death at (96, 272),
-		circle enemy at (0, 288), death at (96, 288),
-		puddle enemy at (0, 304), death at (96, 304),
-		ghost enemy at (0, 320), death at (96, 320),
-		spikey circle enemy at (0, 336), death at (96, 336),
-		coin enemy at (0, 352), death at (96, 352),
+		ballom at (0, 240), death at (96, 240),
+		onil at (0, 256), death at (96, 256),
+		dahl at (0, 272), death at (96, 272),
+		minvo at (0, 288), death at (96, 288),
+		doria at (0, 304), death at (96, 304),
+		ovape at (0, 320), death at (96, 320),
+		pass at (0, 336), death at (96, 336),
+		pontan at (0, 352), death at (96, 352),
 
 		salmon colored deaths continued at (112, 240),
 		purple colored deaths continued at (112, 272),

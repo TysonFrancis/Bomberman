@@ -7,7 +7,7 @@ namespace Constants
 	static constexpr int _cols = 31;
 
 	// Scaling
-	static constexpr float _scale = 5.f;
+	static constexpr float _scale = 3.f;
 	static constexpr int _tileSize = 16;
 	static constexpr int _scaledTile = _tileSize * _scale;
 
