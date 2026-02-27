@@ -181,9 +181,6 @@ void Game::startRound()
     state = GameState::RoundStart;
     audio.getRoundStart().play(); // Play silly music
 
-    // There's a problem with the audio not playing fully
-    // I think the issue is with the file itself idk I'll fix it later
-
     // Wait for music to finish
     while (audio.getRoundStart().getStatus() != sf::SoundSource::Status::Stopped)
     {
