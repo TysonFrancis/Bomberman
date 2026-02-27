@@ -31,7 +31,7 @@ void Player::update()
 					}
 				}
 				// If colliding on diagonals, autocorrect
-				if (pods[y + 1][x + 1].getTile() != nullptr)
+				else if (pods[y + 1][x + 1].getTile() != nullptr)
 				{
 					if (intersects(pods[y + 1][x + 1]))
 					{
@@ -39,7 +39,7 @@ void Player::update()
 							joyY = -1;
 					}
 				}
-				if (pods[y - 1][x + 1].getTile() != nullptr)
+				else if (pods[y - 1][x + 1].getTile() != nullptr)
 				{
 					if (intersects(pods[y - 1][x + 1]))
 					{
@@ -62,7 +62,7 @@ void Player::update()
 					}
 				}
 				// If colliding on diagonals, autocorrect
-				if (pods[y + 1][x - 1].getTile() != nullptr)
+				else if (pods[y + 1][x - 1].getTile() != nullptr)
 				{
 					if (intersects(pods[y + 1][x - 1]))
 					{
@@ -70,7 +70,7 @@ void Player::update()
 							joyY = -1;
 					}
 				}
-				if (pods[y - 1][x - 1].getTile() != nullptr)
+				else if (pods[y - 1][x - 1].getTile() != nullptr)
 				{
 					if (intersects(pods[y - 1][x - 1]))
 					{
@@ -93,7 +93,7 @@ void Player::update()
 					}
 				}
 				// If colliding on diagonals, autocorrect
-				if (pods[y + 1][x + 1].getTile() != nullptr)
+				else if (pods[y + 1][x + 1].getTile() != nullptr)
 				{
 					if (intersects(pods[y + 1][x + 1]))
 					{
@@ -101,7 +101,7 @@ void Player::update()
 							joyX = -1;
 					}
 				}
-				if (pods[y + 1][x - 1].getTile() != nullptr)
+				else if (pods[y + 1][x - 1].getTile() != nullptr)
 				{
 					if (intersects(pods[y + 1][x - 1]))
 					{
@@ -124,7 +124,7 @@ void Player::update()
 					}
 				}
 				// If colliding on diagonals, autocorrect
-				if (pods[y - 1][x + 1].getTile() != nullptr)
+				else if (pods[y - 1][x + 1].getTile() != nullptr)
 				{
 					if (intersects(pods[y - 1][x + 1]))
 					{
@@ -132,7 +132,7 @@ void Player::update()
 							joyX = -1;
 					}
 				}
-				if (pods[y - 1][x - 1].getTile() != nullptr)
+				else if (pods[y - 1][x - 1].getTile() != nullptr)
 				{
 					if (intersects(pods[y - 1][x - 1]))
 					{

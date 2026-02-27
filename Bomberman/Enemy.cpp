@@ -105,6 +105,7 @@ void Enemy::update()
 					}
 					break;
 				}
+				move(sf::Vector2f(moveX,moveY));
 			}
 			else
 			{
