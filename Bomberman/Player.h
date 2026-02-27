@@ -15,7 +15,7 @@
 class Player : public Entity
 {
 public:
-	Player(const sf::Texture&, Pod (&pod)[Constants::_rows][Constants::_cols]);
+	Player(const sf::Texture&, Pod (&pod)[Constants::_rows][Constants::_cols], std::vector<Bomb>& bombs);
 
 	void update();
 	void animate();
@@ -27,4 +27,5 @@ private:
 	Pod (&pods)[Constants::_rows][Constants::_cols];
 	float speed, joyX, joyY;
 	int x, y;
+	std::vector<Bomb>& bombs;
 };

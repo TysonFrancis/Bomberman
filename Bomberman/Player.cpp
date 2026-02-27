@@ -4,8 +4,8 @@
 using namespace Constants;
 using namespace sf::Keyboard;
 
-Player::Player(const sf::Texture& tex, Pod (&pod)[_rows][_cols]) :
-	Entity(tex), pods(pod), speed(4.f), joyX(0.f), joyY(0.f), x(0), y(0) {}
+Player::Player(const sf::Texture& tex, Pod (&pod)[_rows][_cols], std::vector<Bomb>&Bombs) :
+	Entity(tex), pods(pod), speed(4.f), joyX(0.f), joyY(0.f), x(0), y(0), bombs(Bombs) {}
 
 void Player::update()
 {
@@ -160,7 +160,7 @@ void Player::update()
 		// Spawn a bomb
 		if (isKeyPressed(Scancode::Z))
 			if (pods[y][x].getTile() == nullptr)
-				pods[y][x].setTile(new Bomb(true, 2));
+				pods[y][x].setTile(new Tile(2));
 	}
 
 	// Animation
