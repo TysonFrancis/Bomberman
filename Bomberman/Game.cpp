@@ -2,9 +2,10 @@
 #include <iostream>
 #include "time.h"
 
+using namespace Constants;
+
 using sf::Keyboard::isKeyPressed;
 using sf::Keyboard::Scancode;
-using namespace Constants;
 
 Game::Game() : title(animations.getTitle()),                    // Load title sprite
     background(animations.getBackground()),                     // Load background sprite
@@ -17,7 +18,7 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
 
     // Set window icon and framerate
     window.setIcon(animations.getIcon());
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(_fps);
 
     // Set title sprite on right texture, scale to fit and position in middle of window
     title.setTexture(sf::IntRect({ 0, 0 }, { 256, 240 }));
@@ -46,9 +47,8 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
 
     for (Enemy& enemy : enemies)
     {
-        enemy.setTexture(sf::IntRect({ 0, 224 }, { _tileSize, _tileSize }));
         enemy.setScale({ _scale, _scale });
-        enemy.setPosition(sf::Vector2f(rand() % (((_cols - 2) * _scaledTile) - (5 * _scaledTile + 1)) + (5 * _scaledTile), rand() % (((_rows - 2) * _scaledTile) - (5 * _scaledTile + 1)) + (5 * _scaledTile)));
+        enemy.setPosition(sf::Vector2f((rand() % 28 + 2) * _scaledTile, (rand() % 10 + 2) * _scaledTile));
     }
 
     // Create pod system of walls and border
@@ -102,20 +102,35 @@ void Game::events()
 void Game::update()
 {
     // is it expensive to check this every frame?
-    switch (state)
+    // 
+    // No, just a number check basically. Takes virtually no resources
+    // or time and keeps things structured well I suppose. - Dylan
+	switch(state)
     {
-    case GameState::Playing:
+	case(GameState::Playing):
+        bomber.update();
 
-    bomber.update();
+        for (Enemy& enemy : enemies)
+        {
+            enemy.update();
 
-    for (Enemy& enemy : enemies)
-        enemy.update();
-    
-    for (int row = 0; row < _rows; row++)
-        for (int col = 0; col < _cols; col++)
-            pods[row][col].update();
+            if (bomber.intersects(enemy))
+            {
+                enemy.die();
+                std::cout << enemy;
+            }
+        }
+
+        for (int row = 0; row < _rows; row++)
+            for (int col = 0; col < _cols; col++)
+                pods[row][col].update();
 
         frame++;
+        break;
+
+    case(GameState::Title):
+    case(GameState::RoundStart):
+    case(GameState::GameOver): break;
     }
 }
 
@@ -124,10 +139,9 @@ void Game::render()
 {
     window.clear();
 
-    if (state == GameState::Title)            // If not started, draw title
-        window.draw(title);
-    else                                      // Else, draw other sprites
+    switch(state)
     {
+    case(GameState::Playing):
         window.draw(background);
 
         // I think that drawing pods is permanent the way
@@ -140,6 +154,12 @@ void Game::render()
 
         for (Enemy& enemy : enemies)
             window.draw(enemy.getSprite());
+
+        break;
+
+    case(GameState::Title): window.draw(title.getSprite());     break;
+	case(GameState::RoundStart): /* Draw current round??? */
+	case(GameState::GameOver): /* Draw game over screen??? */   break;
     }
 
     window.display();
@@ -156,8 +176,13 @@ void Game::startRound()
     // Wait for music to finish
     while (audio.getRoundStart().getStatus() != sf::SoundSource::Status::Stopped)
     {
-        window.clear();
-        window.display(); // So it doesn't hang lol
+        // Is this what you meant by should we have text on screen Emery???
+        // I agree a blank screen with no text isn't great, and if you don't have
+        // audio on you might think the game is loading slow. I'm going to disable the screen
+        // clearing for now so it stays on title until we have something else to display. - Dylan
+
+        //window.clear();   - - -   Commented out until something else to display
+        //window.display(); // So it doesn't hang lol
     }
 
     state = GameState::Playing;

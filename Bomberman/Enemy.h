@@ -3,8 +3,6 @@
 #include "Constants.h"
 #include "Pod.h"
 
-using namespace Constants;
-
 class Enemy : public Entity
 {
 public:
@@ -20,13 +18,17 @@ public:
 		Pontan
 	};
 
-	Enemy(const sf::Texture&, Pod(&pod)[_rows][_cols], Type);
+	Enemy(const sf::Texture&, Pod(&pod)[Constants::_rows][Constants::_cols], Type);
 
 	void update();
+	void animate();
 	void die();
 
+	// Enemy display, will show type and other info if needed
+	friend std::ostream& operator<<(std::ostream&, const Enemy&);
+
 private:
-	Pod (&pods)[_rows][_cols];
+	Pod (&pods)[Constants::_rows][Constants::_cols];
 	Type type;
 	float speed;
 	int direct;

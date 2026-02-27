@@ -4,8 +4,6 @@
 #include "Animations.h"
 #include "Pod.h"
 
-using sf::Vector2f;
-
 /*
 	Entity class, parent to Player, Enemies, and Bombs, 
 	anything that needs a texture and life state.
@@ -19,14 +17,14 @@ public:
 	Entity(const sf::Texture&);
 
 	const sf::Sprite& getSprite() const;
-	bool getLife() const;
+	bool isAlive() const;
 
 	void setLife(bool);
 
-	void move(Vector2f);
-	void setScale(Vector2f);
-	void setPosition(Vector2f);
-	void setOrigin(Vector2f);
+	void move(sf::Vector2f);
+	void setScale(sf::Vector2f);
+	void setPosition(sf::Vector2f);
+	void setOrigin(sf::Vector2f);
 	void setTexture(const sf::IntRect&);
 
 	bool intersects(Entity&) const;

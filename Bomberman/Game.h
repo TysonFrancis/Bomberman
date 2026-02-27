@@ -26,7 +26,8 @@ enum class GameState
 {
 	Title,
 	RoundStart,
-	Playing
+	Playing,
+	GameOver // Future
 };
 
 class Game
@@ -49,7 +50,7 @@ private:
 	Player bomber;
 	std::vector<Enemy> enemies;
 
-	Pod pods[_rows][_cols]; // Array of Pods, 13 rows, 31 columns
+	Pod pods[Constants::_rows][Constants::_cols]; // Array of Pods, 13 rows, 31 columns
 
 	sf::RenderWindow window;
 

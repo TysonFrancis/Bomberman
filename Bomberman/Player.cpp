@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <iostream>
 
+using namespace Constants;
 using namespace sf::Keyboard;
 
 Player::Player(const sf::Texture& tex, Pod (&pod)[_rows][_cols]) :
@@ -8,54 +9,15 @@ Player::Player(const sf::Texture& tex, Pod (&pod)[_rows][_cols]) :
 
 void Player::update()
 {
-	// *** Animation timing ***
-	myTick++;									// Increment tick counter every game frame
-
-	if (alive)								    // If alive,
-	{
-		if (myTick % 5 == 0)				        // Update frame every 5 ticks, 60fps -> 12 frames per second
-			myFrame = (myFrame + 1) % 3;	        // Loop through frames for waling animation, 3 frames total
-	}
-
-	else                                        // Else,
-	{
-		if (myTick % 5 == 0)
-			myFrame++;								// Update frame every 5 ticks, but don't loop
-		if (myFrame >= 7)
-			myFrame = 7;                            // Freeze on empty frame once finished
-	}
-
-	// *** Sprite movement and texture updates ***
-	if (alive)									// Living animations + movement + collision
+	if (alive)
 	{
 		// Determine total direction held and move accordingly
 		joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
 		joyY = isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up);
 
-		// Update texture if moving
+		// Collision logic
 		if (joyX != 0 || joyY != 0)
 		{
-			// Texture offsets. Irrelevant to movement or input axes.
-			int xOffset = 0, yOffset = 0;
-
-			// Determine the correct texture offset based on input direction
-			if (joyY != 0)
-			{
-				xOffset = 48;
-				if (joyY == -1)
-					yOffset = 16;
-			}
-			else if (joyX == 1)
-				yOffset = 16;
-
-			// Apply selected texture
-			setTexture(sf::IntRect({ myFrame * 16 + xOffset, yOffset }, { _tileSize, _tileSize }));
-
-			// Check if colliding with wall or bomb
-			// Current bug: Stops player prematurely, needs to wait for actual collision first
-
-			// Is this fixed??? ^^^^^^^^^^^^^^^^^
-
 			// Collide while moving right
 			if (joyX > 0 && x < _cols)
 			{
@@ -181,7 +143,7 @@ void Player::update()
 			}
 		}
 
-		// Move player and check what pod they are now in
+		// Move player and update what pod they're in
 		move({ joyX * speed, joyY * speed });
 
 		x = getSprite().getPosition().x / _scaledTile;
@@ -201,8 +163,47 @@ void Player::update()
 				pods[y][x].setTile(new Bomb(true, 2));
 	}
 
-	else										// Death animation
-		setTexture(sf::IntRect({ myFrame * 16, 32 }, { _tileSize, _tileSize }));
+	// Animation
+	animate();
+}
+
+void Player::animate()
+{
+	myTick++;								// Increment tick every update
+
+	if (myTick % 5 != 0)					// Only update frame every 5 ticks, 60fps -> 12 frames per second
+		return;
+
+	if (alive)								// Alive animations
+	{
+		if (joyX != 0 || joyY != 0)				// Only update texture if moving
+		{
+			myFrame = (myFrame + 1) % 3;		// Loop through frames for walking animation, 3 frames total
+
+			// Texture offsets. Irrelevant to movement or input axes.
+			int xOffset = 0, yOffset = 0;
+
+			// Determine the correct texture offset based on input direction
+			if (joyY != 0)
+			{
+				xOffset = 48;
+				if (joyY == -1)
+					yOffset = 16;
+			}
+			else if (joyX == 1)
+				yOffset = 16;
+
+			// Apply selected texture
+			setTexture(sf::IntRect({ myFrame * 16 + xOffset, yOffset }, { _tileSize, _tileSize }));
+		}
+
+		return;
+	}
+											// Death animation
+	if (myFrame < 7)						// Keep incrementing frame until finished with death animation
+		myFrame++;
+
+	setTexture(sf::IntRect({ myFrame * 16, 32 }, { _tileSize, _tileSize }));
 }
 
 std::ostream& operator<<(std::ostream& os, const Player& player)
