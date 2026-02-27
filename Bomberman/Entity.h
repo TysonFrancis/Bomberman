@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Animations.h"
+#include "Constants.h"
 
 using sf::Vector2f;
 

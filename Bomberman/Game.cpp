@@ -7,7 +7,7 @@ using namespace Constants;
 
 Game::Game() : title(animations.getTitle()),                    // Load title sprite
     background(animations.getBackground()),                     // Load background sprite
-    bomber(animations.getEntities(), pods),                     // Load bomber sprite
+    bomber(animations.getEntities(), pods, bombs),                     // Load bomber sprite
     window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     state(GameState::Title), frame(0)                           // Set state to title screen and frame count to 0 
@@ -95,25 +95,9 @@ void Game::update()
     bomber.update();
     std::cout << bomber;
     
-    //Check bombs and update them, also check if they need to explode
-    for (int i = 0; i < _rows; i++)
-    {
-        for (int j = 0; j < _cols; j++)
-        {
-            if (pods[i][j].getTile() != nullptr)
-            {
-                if (pods[i][j].getTile()->getType() == Tile::BOMB)
-                {
-                    pods[i][j].getTile()->tick();
-                    if (pods[i][j].getTile()->getTicks() >= 60) //3 seconds at 60fps
-                    {
-                        pods[i][j].setColor(sf::Color::Black);
-						pods[i][j].deleteTile(); //Deletes bomb tile, but could be used to set explosion tile instead
-                    }
-                }
-            }
-        }
-    }
+   for(int i = 0; i < bombs.size(); i++)
+	   bombs[i].update();
+
     frame++;
 }
 
@@ -131,7 +115,6 @@ void Game::render()
         for (int row = 0; row < _rows; row++)
             for (int col = 0; col < _cols; col++)
                 window.draw(pods[row][col].shape);
-		//*/
 
         window.draw(bomber.getSprite());
     }

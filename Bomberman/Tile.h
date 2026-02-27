@@ -15,9 +15,6 @@ public:
 	// True if this tile type should block movement
 	bool isObstruction() const;
 	bool isDestructible() const;
-	
-	void tick() { ticks++; };
-	int getTicks() const { return ticks; };
 
 	enum Type
 	{
@@ -34,5 +31,4 @@ private:
 
 	// Identifies the child class
 	int type; 
-	int ticks;
 };

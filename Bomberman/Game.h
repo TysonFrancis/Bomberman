@@ -50,6 +50,7 @@ private:
 	Player bomber;
 
 	Pod pods[_rows][_cols]; // Array of Pods, 13 rows, 31 columns
+	std::vector <Bomb> bombs;
 
 	sf::RenderWindow window;
 

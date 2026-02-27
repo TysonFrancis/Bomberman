@@ -17,7 +17,7 @@ using namespace Constants;
 class Player : public Entity
 {
 public:
-	Player(const sf::Texture&, Pod (&pod)[_rows][_cols]);
+	Player(const sf::Texture&, Pod (&pod)[_rows][_cols], std::vector<Bomb>&);
 
 	void update();
 
@@ -26,6 +26,8 @@ public:
 
 private:
 	Pod (&pods)[_rows][_cols];
+	std::vector<Bomb>& bombs;
+
 	float joyX, joyY;
 	float speed;
 	int x, y;
