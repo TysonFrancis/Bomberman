@@ -49,7 +49,7 @@ void Enemy::update()
 				switch (direct)
 				{								//Current issue: Never collides with the pod. It knows which pod is which, which pod to check, and where
 				case 0:							//it is it simply never has collide call true. Not an issue with the intersects method.
-					moveX = speed;
+					moveX = speed;				//If needed we can switch from directly checking intersection to if origin is past the center in a direction
 					//std::cout << "case0";
 					if (pods[y][x + 1].getTile() != nullptr)
 					{
@@ -65,7 +65,6 @@ void Enemy::update()
 							}
 						}
 					}
-					move(sf::Vector2f(moveX, moveY));
 					break;
 				case 1:
 					moveY = -speed;
@@ -84,7 +83,6 @@ void Enemy::update()
 							}
 						}
 					}
-					move(sf::Vector2f(moveX, moveY));
 					break;
 				case 2:
 					moveX = -speed;
@@ -103,7 +101,6 @@ void Enemy::update()
 							}
 						}
 					}
-					move(sf::Vector2f(moveX, moveY));
 					break;
 				case 3:
 					moveY = speed;
@@ -122,10 +119,10 @@ void Enemy::update()
 							}
 						}
 					}
-					move(sf::Vector2f(moveX, moveY));
 					break;
 				}
-				
+				//Commented out so other things can be worked on without enemy running out of the games
+				//move(sf::Vector2f(moveX, moveY));
 			}
 			else
 			{
