@@ -159,8 +159,12 @@ void Player::update()
 
 		// Spawn a bomb
 		if (isKeyPressed(Scancode::Z))
-			if (pods[y][x].getTile() == nullptr)
+			if (pods[y][x].getTile() == nullptr && bombs.size() < maxBombs)
+			{
 				pods[y][x].setTile(new Tile(2));
+				bombs.emplace_back(getSprite().getTexture(), remote, blast, 
+					pods, y, x);
+			}
 	}
 
 	// Animation

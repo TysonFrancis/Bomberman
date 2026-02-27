@@ -121,6 +121,16 @@ void Game::update()
             }
         }
 
+        for(int i = 0; i < bombs.size(); i++)
+        {
+            bombs[i].update();
+            if (!bombs[i].isAlive())//Delete when dead, might need lamda stuff
+            {
+                bombs.erase(bombs.begin() + i);
+				i--;
+            }
+		}
+
         for (int row = 0; row < _rows; row++)
             for (int col = 0; col < _cols; col++)
                 pods[row][col].update();

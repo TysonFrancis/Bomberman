@@ -28,4 +28,8 @@ private:
 	float speed, joyX, joyY;
 	int x, y;
 	std::vector<Bomb>& bombs;
+
+	bool remote = false; // Used to determine if player has remote control powerup, default false
+	int blast = 1; // Used to determine blast radius of bombs
+	int maxBombs = 1; // Used to determine how many bombs player can have out at once
 };

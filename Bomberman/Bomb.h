@@ -15,10 +15,11 @@ public:
 
 	void update();
 	void explode();
+	void animate();
 
 private:
 	Pod(&pods)[_rows][_cols];
 	int x, y;
 	int distance;
-	bool remote;
+	bool remote; //Checks if player has remote power up
 };

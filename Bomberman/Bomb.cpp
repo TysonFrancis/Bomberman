@@ -9,30 +9,27 @@ Bomb::~Bomb() {}
 
 void Bomb::update()
 {
-	myTick++;
-	if(myTick>=60 && alive)
+	animate();
+	if(myTick>=180 && !remote)//If 3 seconds and no remote explode
 		explode();
 }
 
 void Bomb::explode()
 {
 	alive = false;
-	pods[y][x].deleteTile();
-	pods[y][x].setColor(sf::Color::Yellow); //temporary color change to test bomb explosion
-	for (int i = 1; i <= distance; i++)
+	pods[y][x].deleteTile();//Deletes spot it's at
+	for (int i = 1; i <= distance; i++) //Checks each direction
 	{
 
 		if (pods[y][x + i].getTile() == nullptr)
 			pods[y][x + i].setColor(sf::Color::Yellow);//temporary color change to test bomb explosion
 		else
 		{
-		if (pods[y][x + i].getTile()->getType() == 1)
+		if (pods[y][x + i].getTile()->getType() == 1)//Destroys soft
 			pods[y][x + i].deleteTile();
 		break;
 		}
-
-
-	};
+	}
 	for (int i = 1; i <= distance; i++)
 	{
 
@@ -44,11 +41,9 @@ void Bomb::explode()
 				pods[y][x - i].deleteTile();
 			break;
 		}
-
 	}
 	for (int i = 1; i <= distance; i++)
 	{
-
 		if (pods[y + i][x].getTile() == nullptr)
 			pods[y + i][x].setColor(sf::Color::Yellow);
 		else
@@ -60,7 +55,6 @@ void Bomb::explode()
 	};
 	for (int i = 1; i <= distance; i++)
 	{
-
 		if (pods[y - i][x].getTile() == nullptr)
 			pods[y - i][x].setColor(sf::Color::Yellow);
 		else
@@ -71,6 +65,14 @@ void Bomb::explode()
 			}
 			break;
 		}
-
 	}
+}
+
+
+void Bomb::animate()
+{
+	myTick++;
+
+	if (myTick % 18 != 0) //Changes size every 18 ticks
+		return;
 }
