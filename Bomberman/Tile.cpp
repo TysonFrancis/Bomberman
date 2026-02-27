@@ -1,6 +1,6 @@
 #include "Tile.h"
 
-Tile::Tile(int type) : type(type), obstruction(false)
+Tile::Tile(int type) : type(type), obstruction(false), ticks(0)
 {
 	switch (type)
 	{

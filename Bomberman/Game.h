@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Animations.h"
+#include "Audio.h"
 #include "Entity.h"
 #include "Player.h"
 #include "Bomb.h"
@@ -24,7 +25,9 @@
 enum class GameState
 {
 	Title,
-	Playing
+	RoundStart,
+	Playing,
+	GameOver // Future
 };
 
 class Game
@@ -36,21 +39,18 @@ public:
 	void events();
 	void update();
 	void render();
+	void startRound();
 	void closeGame();
-
-	// Old Tyson stuff
-	sf::RectangleShape player;
-	int playindex = 0;
-	//
 
 private:
 	Animations animations;
+	Audio audio;
 	Entity title;
 	Entity background;
 	Player bomber;
+	std::vector<Enemy> enemies;
 
-	Pod pods[_rows][_cols]; // Array of Pods, 13 rows, 31 columns
-	std::vector <Bomb> bombs;
+	Pod pods[Constants::_rows][Constants::_cols]; // Array of Pods, 13 rows, 31 columns
 
 	sf::RenderWindow window;
 

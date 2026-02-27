@@ -1,37 +1,214 @@
 #include "Enemy.h"
+#include <iostream>
 
-Enemy::Enemy(const sf::Texture& tex, int input) :
-	Entity(tex), type(input), speed(4.f) {}
+using namespace Constants;
 
-void Enemy::move()
+using sf::Keyboard::isKeyPressed;
+using sf::Keyboard::Scancode;
+
+Enemy::Enemy(const sf::Texture& tex, Pod (&pod)[_rows][_cols], Type input) :
+	Entity(tex), pods(pod), type(input), speed(0.f)
 {
 	switch (type)
 	{
-	case 1: //ballom, random movement, speed 2
+	case Type::Doria:	speed = 1.f; break;
+	case Type::Ballom:
+	case Type::Ovape:	speed = 2.f; break;
+	case Type::Onil:
+	case Type::Dahl:	speed = 3.f; break;
+	case Type::Minvo:	speed = 4.f; break;
+	case Type::Pass:	speed = 5.f; break;
+	case Type::Pontan:  speed = 6.f; break;
+	}
+
+	// Instead of case logic, can use enum values to calculate
+	// texture position, since textures are in order of enum.
+	// Same with initial death frames before they split into 3 colors.
+	setTexture(sf::IntRect({ 0, 240 + static_cast<int>(type) * _tileSize}, {_tileSize, _tileSize}));
+	direct = rand() % 4;
+}
+
+void Enemy::update()
+{
+	// Movement
+	if (alive)
+	{
+		int x = getSprite().getPosition().x / _scaledTile;
+		int y = getSprite().getPosition().y / _scaledTile;
+		bool pause = (rand() % 9 == 0);
+		if ((int)(sprite.getPosition().x) % _scaledTile == 0 || (int)(getSprite().getPosition().y) % _scaledTile == 0)
+			pause = false;
+		int moveX = 0;
+		int moveY = 0;
+
+		switch (type)
+		{
+		case Type::Ballom: //ballom, random movement
+			if (!pause)
+			{
+				switch (direct)
+				{
+				case 0:
+					moveX = speed;
+					if (pods[y][x + 1].getTile() != nullptr)
+					{
+						if (intersects(pods[y][x + 1]))
+						{
+							if (pods[y][x + 1].getTile()->getType() < 3)
+							{
+								moveX = 0;
+								direct = rand() % 4;
+							}
+						}
+					}
+					break;
+				case 1:
+					moveY = -speed;
+					if (pods[y - 1][x].getTile() != nullptr)
+					{
+						if (intersects(pods[y - 1][x]))
+						{
+							if (pods[y - 1][x].getTile()->getType() < 3)
+							{
+								moveY = 0;
+								direct = rand() % 4;
+							}
+						}
+					}
+					break;
+				case 2:
+					moveX = -speed;
+					if (pods[y][x - 1].getTile() != nullptr)
+					{
+						if (intersects(pods[y][x - 1]))
+						{
+							if (pods[y][x - 1].getTile()->getType() < 3)
+							{
+								moveX = 0;
+								direct = rand() % 4;
+							}
+						}
+					}
+					break;
+				case 3:
+					moveY = speed;
+					if (pods[y + 1][x].getTile() != nullptr)
+					{
+						if (intersects(pods[y + 1][x]))
+						{
+							if (pods[y + 1][x].getTile()->getType() < 3)
+							{
+								moveY = 0;
+								direct = rand() % 4;
+							}
+						}
+					}
+					break;
+				}
+				move(sf::Vector2f(moveX,moveY));
+			}
+			else
+			{
+				direct = rand() % 4;
+			}
+			break;
+
+		case Type::Onil: //onil, chases player if close
+			break;
+
+		case Type::Dahl: //dahl, random movement
+			break;
+
+		case Type::Minvo: //minvo, chases player
+			break;
+
+		case Type::Doria: //doria, chases, avoids bombs, moves through soft blocks
+			break;
+
+		case Type::Ovape: //ovape, random movement, moves through soft blocks
+			break;
+
+		case Type::Pass: //pass, always chases if encountered
+			break;
+
+		case Type::Pontan: //pontan, alwyays chases, moves through soft blocks
+			break;
+		}
+
+		if (isKeyPressed(Scancode::Y))
+			die();
+	}
+
+	// Animation
+	animate();
+}
+
+void Enemy::animate()
+{
+	myTick++;								// Increment tick every update
+
+	if(myTick % 5 != 0)						// Only update frame every 5 ticks, 60fps -> 12 frames per second
+		return;
+
+	if (alive)							    // If alive,
+	{
+		myFrame = (myFrame + 1) % 3;			// Loop through frames for walking animation, 3 frames total
+		return;
+
+		// Movement animations soon to come - Dylan
+	}
+
+	if (myTick < _fps)						// Don't continue with death animation until after 1 second
+		return;
+
+	if (myFrame < 4)						// Keep incrementing frame until finished with death animation
+		myFrame++;
+
+	switch (type)							// Death animations
+	{
+	case Type::Ballom:							// Pink deaths
+	case Type::Minvo:
+	case Type::Pass:
+	case Type::Pontan:
+		setTexture(sf::IntRect({ myFrame * 16 + 112, 240 }, { _tileSize, _tileSize }));
 		break;
 
-	case 2: //onil, chases player if close, speed 3
+	case Type::Onil:							// Blue deaths
+	case Type::Doria:
+		setTexture(sf::IntRect({ myFrame * 16 + 112, 288 }, { _tileSize, _tileSize }));
 		break;
 
-	case 3: //dahl, random movement,speed 3
-		break;
-
-	case 4: //minvo, chases player, speed 4
-		break;
-
-	case 5: //doria, chases, avoids bombs, speed 1, moves through soft blocks
-		break;
-
-	case 6: //ovape, random movement, speed 2, moves through soft blocks
-		break;
-
-	case 7: //pass, always chases if encountered, speed 5
-		break;
-
-	case 8: //pontan, alwyays chases, speed 6, moves through soft blocks
+	case Type::Dahl:							// Purple deaths
+	case Type::Ovape:
+		setTexture(sf::IntRect({ myFrame * 16 + 112, 272 }, { _tileSize, _tileSize }));
 		break;
 	}
 }
 
-void Enemy::update() {}
-void Enemy::die() {}
+void Enemy::die()
+{
+	alive = false;
+	myFrame = myTick = 0;
+	setTexture(sf::IntRect({ 96, 240 + static_cast<int>(type) * _tileSize }, { _tileSize, _tileSize }));
+}
+
+std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
+{
+	out << "Enemy type: ";
+
+	switch (enemy.type)
+	{
+	case Enemy::Type::Ballom:	out << "Ballom";	break;
+	case Enemy::Type::Onil:		out << "Onil";		break;
+	case Enemy::Type::Dahl:		out << "Dahl";		break;
+	case Enemy::Type::Minvo:	out << "Minvo";		break;
+	case Enemy::Type::Doria:	out << "Doria";		break;
+	case Enemy::Type::Ovape:	out << "Ovape";		break;
+	case Enemy::Type::Pass:		out << "Pass";		break;
+	case Enemy::Type::Pontan:	out << "Pontan";	break;
+	}
+
+	out << "\n";
+
+	return out;
+}

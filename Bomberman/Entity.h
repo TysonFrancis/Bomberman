@@ -2,9 +2,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Animations.h"
-#include "Constants.h"
-
-using sf::Vector2f;
+#include "Pod.h"
 
 /*
 	Entity class, parent to Player, Enemies, and Bombs, 
@@ -13,24 +11,27 @@ using sf::Vector2f;
 	Accepts a texture to apply to sprite, given from an animation object.
 */
 
-class Entity
+class Entity : public sf::Drawable
 {
 public:
 	Entity(const sf::Texture&);
 
 	const sf::Sprite& getSprite() const;
-	bool getLife() const;
+	bool isAlive() const;
 
 	void setLife(bool);
 
-	void move(Vector2f);
-	void setScale(Vector2f);
-	void setPosition(Vector2f);
-	void setOrigin(Vector2f);
-
+	void move(sf::Vector2f);
+	void setScale(sf::Vector2f);
+	void setPosition(sf::Vector2f);
+	void setOrigin(sf::Vector2f);
 	void setTexture(const sf::IntRect&);
 
-	bool intersects(Entity&);
+	bool intersects(Entity&) const;
+	bool intersects(Pod&) const;
+
+	// So game can just draw with entitiy instead of entity.sprite()
+	void draw(sf::RenderTarget&, sf::RenderStates) const override;
 
 protected:
 	sf::Sprite sprite;

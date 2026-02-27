@@ -6,29 +6,25 @@
 #include "Constants.h"
 #include "Bomb.h"
 
-using namespace Constants;
-
 /*
 	Player class that extends entity not owning its own sprite,
-	but has access to it. Addpends new member variables as needed.
+	but has access to it. Appends new member variables as needed.
 	Update method takes in the current frame of animation to update the sprite.
 */
 
 class Player : public Entity
 {
 public:
-	Player(const sf::Texture&, Pod (&pod)[_rows][_cols], std::vector<Bomb>&);
+	Player(const sf::Texture&, Pod (&pod)[Constants::_rows][Constants::_cols]);
 
 	void update();
+	void animate();
 
 	// For testing purposes, prints the player's position
 	friend std::ostream& operator<<(std::ostream&, const Player&);
 
 private:
-	Pod (&pods)[_rows][_cols];
-	std::vector<Bomb>& bombs;
-
-	float joyX, joyY;
-	float speed;
+	Pod (&pods)[Constants::_rows][Constants::_cols];
+	float speed, joyX, joyY;
 	int x, y;
 };
