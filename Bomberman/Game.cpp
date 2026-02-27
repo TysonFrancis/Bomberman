@@ -9,7 +9,7 @@ using sf::Keyboard::Scancode;
 
 Game::Game() : title(animations.getTitle()),                    // Load title sprite
     background(animations.getBackground()),                     // Load background sprite
-    bomber(animations.getEntities(), pods),                     // Load bomber sprite
+    bomber(animations.getEntities(), pods, bombs),                     // Load bomber sprite
     window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     state(GameState::Title), frame(0)                           // Set state to title screen and frame count to 0 

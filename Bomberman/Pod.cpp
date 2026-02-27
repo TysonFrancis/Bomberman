@@ -16,13 +16,6 @@ void Pod::update()
 	if (tile != nullptr)
 		if (tile->getType() == Tile::BOMB)
 		{
-			tile->tick();
-
-			if (tile->getTicks() >= 60) // 3 seconds at 60fps
-			{
-				setTexture(sf::IntRect({ 32, 96 }, { 16, 16 }));
-				deleteTile(); // Deletes bomb tile, but could be used to set explosion tile instead
-			}
 		}
 }
 

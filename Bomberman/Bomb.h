@@ -1,24 +1,24 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-
-#include "Tile.h"
 #include "Pod.h"
 #include "Constants.h"
+#include "Entity.h"
 
-class Bomb : public Tile
+using namespace Constants;
+
+
+class Bomb : public Entity
 {
 public:
-	Bomb(bool, int);
+	Bomb(const sf::Texture&, bool, int, Pod(&pods)[_rows][_cols], int, int);
+	~Bomb();
 
-	void tick();
+	void update();
 	void explode();
 
-	int getType() const { return BOMB; }
-	int getTicks() const { return ticks; }
-
 private:
+	Pod(&pods)[_rows][_cols];
+	int x, y;
 	int distance;
-	int ticks;
-	int myFrame, myTick;
-	bool placed;
+	bool remote;
 };

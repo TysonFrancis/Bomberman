@@ -51,7 +51,7 @@ private:
 	std::vector<Enemy> enemies;
 
 	Pod pods[Constants::_rows][Constants::_cols]; // Array of Pods, 13 rows, 31 columns
-
+	std::vector<Bomb> bombs;
 	sf::RenderWindow window;
 
 	GameState state;
