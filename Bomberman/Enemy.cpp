@@ -20,7 +20,7 @@ Enemy::Enemy(const sf::Texture& tex, Pod (&pod)[_rows][_cols], Type input) :
 	case Type::Pass:	speed = 5.f; break;
 	case Type::Pontan:  speed = 6.f; break;
 	}
-
+	
 	// Instead of case logic, can use enum values to calculate
 	// texture position, since textures are in order of enum.
 	// Same with initial death frames before they split into 3 colors.
@@ -40,72 +40,92 @@ void Enemy::update()
 			pause = false;
 		int moveX = 0;
 		int moveY = 0;
-
+		std::cout << "(" << x << "," << y<<","<<direct<< ")\n";
 		switch (type)
 		{
 		case Type::Ballom: //ballom, random movement
 			if (!pause)
 			{
 				switch (direct)
-				{
-				case 0:
+				{								//Current issue: Never collides with the pod. It knows which pod is which, which pod to check, and where
+				case 0:							//it is it simply never has collide call true. Not an issue with the intersects method.
 					moveX = speed;
+					//std::cout << "case0";
 					if (pods[y][x + 1].getTile() != nullptr)
 					{
+						//std::cout << "case00";
 						if (intersects(pods[y][x + 1]))
 						{
-							if (pods[y][x + 1].getTile()->getType() < 3)
+							std::cout << "case000";
+							if (pods[y][x + 1].getTile()->isObstruction())
 							{
 								moveX = 0;
 								direct = rand() % 4;
+								//std::cout << "hit0";
 							}
 						}
 					}
+					move(sf::Vector2f(moveX, moveY));
 					break;
 				case 1:
 					moveY = -speed;
+					//std::cout << "case1";
 					if (pods[y - 1][x].getTile() != nullptr)
 					{
+						//std::cout << "case11";
 						if (intersects(pods[y - 1][x]))
 						{
-							if (pods[y - 1][x].getTile()->getType() < 3)
+							std::cout << "case111";
+							if (pods[y - 1][x].getTile()->isObstruction())
 							{
 								moveY = 0;
 								direct = rand() % 4;
+								//std::cout << "hit1";
 							}
 						}
 					}
+					move(sf::Vector2f(moveX, moveY));
 					break;
 				case 2:
 					moveX = -speed;
+					//std::cout << "case2";
 					if (pods[y][x - 1].getTile() != nullptr)
 					{
+						//std::cout << "case22";
 						if (intersects(pods[y][x - 1]))
 						{
-							if (pods[y][x - 1].getTile()->getType() < 3)
+							std::cout << "case222";
+							if (pods[y][x - 1].getTile()->isObstruction())
 							{
 								moveX = 0;
 								direct = rand() % 4;
+								//std::cout << "hit2";
 							}
 						}
 					}
+					move(sf::Vector2f(moveX, moveY));
 					break;
 				case 3:
 					moveY = speed;
+					//std::cout << "case3";
 					if (pods[y + 1][x].getTile() != nullptr)
 					{
+						//std::cout << "case33";
 						if (intersects(pods[y + 1][x]))
 						{
-							if (pods[y + 1][x].getTile()->getType() < 3)
+							std::cout << "case333";
+							if (pods[y + 1][x].getTile()->isObstruction())
 							{
 								moveY = 0;
 								direct = rand() % 4;
+								//std::cout << "hit3";
 							}
 						}
 					}
+					move(sf::Vector2f(moveX, moveY));
 					break;
 				}
-				move(sf::Vector2f(moveX,moveY));
+				
 			}
 			else
 			{

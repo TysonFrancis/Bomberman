@@ -37,13 +37,14 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
     bomber.setPosition({ _scaledTile * 1.5, _scaledTile * 1.5 });
 
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Ballom));
+    /*
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Dahl));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Doria));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Minvo));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Onil));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Ovape));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pass));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pontan));
+    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pontan));*/
 
     for (Enemy& enemy : enemies)
     {
