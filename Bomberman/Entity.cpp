@@ -31,3 +31,16 @@ bool Entity::intersects(Pod& pod) const
 }
 
 void Entity::draw(sf::RenderTarget& target, sf::RenderStates states) const { target.draw(sprite, states); }
+
+Entity& Entity::operator=(const Entity& other)
+{
+	if (this == &other)
+		return *this;
+
+	sprite = other.sprite;
+	alive = other.alive;
+	myTick = other.myTick;
+	myFrame = other.myFrame;
+
+	return *this;
+}

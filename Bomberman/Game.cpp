@@ -102,33 +102,31 @@ void Game::events()
 // with current frame and increments frame counter
 void Game::update()
 {
-    // is it expensive to check this every frame?
-    // 
-    // No, just a number check basically. Takes virtually no resources
-    // or time and keeps things structured well I suppose. - Dylan
 	switch(state)
     {
 	case(GameState::Playing):
         bomber.update();
 
-        for (Enemy& enemy : enemies)
+        for (size_t i = 0; i < enemies.size(); i++)
         {
-            enemy.update();
+            enemies.at(i).update();
 
-            if (bomber.intersects(enemy))
+            if (bomber.intersects(enemies.at(i)))
             {
-                enemy.die();
-                std::cout << enemy;
+                enemies.at(i).die();
+                std::cout << enemies.at(i);
+                enemies.erase(enemies.begin() + i);
+                i--;
             }
         }
-
+        
         for(int i = 0; i < bombs.size(); i++)
         {
             bombs[i].update();
             if (!bombs[i].isAlive())//Delete when dead, might need lamda stuff
             {
                 bombs.erase(bombs.begin() + i);
-				i--;
+                i--;
             }
 		}
 
@@ -177,7 +175,7 @@ void Game::render()
 }
 
 void Game::startRound()
-{
+{/*
     state = GameState::RoundStart;
     audio.getRoundStart().play(); // Play silly music
 
@@ -192,7 +190,7 @@ void Game::startRound()
         //window.clear();   - - -   Commented out until something else to display
         //window.display(); // So it doesn't hang lol
     }
-
+    */
     state = GameState::Playing;
 }
 

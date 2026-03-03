@@ -33,6 +33,8 @@ public:
 	// So game can just draw with entitiy instead of entity.sprite()
 	void draw(sf::RenderTarget&, sf::RenderStates) const override;
 
+	Entity& operator=(const Entity& other);
+
 protected:
 	sf::Sprite sprite;
 	bool alive;

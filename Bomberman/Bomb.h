@@ -17,6 +17,8 @@ public:
 	void explode();
 	void animate();
 
+	Bomb& operator=(const Bomb& other);
+
 private:
 	Pod(&pods)[_rows][_cols];
 	int x, y;

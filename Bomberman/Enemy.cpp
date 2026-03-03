@@ -209,6 +209,13 @@ void Enemy::die()
 	setTexture(sf::IntRect({ 96, 240 + static_cast<int>(type) * _tileSize }, { _tileSize, _tileSize }));
 }
 
+Enemy& Enemy::operator=(const Enemy& other)
+{
+	if (this != &other)
+		Entity::operator=(other);
+	return *this;
+}
+
 std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
 {
 	out << "Enemy type: ";

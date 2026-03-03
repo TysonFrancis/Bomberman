@@ -76,3 +76,10 @@ void Bomb::animate()
 	if (myTick % 18 != 0) //Changes size every 18 ticks
 		return;
 }
+
+Bomb& Bomb::operator=(const Bomb& other)
+{
+	if (this != &other)
+		Entity::operator=(other);
+	return *this;
+}
