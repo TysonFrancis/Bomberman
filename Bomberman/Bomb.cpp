@@ -9,14 +9,15 @@ Bomb::~Bomb() {}
 
 void Bomb::update()
 {
-	animate();
 	if(myTick>=180 && !remote)//If 3 seconds and no remote explode
 		explode();
+
+	animate();
 }
 
 void Bomb::explode()
 {
-	alive = false;
+	state = State::Dead;
 	pods[y][x].deleteTile();//Deletes spot it's at
 	for (int i = 1; i <= distance; i++) //Checks each direction
 	{
@@ -80,6 +81,8 @@ void Bomb::animate()
 Bomb& Bomb::operator=(const Bomb& other)
 {
 	if (this != &other)
+	{
 		Entity::operator=(other);
+	}
 	return *this;
 }

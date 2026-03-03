@@ -9,7 +9,7 @@ using sf::Keyboard::Scancode;
 
 Game::Game() : title(animations.getTitle()),                    // Load title sprite
     background(animations.getBackground()),                     // Load background sprite
-    bomber(animations.getEntities(), pods, bombs),                     // Load bomber sprite
+    bomber(animations.getEntities(), pods, bombs),              // Load bomber sprite
     window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     state(GameState::Title), frame(0)                           // Set state to title screen and frame count to 0 
@@ -37,14 +37,13 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
     bomber.setPosition({ _scaledTile * 1.5, _scaledTile * 1.5 });
 
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Ballom));
-    /*
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Dahl));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Doria));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Minvo));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Onil));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Ovape));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pass));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pontan));*/
+    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pontan));
 
     for (Enemy& enemy : enemies)
     {
@@ -107,23 +106,27 @@ void Game::update()
 	case(GameState::Playing):
         bomber.update();
 
+        std::cout << "Enemy size: " << enemies.size() << "\n";
         for (size_t i = 0; i < enemies.size(); i++)
         {
             enemies.at(i).update();
 
             if (bomber.intersects(enemies.at(i)))
-            {
                 enemies.at(i).die();
-                std::cout << enemies.at(i);
+
+            if (enemies[i].getState() == Entity::State::Dead)
+            {
                 enemies.erase(enemies.begin() + i);
                 i--;
             }
         }
-        
+
+        std::cout << "Bomb size: " << bombs.size() << "\n";
         for(int i = 0; i < bombs.size(); i++)
         {
             bombs[i].update();
-            if (!bombs[i].isAlive())//Delete when dead, might need lamda stuff
+
+            if (bombs[i].getState() == Entity::State::Dead)
             {
                 bombs.erase(bombs.begin() + i);
                 i--;
@@ -159,16 +162,15 @@ void Game::render()
             for (int col = 0; col < _cols; col++)
                 window.draw(pods[row][col].getShape());
 
-        window.draw(bomber.getSprite());
+        window.draw(bomber);
 
         for (Enemy& enemy : enemies)
-            window.draw(enemy.getSprite());
-
+            window.draw(enemy);
         break;
 
-    case(GameState::Title): window.draw(title.getSprite());     break;
-	case(GameState::RoundStart): /* Draw current round??? */
-	case(GameState::GameOver): /* Draw game over screen??? */   break;
+    case(GameState::Title):         window.draw(title);             break;
+	case(GameState::RoundStart):    /* Draw current round??? */
+	case(GameState::GameOver):      /* Draw game over screen??? */  break;
     }
 
     window.display();

@@ -14,12 +14,17 @@
 class Entity : public sf::Drawable
 {
 public:
+	enum class State
+	{
+		Living,
+		Dying,
+		Dead
+	};
+
 	Entity(const sf::Texture&);
 
 	const sf::Sprite& getSprite() const;
-	bool isAlive() const;
-
-	void setLife(bool);
+	State getState() const;
 
 	void move(sf::Vector2f);
 	void setScale(sf::Vector2f);
@@ -37,7 +42,7 @@ public:
 
 protected:
 	sf::Sprite sprite;
-	bool alive;
+	State state;
 	int myFrame; 
 	int myTick;
 };

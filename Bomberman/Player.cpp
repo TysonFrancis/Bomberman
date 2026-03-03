@@ -9,7 +9,7 @@ Player::Player(const sf::Texture& tex, Pod (&pod)[_rows][_cols], std::vector<Bom
 
 void Player::update()
 {
-	if (alive)
+	if (state == State::Living)
 	{
 		// Determine total direction held and move accordingly
 		joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
@@ -152,7 +152,7 @@ void Player::update()
 		// Used to kill player, mainly just for death animation testing
 		if (isKeyPressed(Scancode::X))
 		{
-			alive = false;
+			state = State::Dying;
 			myFrame = myTick = 0;
 			std::cout << "Dead";
 		}
@@ -178,7 +178,7 @@ void Player::animate()
 	if (myTick % 5 != 0)					// Only update frame every 5 ticks, 60fps -> 12 frames per second
 		return;
 
-	if (alive)								// Alive animations
+	if (state == State::Living)								// Alive animations
 	{
 		if (joyX != 0 || joyY != 0)				// Only update texture if moving
 		{
