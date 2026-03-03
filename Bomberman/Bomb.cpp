@@ -81,8 +81,6 @@ void Bomb::animate()
 Bomb& Bomb::operator=(const Bomb& other)
 {
 	if (this != &other)
-	{
 		Entity::operator=(other);
-	}
 	return *this;
 }

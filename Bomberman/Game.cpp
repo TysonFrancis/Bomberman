@@ -37,13 +37,13 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
     bomber.setPosition({ _scaledTile * 1.5, _scaledTile * 1.5 });
 
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Ballom));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Dahl));
+    /*enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Dahl));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Doria));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Minvo));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Onil));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Ovape));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pass));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pontan));
+    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pontan));*/
 
     for (Enemy& enemy : enemies)
     {
@@ -106,7 +106,6 @@ void Game::update()
 	case(GameState::Playing):
         bomber.update();
 
-        std::cout << "Enemy size: " << enemies.size() << "\n";
         for (size_t i = 0; i < enemies.size(); i++)
         {
             enemies.at(i).update();
@@ -121,7 +120,6 @@ void Game::update()
             }
         }
 
-        std::cout << "Bomb size: " << bombs.size() << "\n";
         for(int i = 0; i < bombs.size(); i++)
         {
             bombs[i].update();
