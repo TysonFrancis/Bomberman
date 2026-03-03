@@ -26,25 +26,28 @@ void Player::update()
 				{
 					if (intersects(pods[y][x + 1]))
 					{
-						if (pods[y][x + 1].getTile()->getType() < 3)
+						if (pods[y][x + 1].getTile()->isObstruction())
 							joyX = 0;
 					}
 				}
 				// If colliding on diagonals, autocorrect
-				else if (pods[y + 1][x + 1].getTile() != nullptr)
-				{
-					if (intersects(pods[y + 1][x + 1]))
+				else{
+					if (pods[y + 1][x + 1].getTile() != nullptr)
 					{
-						if (pods[y + 1][x + 1].getTile()->getType() < 3)
-							joyY = -1;
+						if (intersects(pods[y + 1][x + 1]))
+						{
+							if (pods[y + 1][x + 1].getTile()->isObstruction())
+								joyY = -1;
+						}
 					}
-				}
-				else if (pods[y - 1][x + 1].getTile() != nullptr)
-				{
-					if (intersects(pods[y - 1][x + 1]))
+					if (pods[y - 1][x + 1].getTile() != nullptr)
 					{
-						if (pods[y - 1][x + 1].getTile()->getType() < 3)
-							joyY = 1;
+
+						if (intersects(pods[y - 1][x + 1]))
+						{
+							if (pods[y - 1][x + 1].getTile()->isObstruction())
+								joyY = 1;
+						}
 					}
 				}
 			}
@@ -57,25 +60,27 @@ void Player::update()
 				{
 					if (intersects(pods[y][x - 1]))
 					{
-						if (pods[y][x - 1].getTile()->getType() < 3)
+						if (pods[y][x - 1].getTile()->isObstruction())
 							joyX = 0;
 					}
 				}
 				// If colliding on diagonals, autocorrect
-				else if (pods[y + 1][x - 1].getTile() != nullptr)
-				{
-					if (intersects(pods[y + 1][x - 1]))
+				else{
+					if (pods[y + 1][x - 1].getTile() != nullptr)
 					{
-						if (pods[y + 1][x - 1].getTile()->getType() < 3)
-							joyY = -1;
+						if (intersects(pods[y + 1][x - 1]))
+						{
+							if (pods[y + 1][x - 1].getTile()->isObstruction())
+								joyY = -1;
+						}
 					}
-				}
-				else if (pods[y - 1][x - 1].getTile() != nullptr)
-				{
-					if (intersects(pods[y - 1][x - 1]))
+					if (pods[y - 1][x - 1].getTile() != nullptr)
 					{
-						if (pods[y - 1][x - 1].getTile()->getType() < 3)
-							joyY = 1;
+						if (intersects(pods[y - 1][x - 1]))
+						{
+							if (pods[y - 1][x - 1].getTile()->isObstruction())
+								joyY = 1;
+						}
 					}
 				}
 			}
@@ -88,25 +93,27 @@ void Player::update()
 				{
 					if (intersects(pods[y + 1][x]))
 					{
-						if (pods[y + 1][x].getTile()->getType() < 3)
+						if (pods[y + 1][x].getTile()->isObstruction())
 							joyY = 0;
 					}
 				}
 				// If colliding on diagonals, autocorrect
-				else if (pods[y + 1][x + 1].getTile() != nullptr)
-				{
-					if (intersects(pods[y + 1][x + 1]))
+				else{
+					if (pods[y + 1][x + 1].getTile() != nullptr)
 					{
-						if (pods[y + 1][x + 1].getTile()->getType() < 3)
-							joyX = -1;
+						if (intersects(pods[y + 1][x + 1]))
+						{
+							if (pods[y + 1][x + 1].getTile()->isObstruction())
+								joyX = -1;
+						}
 					}
-				}
-				else if (pods[y + 1][x - 1].getTile() != nullptr)
-				{
-					if (intersects(pods[y + 1][x - 1]))
+					if (pods[y + 1][x - 1].getTile() != nullptr)
 					{
-						if (pods[y + 1][x - 1].getTile()->getType() < 3)
-							joyX = 1;
+						if (intersects(pods[y + 1][x - 1]))
+						{
+							if (pods[y + 1][x - 1].getTile()->isObstruction())
+								joyX = 1;
+						}
 					}
 				}
 			}
@@ -119,25 +126,27 @@ void Player::update()
 				{
 					if (intersects(pods[y - 1][x]))
 					{
-						if (pods[y - 1][x].getTile()->getType() < 3)
+						if (pods[y - 1][x].getTile()->isObstruction())
 							joyY = 0;
 					}
 				}
 				// If colliding on diagonals, autocorrect
-				else if (pods[y - 1][x + 1].getTile() != nullptr)
-				{
-					if (intersects(pods[y - 1][x + 1]))
+				else{
+					if (pods[y - 1][x + 1].getTile() != nullptr)
 					{
-						if (pods[y - 1][x + 1].getTile()->getType() < 3)
-							joyX = -1;
+						if (intersects(pods[y - 1][x + 1]))
+						{
+							if (pods[y - 1][x + 1].getTile()->isObstruction())
+								joyX = -1;
+						}
 					}
-				}
-				else if (pods[y - 1][x - 1].getTile() != nullptr)
-				{
-					if (intersects(pods[y - 1][x - 1]))
+					if (pods[y - 1][x - 1].getTile() != nullptr)
 					{
-						if (pods[y - 1][x - 1].getTile()->getType() < 3)
-							joyX = 1;
+						if (intersects(pods[y - 1][x - 1]))
+						{
+							if (pods[y - 1][x - 1].getTile()->isObstruction())
+								joyX = 1;
+						}
 					}
 				}
 			}

@@ -35,12 +35,14 @@ void Enemy::update()
 	{
 		int x = getSprite().getPosition().x / _scaledTile;
 		int y = getSprite().getPosition().y / _scaledTile;
+		int tileX = x*_scaledTile;
+		int tileY = y * _scaledTile;
 		bool pause = (rand() % 9 == 0);
 		if ((int)(sprite.getPosition().x) % _scaledTile == 0 || (int)(getSprite().getPosition().y) % _scaledTile == 0)
 			pause = false;
 		int moveX = 0;
 		int moveY = 0;
-		std::cout << "(" << x << "," << y<<","<<direct<< ")\n";
+		//std::cout << "(" << x << "," << y<<","<<direct<< ")\n";
 		switch (type)
 		{
 		case Type::Ballom: //ballom, random movement
@@ -54,7 +56,7 @@ void Enemy::update()
 					if (pods[y][x + 1].getTile() != nullptr)
 					{
 						//std::cout << "case00";
-						if (intersects(pods[y][x + 1]))
+						if (getSprite().getPosition().x)
 						{
 							std::cout << "case000";
 							if (pods[y][x + 1].getTile()->isObstruction())
