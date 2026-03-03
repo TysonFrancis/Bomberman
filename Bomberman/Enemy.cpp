@@ -33,32 +33,33 @@ void Enemy::update()
 	// Movement
 	if (alive)
 	{
-		int x = getSprite().getPosition().x / _scaledTile;
-		int y = getSprite().getPosition().y / _scaledTile;
+		int x = (getSprite().getPosition().x +24)/ _scaledTile;
+		int y = (getSprite().getPosition().y+24) / _scaledTile;
 		int tileX = x*_scaledTile;
 		int tileY = y * _scaledTile;
 		bool pause = (rand() % 9 == 0);
+		if (tileX - getSprite().getPosition().x != 0 || tileY - getSprite().getPosition().y != 0)
+			pause = false;
 		if ((int)(sprite.getPosition().x) % _scaledTile == 0 || (int)(getSprite().getPosition().y) % _scaledTile == 0)
 			pause = false;
 		int moveX = 0;
 		int moveY = 0;
-		//std::cout << "(" << x << "," << y<<","<<direct<< ")\n";
 		switch (type)
 		{
 		case Type::Ballom: //ballom, random movement
 			if (!pause)
 			{
 				switch (direct)
-				{								//Current issue: Never collides with the pod. It knows which pod is which, which pod to check, and where
-				case 0:							//it is it simply never has collide call true. Not an issue with the intersects method.
-					moveX = speed;				//If needed we can switch from directly checking intersection to if origin is past the center in a direction
+				{
+				case 0:
+					moveX = speed;
 					//std::cout << "case0";
 					if (pods[y][x + 1].getTile() != nullptr)
 					{
 						//std::cout << "case00";
-						if (getSprite().getPosition().x)
+						if (intersects(pods[y][x+1]))
 						{
-							std::cout << "case000";
+							//std::cout << "case000";
 							if (pods[y][x + 1].getTile()->isObstruction())
 							{
 								moveX = 0;
@@ -76,7 +77,7 @@ void Enemy::update()
 						//std::cout << "case11";
 						if (intersects(pods[y - 1][x]))
 						{
-							std::cout << "case111";
+							//std::cout << "case111";
 							if (pods[y - 1][x].getTile()->isObstruction())
 							{
 								moveY = 0;
@@ -94,7 +95,7 @@ void Enemy::update()
 						//std::cout << "case22";
 						if (intersects(pods[y][x - 1]))
 						{
-							std::cout << "case222";
+							//std::cout << "case222";
 							if (pods[y][x - 1].getTile()->isObstruction())
 							{
 								moveX = 0;
@@ -112,7 +113,7 @@ void Enemy::update()
 						//std::cout << "case33";
 						if (intersects(pods[y + 1][x]))
 						{
-							std::cout << "case333";
+							//std::cout << "case333";
 							if (pods[y + 1][x].getTile()->isObstruction())
 							{
 								moveY = 0;
@@ -123,8 +124,7 @@ void Enemy::update()
 					}
 					break;
 				}
-				//Commented out so other things can be worked on without enemy running out of the games
-				//move(sf::Vector2f(moveX, moveY));
+				move(sf::Vector2f(moveX, moveY));
 			}
 			else
 			{
