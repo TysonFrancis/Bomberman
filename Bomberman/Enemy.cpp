@@ -7,7 +7,7 @@ using sf::Keyboard::isKeyPressed;
 using sf::Keyboard::Scancode;
 
 Enemy::Enemy(const sf::Texture& tex, Pod (&pod)[_rows][_cols], Type input) :
-	Entity(tex), pods(pod), type(input), speed(0.f)
+	Entity(tex), pods(pod), type(input), speed(0.f), lastFacing(Facing::Left)
 {
 	switch (type)
 	{
@@ -21,11 +21,9 @@ Enemy::Enemy(const sf::Texture& tex, Pod (&pod)[_rows][_cols], Type input) :
 	case Type::Pontan:  speed = 6.f; break;
 	}
 	
-	// Instead of case logic, can use enum values to calculate
-	// texture position, since textures are in order of enum.
-	// Same with initial death frames before they split into 3 colors.
+	// Set texture based on enum Type
 	setTexture(sf::IntRect({ 0, 240 + static_cast<int>(type) * _tileSize}, {_tileSize, _tileSize}));
-	direct = rand() % 4;
+	dir = randomDirection();
 }
 
 void Enemy::update()
@@ -49,9 +47,9 @@ void Enemy::update()
 		case Type::Ballom: //ballom, random movement
 			if (!pause)
 			{
-				switch (direct)
+				switch (dir)
 				{
-				case 0:
+				case Facing::Right:
 					moveX = speed;
 					//std::cout << "case0";
 					if (pods[y][x + 1].getTile() != nullptr)
@@ -63,13 +61,13 @@ void Enemy::update()
 							if (pods[y][x + 1].getTile()->isObstruction())
 							{
 								moveX = 0;
-								direct = rand() % 4;
+								dir = randomDirection();
 								//std::cout << "hit0";
 							}
 						}
 					}
 					break;
-				case 1:
+				case Facing::Up:
 					moveY = -speed;
 					//std::cout << "case1";
 					if (pods[y - 1][x].getTile() != nullptr)
@@ -81,13 +79,13 @@ void Enemy::update()
 							if (pods[y - 1][x].getTile()->isObstruction())
 							{
 								moveY = 0;
-								direct = rand() % 4;
+								dir = randomDirection();
 								//std::cout << "hit1";
 							}
 						}
 					}
 					break;
-				case 2:
+				case Facing::Left:
 					moveX = -speed;
 					//std::cout << "case2";
 					if (pods[y][x - 1].getTile() != nullptr)
@@ -99,13 +97,13 @@ void Enemy::update()
 							if (pods[y][x - 1].getTile()->isObstruction())
 							{
 								moveX = 0;
-								direct = rand() % 4;
+								dir = randomDirection();
 								//std::cout << "hit2";
 							}
 						}
 					}
 					break;
-				case 3:
+				case Facing::Down:
 					moveY = speed;
 					//std::cout << "case3";
 					if (pods[y + 1][x].getTile() != nullptr)
@@ -117,7 +115,7 @@ void Enemy::update()
 							if (pods[y + 1][x].getTile()->isObstruction())
 							{
 								moveY = 0;
-								direct = rand() % 4;
+								dir = randomDirection();
 								//std::cout << "hit3";
 							}
 						}
@@ -128,7 +126,7 @@ void Enemy::update()
 			}
 			else
 			{
-				direct = rand() % 4;
+				dir = randomDirection();
 			}
 			break;
 
@@ -166,15 +164,25 @@ void Enemy::animate()
 {
 	myTick++;								// Increment tick every update
 
-	if(myTick % 5 != 0)						// Only update frame every 5 ticks, 60fps -> 12 frames per second
+	if(myTick % 10 != 0)					// Only update frame every 10 ticks, 60fps -> 6 frames per second
 		return;
 
-	if (state == State::Living)							    // If alive,
+	if (dir == Facing::Left || dir == Facing::Right)
+		lastFacing = dir;					// Update last facing if moving left or right, so if 
+											// moving up or down, it will still show the correct
+	Facing facing = lastFacing;				// texture instead of defaulting to a set direction
+
+	if (state == State::Living)				// If alive,
 	{
 		myFrame = (myFrame + 1) % 3;			// Loop through frames for walking animation, 3 frames total
-		return;
 
-		// Movement animations soon to come - Dylan
+		if(facing == Facing::Left)
+			setTexture(sf::IntRect({ myFrame * 16 + 48, 240 }, { _tileSize, _tileSize }));
+		else
+			setTexture(sf::IntRect({ myFrame * 16, 240 }, { _tileSize, _tileSize }));
+		
+
+		return;
 	}
 
 	if (myTick < _fps)						// Don't continue with death animation until after 1 second
@@ -186,25 +194,13 @@ void Enemy::animate()
 	if (myFrame >= 4)						// Once animation is finished, fully diezzz
 		state = State::Dead;
 
-	switch (type)							// Death animations
-	{
-	case Type::Ballom:							// Pink deaths
-	case Type::Minvo:
-	case Type::Pass:
-	case Type::Pontan:
-		setTexture(sf::IntRect({ myFrame * 16 + 112, 240 }, { _tileSize, _tileSize }));
-		break;
+	int deathRow = 240;							// Deafault to pink death row
+	if(type == Type::Onil || type == Type::Doria)
+		deathRow = 288;							// Set to blue death row
+	else if (type == Type::Dahl || type == Type::Ovape)
+		deathRow = 272;							// Set to purple death row
 
-	case Type::Onil:							// Blue deaths
-	case Type::Doria:
-		setTexture(sf::IntRect({ myFrame * 16 + 112, 288 }, { _tileSize, _tileSize }));
-		break;
-
-	case Type::Dahl:							// Purple deaths
-	case Type::Ovape:
-		setTexture(sf::IntRect({ myFrame * 16 + 112, 272 }, { _tileSize, _tileSize }));
-		break;
-	}
+	setTexture(sf::IntRect({ myFrame * 16 + 112, deathRow }, { _tileSize, _tileSize }));
 }
 
 void Enemy::die()
@@ -220,6 +216,8 @@ Enemy& Enemy::operator=(const Enemy& other)
 		Entity::operator=(other);
 	return *this;
 }
+
+Entity::Facing Enemy::randomDirection() { return static_cast<Entity::Facing>(rand() % 4); }
 
 std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
 {

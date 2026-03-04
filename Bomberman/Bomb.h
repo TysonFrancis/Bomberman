@@ -20,6 +20,8 @@ public:
 	Bomb& operator=(const Bomb& other);
 
 private:
+	void explodeDirection(int xDir, int yDir);
+
 	Pod(&pods)[_rows][_cols];
 	int x, y;
 	int distance;

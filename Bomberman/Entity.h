@@ -14,12 +14,8 @@
 class Entity : public sf::Drawable
 {
 public:
-	enum class State
-	{
-		Living,
-		Dying,
-		Dead
-	};
+	enum class State { Living, Dying, Dead };
+	enum class Facing { Up, Down, Left, Right };
 
 	Entity(const sf::Texture&);
 
@@ -43,6 +39,7 @@ public:
 protected:
 	sf::Sprite sprite;
 	State state;
+	Facing dir;
 	int myFrame; 
 	int myTick;
 };

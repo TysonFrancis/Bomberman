@@ -6,17 +6,7 @@
 class Enemy : public Entity
 {
 public:
-	enum class Type
-	{
-		Ballom,
-		Onil,
-		Dahl,
-		Minvo,
-		Doria,
-		Ovape,
-		Pass,
-		Pontan
-	};
+	enum class Type { Ballom, Onil, Dahl, Minvo, Doria, Ovape, Pass, Pontan };
 
 	Enemy(const sf::Texture&, Pod(&pod)[Constants::_rows][Constants::_cols], Type);
 
@@ -30,8 +20,10 @@ public:
 	Enemy& operator=(const Enemy& other);
 
 private:
+	Facing randomDirection();
+
 	Pod (&pods)[Constants::_rows][Constants::_cols];
 	Type type;
 	float speed;
-	int direct;
+	Entity::Facing lastFacing;
 };

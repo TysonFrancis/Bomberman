@@ -11,8 +11,6 @@ public:
 	Pod(const sf::Texture&, sf::RectangleShape, int, int);
 	~Pod() { delete tile; }
 
-	void update();
-
 	// Sets the object occupying the pod.
 	void setTile(Tile*);
 

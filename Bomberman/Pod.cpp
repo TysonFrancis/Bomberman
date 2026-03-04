@@ -1,6 +1,5 @@
 #include "Pod.h"
 
-// Got annoyed at complier yelling stuff was uninitalized
 Pod::Pod() : shape({ 0, 0 }), filled(false), tile(nullptr), x(0), y(0) {}
 
 Pod::Pod(const sf::Texture& tex, sf::RectangleShape shapes, int x, int y) :
@@ -8,15 +7,6 @@ Pod::Pod(const sf::Texture& tex, sf::RectangleShape shapes, int x, int y) :
 {
 	shape.setTexture(&tex);
 	shape.setPosition(sf::Vector2f(x, y));
-}
-
-void Pod::update()
-{
-	// Check bombs and update them, also check if they need to explode
-	if (tile != nullptr)
-		if (tile->getType() == Tile::BOMB)
-		{
-		}
 }
 
 bool Pod::isObstructed()
@@ -55,6 +45,7 @@ void Pod:: deleteTile()
 {
 	delete tile;
 	tile = nullptr;
+	setTexture(sf::IntRect({ 96, 0 }, { 16, 16 })); // Set to empty texture to let background through
 }
 
 void Pod::setColor(sf::Color color) { shape.setFillColor(color); }

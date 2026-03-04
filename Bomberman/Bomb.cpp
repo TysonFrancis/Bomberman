@@ -9,7 +9,7 @@ Bomb::~Bomb() {}
 
 void Bomb::update()
 {
-	if(myTick>=180 && !remote)//If 3 seconds and no remote explode
+	if (myTick >= _fps * 3 && !remote)	// If 3 seconds and no remote explode
 		explode();
 
 	animate();
@@ -18,55 +18,12 @@ void Bomb::update()
 void Bomb::explode()
 {
 	state = State::Dead;
-	pods[y][x].deleteTile();//Deletes spot it's at
-	for (int i = 1; i <= distance; i++) //Checks each direction
-	{
+	pods[y][x].deleteTile();	// Deletes spot it's at
 
-		if (pods[y][x + i].getTile() == nullptr)
-			pods[y][x + i].setColor(sf::Color::Yellow);//temporary color change to test bomb explosion
-		else
-		{
-		if (pods[y][x + i].getTile()->getType() == 1)//Destroys soft
-			pods[y][x + i].deleteTile();
-		break;
-		}
-	}
-	for (int i = 1; i <= distance; i++)
-	{
-
-		if (pods[y][x - i].getTile() == nullptr)
-			pods[y][x - i].setColor(sf::Color::Yellow);
-		else
-		{
-			if (pods[y][x - i].getTile()->getType() == 1)
-				pods[y][x - i].deleteTile();
-			break;
-		}
-	}
-	for (int i = 1; i <= distance; i++)
-	{
-		if (pods[y + i][x].getTile() == nullptr)
-			pods[y + i][x].setColor(sf::Color::Yellow);
-		else
-		{
-			if (pods[y+i][x].getTile()->getType() == 1)
-				pods[y+i][x].deleteTile();
-			break;
-		}
-	};
-	for (int i = 1; i <= distance; i++)
-	{
-		if (pods[y - i][x].getTile() == nullptr)
-			pods[y - i][x].setColor(sf::Color::Yellow);
-		else
-		{
-			if (pods[y - i][x].getTile()->getType() == 1)
-			{
-				pods[y - i][x].deleteTile();
-			}
-			break;
-		}
-	}
+	explodeDirection(1, 0);		// Checks right
+	explodeDirection(-1, 0);	// Checks left
+	explodeDirection(0, 1);		// Checks down
+	explodeDirection(0, -1);	// Checks up
 }
 
 
@@ -83,4 +40,22 @@ Bomb& Bomb::operator=(const Bomb& other)
 	if (this != &other)
 		Entity::operator=(other);
 	return *this;
+}
+
+void Bomb::explodeDirection(int xDir, int yDir)
+{
+	for (int i = 1; i <= distance; i++)
+	{
+		int xPos = x + xDir * i, yPos = y + yDir * i;		// Resized postion to check based on direction and distance
+		Tile* tile = pods[yPos][xPos].getTile();			// Get tile at position
+
+		if (pods[yPos][xPos].getTile() == nullptr)			// Skip to next check if empty tile
+			continue;		// This skips to next loop iteration
+		
+		if (pods[yPos][xPos].getTile()->getType() == Tile::Type::SOFT_WALL)		// If a soft wall is in the way,
+		{																		// delete it and stop checking in that direction
+			pods[yPos][xPos].deleteTile();
+			break;											// Important to break, else could explode through walls 
+		}
+	}
 }
