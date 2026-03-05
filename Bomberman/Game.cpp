@@ -120,15 +120,18 @@ void Game::update()
             }
         }
         
+       
+        
         for(int i = 0; i < bombs.size(); i++)
         {
-            bombs[i].update();
+            bombs[i].update();//Updates each bomb
             if (!bombs[i].isAlive())//Delete when dead, might need lamda stuff
             {
                 bombs.erase(bombs.begin() + i);
                 i--;
             }
 		}
+		std::cout << bombs.size() << std::endl;
 
         for (int row = 0; row < _rows; row++)
             for (int col = 0; col < _cols; col++)
