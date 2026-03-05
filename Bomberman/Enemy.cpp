@@ -31,7 +31,7 @@ Enemy::Enemy(const sf::Texture& tex, Pod (&pod)[_rows][_cols], Type input) :
 void Enemy::update()
 {
 	// Movement
-	if (alive)
+	if (state == State::Living)
 	{
 		int x = (getSprite().getPosition().x +24)/ _scaledTile;
 		int y = (getSprite().getPosition().y+24) / _scaledTile;
@@ -169,7 +169,7 @@ void Enemy::animate()
 	if(myTick % 5 != 0)						// Only update frame every 5 ticks, 60fps -> 12 frames per second
 		return;
 
-	if (alive)							    // If alive,
+	if (state == State::Living)							    // If alive,
 	{
 		myFrame = (myFrame + 1) % 3;			// Loop through frames for walking animation, 3 frames total
 		return;
@@ -182,6 +182,9 @@ void Enemy::animate()
 
 	if (myFrame < 4)						// Keep incrementing frame until finished with death animation
 		myFrame++;
+
+	if (myFrame >= 4)						// Once animation is finished, fully diezzz
+		state = State::Dead;
 
 	switch (type)							// Death animations
 	{
@@ -206,7 +209,7 @@ void Enemy::animate()
 
 void Enemy::die()
 {
-	alive = false;
+	state = State::Dying;
 	myFrame = myTick = 0;
 	setTexture(sf::IntRect({ 96, 240 + static_cast<int>(type) * _tileSize }, { _tileSize, _tileSize }));
 }

@@ -1,12 +1,10 @@
 #include "Entity.h"
 
 Entity::Entity(const sf::Texture& tex) :
-	sprite(tex), alive(true), myFrame(0), myTick(0) {}
+	sprite(tex), state(State::Living), myFrame(0), myTick(0) {}
 
 const sf::Sprite& Entity::getSprite() const { return sprite; }
-bool Entity::isAlive() const { return alive; }
-
-void Entity::setLife(bool life) { alive = life; }
+Entity::State Entity::getState() const { return state; }
 
 void Entity::move(sf::Vector2f dir) { sprite.move(dir); }
 void Entity::setScale(sf::Vector2f scale) { sprite.setScale(scale); }
@@ -16,8 +14,9 @@ void Entity::setTexture(const sf::IntRect& rect) { sprite.setTextureRect(rect); 
 
 bool Entity::intersects(Entity& other) const
 {
-	if (this->getSprite().getGlobalBounds().
-		findIntersection(other.getSprite().getGlobalBounds()))
+	if (this->sprite.getGlobalBounds().
+		findIntersection(other.sprite.getGlobalBounds()) &&
+		this->state == State::Living && other.state == State::Living)
 		return true;
 	return false;
 }
@@ -38,7 +37,7 @@ Entity& Entity::operator=(const Entity& other)
 		return *this;
 
 	sprite = other.sprite;
-	alive = other.alive;
+	state = other.state;
 	myTick = other.myTick;
 	myFrame = other.myFrame;
 
