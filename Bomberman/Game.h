@@ -52,8 +52,10 @@ private:
 
 	Pod pods[Constants::_rows][Constants::_cols]; // Array of Pods, 13 rows, 31 columns
 	std::vector<Bomb> bombs;
+	int bombCount;
 	sf::RenderWindow window;
 
 	GameState state;
 	int frame;
+	
 };

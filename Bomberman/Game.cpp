@@ -133,6 +133,7 @@ void Game::update()
                 i--;
             }
 		}
+		std::cout << bombs.size() << std::endl;
 
         frame++;
         break;

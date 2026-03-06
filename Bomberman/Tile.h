@@ -23,12 +23,14 @@ public:
 	{
 		HARD_WALL,
 		SOFT_WALL,
-		BOMB
+		BOMB,
+		FIRE
 	};
 	
 private:
 	// Whether the movement/explosions should be blocked by this tile
 	bool obstruction;
+	bool damage; //If this tile damages
 
 	// Identifies the child class
 	int type; 
