@@ -3,11 +3,8 @@
 
 using namespace Constants;
 
-using sf::Keyboard::isKeyPressed;
-using sf::Keyboard::Scancode;
-
-Enemy::Enemy(const sf::Texture& tex, Pod (&pod)[_rows][_cols], Type input) :
-	Entity(tex), pods(pod), type(input), speed(0.f), lastFacing(Facing::Left)
+Enemy::Enemy(const sf::Texture& tex, Pod (&pods)[_rows][_cols], Type input) :
+	Entity(tex, pods), type(input), speed(0.f), moveX(0), moveY(0), lastFacing(Facing::Left)
 {
 	switch (type)
 	{
@@ -23,111 +20,56 @@ Enemy::Enemy(const sf::Texture& tex, Pod (&pod)[_rows][_cols], Type input) :
 	
 	// Set texture based on enum Type
 	setTexture(sf::IntRect({ 0, 240 + static_cast<int>(type) * _tileSize}, {_tileSize, _tileSize}));
-	dir = randomDirection();
+	changeDirection();
 }
 
 void Enemy::update()
 {
+	if (state == State::Dead)		// Nothing to do if dead, can skip everything
+		return;
+
 	// Movement
 	if (state == State::Living)
 	{
-		int x = (getSprite().getPosition().x +24)/ _scaledTile;
-		int y = (getSprite().getPosition().y+24) / _scaledTile;
-		int tileX = x*_scaledTile;
-		int tileY = y * _scaledTile;
+		// Update tile position based on current world position
+		tileX = static_cast<int>((getSprite().getPosition().x - _halfTile) / _scaledTile);
+		tileY = static_cast<int>((getSprite().getPosition().y - _halfTile) / _scaledTile);
+
 		bool pause = (rand() % 9 == 0);
-		if (tileX - getSprite().getPosition().x != 0 || tileY - getSprite().getPosition().y != 0)
+
+		if (tileX - getSprite().getPosition().x != 0 ||
+			tileY - getSprite().getPosition().y != 0 ||
+			static_cast<int>(sprite.getPosition().x) % _scaledTile == 0 ||
+			static_cast<int>(sprite.getPosition().y) % _scaledTile == 0)
 			pause = false;
-		if ((int)(sprite.getPosition().x) % _scaledTile == 0 || (int)(getSprite().getPosition().y) % _scaledTile == 0)
-			pause = false;
-		int moveX = 0;
-		int moveY = 0;
+
 		switch (type)
 		{
 		case Type::Ballom: //ballom, random movement
 			if (!pause)
 			{
-				switch (dir)
-				{
-				case Facing::Right:
-					moveX = speed;
-					//std::cout << "case0";
-					if (pods[y][x + 1].getTile() != nullptr)
+				int nextX = tileX + moveX;			// Calculate next tile position based on input to avoid 
+				int nextY = tileY + moveY;			// repeated if blocks of y + 1, y - 1, x + 1, x - 1, etc.
+
+				if (moveX != 0)						// If moving horizontally,
+					if (isObstructed(nextX, tileY))		// If pod in next tile is solid and colliding, stop + change direction
 					{
-						//std::cout << "case00";
-						if (intersects(pods[y][x+1]))
-						{
-							//std::cout << "case000";
-							if (pods[y][x + 1].getTile()->isObstruction())
-							{
-								moveX = 0;
-								dir = randomDirection();
-								//std::cout << "hit0";
-							}
-						}
+						moveX = 0;
+						changeDirection();
 					}
-					break;
-				case Facing::Up:
-					moveY = -speed;
-					//std::cout << "case1";
-					if (pods[y - 1][x].getTile() != nullptr)
+
+				if (moveY != 0)						// If moving vertically,
+					if (isObstructed(tileX, nextY))		// If pod in next tile is solid and colliding, stop + change direction
 					{
-						//std::cout << "case11";
-						if (intersects(pods[y - 1][x]))
-						{
-							//std::cout << "case111";
-							if (pods[y - 1][x].getTile()->isObstruction())
-							{
-								moveY = 0;
-								dir = randomDirection();
-								//std::cout << "hit1";
-							}
-						}
+						moveY = 0;
+						changeDirection();
 					}
-					break;
-				case Facing::Left:
-					moveX = -speed;
-					//std::cout << "case2";
-					if (pods[y][x - 1].getTile() != nullptr)
-					{
-						//std::cout << "case22";
-						if (intersects(pods[y][x - 1]))
-						{
-							//std::cout << "case222";
-							if (pods[y][x - 1].getTile()->isObstruction())
-							{
-								moveX = 0;
-								dir = randomDirection();
-								//std::cout << "hit2";
-							}
-						}
-					}
-					break;
-				case Facing::Down:
-					moveY = speed;
-					//std::cout << "case3";
-					if (pods[y + 1][x].getTile() != nullptr)
-					{
-						//std::cout << "case33";
-						if (intersects(pods[y + 1][x]))
-						{
-							//std::cout << "case333";
-							if (pods[y + 1][x].getTile()->isObstruction())
-							{
-								moveY = 0;
-								dir = randomDirection();
-								//std::cout << "hit3";
-							}
-						}
-					}
-					break;
-				}
-				move(sf::Vector2f(moveX, moveY));
+
+				move({ moveX * speed, moveY * speed });
 			}
+
 			else
-			{
-				dir = randomDirection();
-			}
+				changeDirection();
 			break;
 
 		case Type::Onil: //onil, chases player if close
@@ -152,7 +94,7 @@ void Enemy::update()
 			break;
 		}
 
-		if (isKeyPressed(Scancode::Y))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Y))
 			die();
 	}
 
@@ -174,50 +116,76 @@ void Enemy::animate()
 
 	if (state == State::Living)				// If alive,
 	{
-		myFrame = (myFrame + 1) % 3;			// Loop through frames for walking animation, 3 frames total
+		myFrame = (myFrame + 1) % _moveFrames;			// Loop through frames for walking animation
 
 		if(facing == Facing::Left)
-			setTexture(sf::IntRect({ myFrame * 16 + 48, 240 }, { _tileSize, _tileSize }));
+			setTexture(sf::IntRect({ myFrame * _tileSize + 48, 240 }, { _tileSize, _tileSize }));
 		else
-			setTexture(sf::IntRect({ myFrame * 16, 240 }, { _tileSize, _tileSize }));
-		
+			setTexture(sf::IntRect({ myFrame * _tileSize, 240 }, { _tileSize, _tileSize }));
 
 		return;
 	}
 
-	if (myTick < _fps)						// Don't continue with death animation until after 1 second
-		return;
+	if (state == State::Dying)				// If dying,
+	{
+		if (myTick < _fps)						// Don't continue with death animation until after 1 second
+			return;
 
-	if (myFrame < 4)						// Keep incrementing frame until finished with death animation
-		myFrame++;
+		if (myFrame < 4)						// Keep incrementing frame until finished with death animation
+			myFrame++;
 
-	if (myFrame >= 4)						// Once animation is finished, fully diezzz
-		state = State::Dead;
+		if (myFrame >= 4)						// Once animation is finished, fully die
+			state = State::Dead;
 
-	int deathRow = 240;							// Deafault to pink death row
-	if(type == Type::Onil || type == Type::Doria)
-		deathRow = 288;							// Set to blue death row
-	else if (type == Type::Dahl || type == Type::Ovape)
-		deathRow = 272;							// Set to purple death row
+		int deathRow = 240;							// Deafault to pink death row
 
-	setTexture(sf::IntRect({ myFrame * 16 + 112, deathRow }, { _tileSize, _tileSize }));
+		if (type == Type::Onil || type == Type::Doria)
+			deathRow = 288;							// Set to blue death row
+		else if (type == Type::Dahl || type == Type::Ovape)
+			deathRow = 272;							// Set to purple death row
+
+		setTexture(sf::IntRect({ myFrame * _tileSize + 112, deathRow }, { _tileSize, _tileSize }));
+	}
 }
 
 void Enemy::die()
 {
+	if(state != State::Living)
+		return;
+
 	state = State::Dying;
 	myFrame = myTick = 0;
 	setTexture(sf::IntRect({ 96, 240 + static_cast<int>(type) * _tileSize }, { _tileSize, _tileSize }));
 }
 
-Enemy& Enemy::operator=(const Enemy& other)
+
+// *** Private helper methods *** //
+
+bool Enemy::isObstructed(int checkX, int checkY)
 {
-	if (this != &other)
-		Entity::operator=(other);
-	return *this;
+	if (checkX < 0 || checkX >= _cols ||		// Out of bounds, treat as solid
+		checkY < 0 || checkY >= _rows)
+		return true;
+
+	// return if pod in question is solid and colliding
+	return pods[checkY][checkX].filled && intersects(checkX, checkY);
 }
 
-Entity::Facing Enemy::randomDirection() { return static_cast<Entity::Facing>(rand() % 4); }
+void Enemy::changeDirection()
+{
+	dir = static_cast<Entity::Facing>(rand() % 4);
+
+	switch (dir)
+	{
+	case Facing::Up:		moveX = 0;	moveY = -1;		break;
+	case Facing::Down:		moveX = 0;	moveY = 1;		break;
+	case Facing::Left:		moveX = -1; moveY = 0;		break;
+	case Facing::Right:		moveX = 1;	moveY = 0;		break;
+	}
+}
+
+
+// *** Public debugging methods *** //
 
 std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
 {
@@ -238,4 +206,11 @@ std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
 	out << "\n";
 
 	return out;
+}
+
+Enemy& Enemy::operator=(const Enemy& other)
+{
+	if (this != &other)
+		Entity::operator=(other);
+	return *this;
 }

@@ -1,16 +1,25 @@
 #include "Entity.h"
 
-Entity::Entity(const sf::Texture& tex) :
-	sprite(tex), state(State::Living), myFrame(0), myTick(0) {}
+using namespace Constants;
 
-const sf::Sprite& Entity::getSprite() const { return sprite; }
-Entity::State Entity::getState() const { return state; }
+Entity::Entity(const sf::Texture& tex, Pod(&pods)[_rows][_cols]) :
+	sprite(tex), pods(pods), state(State::Living), dir(Facing::None),
+	myTick(0), myFrame(0), tileX(0), tileY(0), worldX(0), worldY(0)
+{
+	setOrigin({ Constants::_halfTile, Constants::_halfTile });
+	setScale({ Constants::_scale, Constants::_scale });
+}
 
-void Entity::move(sf::Vector2f dir) { sprite.move(dir); }
-void Entity::setScale(sf::Vector2f scale) { sprite.setScale(scale); }
-void Entity::setPosition(sf::Vector2f pos) { sprite.setPosition(pos); }
-void Entity::setOrigin(sf::Vector2f origin) { sprite.setOrigin(origin); }
-void Entity::setTexture(const sf::IntRect& rect) { sprite.setTextureRect(rect); }
+const sf::Sprite& Entity::getSprite() const		{ return sprite; }
+Entity::State Entity::getState() const			{ return state; }
+
+void Entity::move(sf::Vector2f dir)					{ sprite.move(dir); }
+void Entity::setScale(sf::Vector2f scale)			{ sprite.setScale(scale); }
+void Entity::setPosition(sf::Vector2f pos)			{ sprite.setPosition(pos); }
+void Entity::setOrigin(sf::Vector2f origin)			{ sprite.setOrigin(origin); }
+void Entity::setTexture(const sf::IntRect& rect)	{ sprite.setTextureRect(rect); }
+void Entity::draw(sf::RenderTarget& target,
+				sf::RenderStates states) const		{ target.draw(sprite, states); }
 
 bool Entity::intersects(Entity& other) const
 {
@@ -21,25 +30,37 @@ bool Entity::intersects(Entity& other) const
 	return false;
 }
 
-bool Entity::intersects(Pod& pod) const
+// Takes in coordinates of the pod to check, and creates an sf::FloatRect of the area to check for an intersection
+// with the entity's sprite, similar to how you could use getGlobalBounds() on an sf::RectangleShape, this is just manual.
+// Since there's no shape and just boolean values I have to create the rectangle to make the comparison myself.
+bool Entity::intersects(float x, float y) const
 {
-	if (this->getSprite().getGlobalBounds().
-		findIntersection(pod.getShape().getGlobalBounds()))
+	if (this->getSprite().getGlobalBounds(). // At position (tileX * game tile scale, tileY * game tile scale), with size of game tile scale
+		findIntersection(sf::FloatRect(sf::Vector2f(x * _scaledTile, y * _scaledTile), sf::Vector2f(_scaledTile, _scaledTile))))
 		return true;
 	return false;
 }
 
-void Entity::draw(sf::RenderTarget& target, sf::RenderStates states) const { target.draw(sprite, states); }
+
+// *** Public debugging method for derived class use *** //
 
 Entity& Entity::operator=(const Entity& other)
 {
-	if (this == &other)
-		return *this;
+	if (this != &other)
+	{
+		sprite = other.sprite;
 
-	sprite = other.sprite;
-	state = other.state;
-	myTick = other.myTick;
-	myFrame = other.myFrame;
+		state = other.state;
+		dir = other.dir;
+
+		myTick = other.myTick;
+		myFrame = other.myFrame;
+
+		tileX = other.tileX;
+		tileY = other.tileY;
+		worldX = other.worldX;
+		worldY = other.worldY;
+	}
 
 	return *this;
 }

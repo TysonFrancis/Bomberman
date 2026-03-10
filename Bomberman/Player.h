@@ -15,21 +15,27 @@
 class Player : public Entity
 {
 public:
-	Player(const sf::Texture&, Pod (&pod)[Constants::_rows][Constants::_cols], std::vector<Bomb>& bombs);
+	Player(const sf::Texture&, Pod (&pods)[Constants::_rows][Constants::_cols], std::vector<Bomb>& bombs);
 
 	void update();
 	void animate();
+	void die();
 
-	// For testing purposes, prints the player's position
 	friend std::ostream& operator<<(std::ostream&, const Player&);
+	Player& operator=(const Player& other);
 
 private:
-	Pod (&pods)[Constants::_rows][Constants::_cols];
-	float speed, joyX, joyY;
-	int x, y;
+	void moveLogic();
+	bool isObstructed(int, int);
+
 	std::vector<Bomb>& bombs;
 
-	bool remote = false; // Used to determine if player has remote control powerup, default false
-	int blast = 1; // Used to determine blast radius of bombs
-	int maxBombs = 3; // Used to determine how many bombs player can have out at once
+	float speed;
+
+	int joyX, joyY;
+	int lives;
+
+	int blast;		// Used to determine blast radius of bombs
+	int maxBombs;	// Used to determine how many bombs player can have out at once
+	bool remote;	// Used to determine if player has remote control powerup, default false
 };

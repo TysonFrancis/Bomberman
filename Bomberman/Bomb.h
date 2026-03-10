@@ -4,26 +4,20 @@
 #include "Constants.h"
 #include "Entity.h"
 
-using namespace Constants;
-
-
 class Bomb : public Entity
 {
 public:
-	Bomb(const sf::Texture&, bool, int, Pod(&pods)[_rows][_cols], int, int);
-	~Bomb();
+	Bomb(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols], bool, int, int, int);
 
 	void update();
-	void explode();
 	void animate();
+	void explode();
 
 	Bomb& operator=(const Bomb& other);
 
 private:
-	void explodeDirection(int xDir, int yDir);
+	void propogate(int, int);
 
-	Pod(&pods)[_rows][_cols];
-	int x, y;
 	int distance;
-	bool remote; //Checks if player has remote power up
+	bool remote; // Checks if player has remote power up
 };

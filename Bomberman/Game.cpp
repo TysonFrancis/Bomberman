@@ -12,7 +12,7 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
     bomber(animations.getEntities(), pods, bombs),              // Load bomber sprite
     window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
-    state(GameState::Title), frame(0)                           // Set state to title screen and frame count to 0 
+    state(GameState::Title)                                     // Set state to title screen
 {
     srand(time(NULL));
 
@@ -21,25 +21,15 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
     window.setFramerateLimit(_fps);
 
     // Set title sprite on right texture, scale to fit and position in middle of window
-    title.setTexture(sf::IntRect({ 0, 0 }, { 256, 240 }));
+    title.setTextureRect(sf::IntRect({ 0, 0 }, { 256, 240 }));
     title.setOrigin({ 128.f, 120.f });
-    title.setScale({ _scale * 0.875f, _scale * 0.875f}); // Best ratio fit for title screen
+    title.setScale({ _scale * 0.875f, _scale * 0.875f});        // Best ratio fit for title screen
     title.setPosition({ _windowWidth / 2.f, _windowHeight / 2.f });
 
     // Set background sprite on right texture and scale to fit window
-    background.setTexture(sf::IntRect({ 0, 0 }, { 496, 208 }));
+    background.setTextureRect(sf::IntRect({ 0, 0 }, { 496, 208 }));
     background.setScale({ _scale, _scale });
 
-    // Set bomber sprite on starting texture and scale to see better
-    bomber.setTexture(sf::IntRect({ 64, 0 }, { _tileSize, _tileSize }));
-    bomber.setOrigin({ 8.f, 8.f });
-    bomber.setScale({ _scale, _scale });
-    bomber.setPosition({ _scaledTile * 1.5, _scaledTile * 1.5 });
-
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Ballom));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Ballom));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Ballom));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Ballom));
     /*enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Dahl));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Doria));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Minvo));
@@ -48,32 +38,42 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pass));
     enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pontan));*/
 
-    for (Enemy& enemy : enemies)
-    {
-        enemy.setScale({ _scale, _scale });
-        enemy.setPosition(sf::Vector2f((rand() % 28 + 2) * _scaledTile, (rand() % 10 + 2) * _scaledTile));
-    }
-
     // Create pod system of walls and border
     for (int row = 0; row < _rows; row++)
         for (int col = 0; col < _cols; col++)
         {
-            pods[row][col] = Pod(animations.getEntities(), // To pass entity textures
-                sf::RectangleShape({_scaledTile, _scaledTile}),
-                col * _scaledTile, row * _scaledTile);
-
 			bool isInnerWall = col % 2 == 0 && row % 2 == 0;
 			bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
             bool isSoft = (rand() % 4 == 0 && (row > 2 || col > 2)); // Can't spawn in top 2 x 2 by player
 
             // Tile*'s deleted in pod desturctor, so no memory leak
             if (isInnerWall || isBorder)    // Set border
-				pods[row][col].setTile(new HardWall);
-            else if (isSoft)                // Set breakable blocks
-                pods[row][col].setTile(new SoftWall);           
-            else                            // Set inner
-                pods[row][col].setTile(nullptr); // Set to nullptr to not display a texture later
+                pods[row][col].filled = true;
+            else if(isSoft)
+            {
+                pods[row][col].filled = true;
+				pods[row][col].isSoft = true;
+				softWalls.push_back(SoftWall(animations.getEntities(), pods, col, row));
+            }
+            else
+				pods[row][col].filled = false;
         }
+
+    // Make 5 enemies and put them in positions that are empty
+    for (int i = 0; i < 5; i++)
+    {
+        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Ballom);
+        int x, y;
+
+        do
+        {
+            x = rand() % 29 + 2;
+            y = rand() % 11 + 2;
+        } while (pods[y][x].filled);
+
+        enemy.setPosition(sf::Vector2f(x * _scaledTile + _halfScaled, y * _scaledTile + _halfScaled));
+		enemies.push_back(enemy);
+    }
 }
 
 // Holds main game loop, all actions passed
@@ -111,10 +111,10 @@ void Game::update()
 
         for (size_t i = 0; i < enemies.size(); i++)
         {
-            enemies.at(i).update();
+            enemies[i].update();
 
-            if (bomber.intersects(enemies.at(i)))
-                enemies.at(i).die();
+            if (enemies[i].intersects(bomber))
+                bomber.die();
 
             if (enemies[i].getState() == Entity::State::Dead)
             {
@@ -123,7 +123,7 @@ void Game::update()
             }
         }
 
-        for(int i = 0; i < bombs.size(); i++)
+        for (size_t i = 0; i < bombs.size(); i++)
         {
             bombs[i].update();
 
@@ -132,10 +132,19 @@ void Game::update()
                 bombs.erase(bombs.begin() + i);
                 i--;
             }
-		}
-		std::cout << bombs.size() << std::endl;
+        }
 
-        frame++;
+        for (size_t i = 0; i < softWalls.size(); i++)
+        {
+            softWalls[i].update();
+
+            if (softWalls[i].getState() == Entity::State::Dead)
+            {
+                softWalls.erase(softWalls.begin() + i);
+                i--;
+            }
+        }
+
         break;
 
     case(GameState::Title):
@@ -154,16 +163,22 @@ void Game::render()
     case(GameState::Playing):
         window.draw(background);
 
-        // I think that drawing pods is permanent the way
-        // I've structured it so far, might need to refactor
-        for (int row = 0; row < _rows; row++)
-            for (int col = 0; col < _cols; col++)
-                window.draw(pods[row][col].getShape());
+        // Removed drawing pods lets FREAKING go
+
+        for (Bomb& bomb : bombs)
+            window.draw(bomb);
+
+        for (Explosion& explosion : explosions)
+            window.draw(explosion);
 
         window.draw(bomber);
 
         for (Enemy& enemy : enemies)
             window.draw(enemy);
+
+        for (SoftWall& wall : softWalls)
+            window.draw(wall);
+
         break;
 
     case(GameState::Title):         window.draw(title);             break;
@@ -197,4 +212,7 @@ void Game::startRound()
 // Called when window is closed, used to
 // ensure necessary things are destructed
 // Currently nothing to destruct, but will be in future
-void Game::closeGame() { window.close(); }
+void Game::closeGame()
+{
+    window.close();
+}
