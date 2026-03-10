@@ -156,7 +156,6 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Explosion.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="SoftWall.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Tile.h" />
@@ -168,9 +167,6 @@
     <Image Include="Textures\Entities.png" />
     <Image Include="Textures\Misc.png" />
     <Image Include="Textures\Title.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Bomberman.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
