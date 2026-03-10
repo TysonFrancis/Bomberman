@@ -20,4 +20,5 @@ private:
 
 	int distance;
 	bool remote; // Checks if player has remote power up
+	bool up;
 };

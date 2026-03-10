@@ -1,11 +1,13 @@
 #include "Explosion.h"
 
+using namespace Constants;
+
 Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols], int x, int y, Facing dir) :
 	Entity(tex, pods)
 {
 	tileX = x;
 	tileY = y;
-	this.dir = dir;
+	this->dir = dir;
 }
 
 void Explosion::update()

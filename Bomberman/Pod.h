@@ -1,7 +1,8 @@
 #pragma once
 
-struct Pod
+class Pod
 {
+public:
 	Pod() : filled(true), isSoft(false), isExplosion(false) {}
 
 	bool filled;
