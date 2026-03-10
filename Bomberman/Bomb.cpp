@@ -16,7 +16,7 @@ Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 
 void Bomb::update()
 {
-	if (myTick >= _fps * 3 && !remote)	// If 3 seconds and no remote explode
+	if (myTick >= _fps * 2.5 && !remote)	// If 3 seconds and no remote explode
 		explode();
 
 	animate();
