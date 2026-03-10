@@ -9,8 +9,8 @@
 #include "Bomb.h"
 #include "Enemy.h"
 #include "Pod.h"
-#include "HardWall.h"
 #include "SoftWall.h"
+#include "Explosion.h"
 #include "Constants.h"
 
 /*
@@ -22,13 +22,7 @@
 	GameState enum to determine what to update and render.
 */
 
-enum class GameState
-{
-	Title,
-	RoundStart,
-	Playing,
-	GameOver // Future
-};
+enum class GameState { Title, RoundStart, Playing, GameOver };
 
 class Game
 {
@@ -44,18 +38,20 @@ public:
 
 private:
 	Animations animations;
-	Audio audio;
-	Entity title;
-	Entity background;
+
 	Player bomber;
 	std::vector<Enemy> enemies;
 
-	Pod pods[Constants::_rows][Constants::_cols]; // Array of Pods, 13 rows, 31 columns
 	std::vector<Bomb> bombs;
-	int bombCount;
-	sf::RenderWindow window;
+	std::vector<Explosion> explosions;
+	std::vector<SoftWall> softWalls;
 
+	Pod pods[Constants::_rows][Constants::_cols];
+
+	Audio audio;
+	sf::Sprite title;
+	sf::Sprite background;
+
+	sf::RenderWindow window;
 	GameState state;
-	int frame;
-	
 };

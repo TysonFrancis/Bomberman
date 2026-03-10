@@ -1,11 +1,18 @@
 #pragma once
-#include "Tile.h"
+#include <SFML/Graphics.hpp>
 
-class SoftWall : public Tile
+#include "Entity.h"
+#include "Pod.h"
+#include "Constants.h"
+
+class SoftWall : public Entity
 {
 public:
-	SoftWall() : Tile(SOFT_WALL) {}
-	~SoftWall() {}
-	bool isObstruction() const { return true; }
-	bool isDestructible() const { return true; }
+	SoftWall(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols], int, int);
+
+	void update();
+	void animate();
+	void die();
+
+	SoftWall& operator=(const SoftWall& other);
 };
