@@ -71,7 +71,7 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
             y = rand() % 11 + 2;
         } while (pods[y][x].filled);
 
-        enemy.setPosition(sf::Vector2f(x * _scaledTile + _halfScaled, y * _scaledTile + _halfScaled));
+        enemy.setPosition(sf::Vector2f(x * _scaledTile -_halfScaled, y * _scaledTile -_halfScaled));
 		enemies.push_back(enemy);
     }
 }
