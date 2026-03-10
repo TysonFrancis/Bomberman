@@ -23,6 +23,6 @@ private:
 
 	Type type;
 	float speed;
-	int moveX, moveY;
+	double moveX, moveY;
 	Entity::Facing lastFacing;
 };

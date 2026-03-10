@@ -32,15 +32,13 @@ void Enemy::update()
 	if (state == State::Living)
 	{
 		// Update tile position based on current world position
-		tileX = static_cast<int>((getSprite().getPosition().x - _halfTile) / _scaledTile);
-		tileY = static_cast<int>((getSprite().getPosition().y - _halfTile) / _scaledTile);
+		tileX = static_cast<int>((getSprite().getPosition().x ) / _scaledTile);
+		tileY = static_cast<int>((getSprite().getPosition().y ) / _scaledTile);
 
 		bool pause = (rand() % 9 == 0);
 
-		if (tileX - getSprite().getPosition().x != 0 ||
-			tileY - getSprite().getPosition().y != 0 ||
-			static_cast<int>(sprite.getPosition().x) % _scaledTile == 0 ||
-			static_cast<int>(sprite.getPosition().y) % _scaledTile == 0)
+		if (static_cast<int>(sprite.getPosition().x) % _scaledTile != _halfScaled ||
+			static_cast<int>(sprite.getPosition().y) % _scaledTile != _halfScaled)
 			pause = false;
 
 		switch (type)
@@ -54,18 +52,24 @@ void Enemy::update()
 				if (moveX != 0)						// If moving horizontally,
 					if (isObstructed(nextX, tileY))		// If pod in next tile is solid and colliding, stop + change direction
 					{
-						moveX = 0;
-						changeDirection();
+						changeDirection();			//recovery variables say that when colliding into a wall recenter in the pod
+						double recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
+						moveX = recoverX/speed;
+						double recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
+						moveY = recoverY / speed;
 					}
 
 				if (moveY != 0)						// If moving vertically,
 					if (isObstructed(tileX, nextY))		// If pod in next tile is solid and colliding, stop + change direction
 					{
-						moveY = 0;
-						changeDirection();
+						changeDirection();			//recovery variables say that when colliding into a wall recenter in the pod
+						double recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
+						moveY = recoverY/speed;
+						double recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
+						moveX = recoverX / speed;
 					}
 
-				move({ moveX * speed, moveY * speed });
+				move({ (float)(moveX * speed), (float)(moveY * speed) });
 			}
 
 			else
@@ -177,10 +181,29 @@ void Enemy::changeDirection()
 
 	switch (dir)
 	{
-	case Facing::Up:		moveX = 0;	moveY = -1;		break;
-	case Facing::Down:		moveX = 0;	moveY = 1;		break;
-	case Facing::Left:		moveX = -1; moveY = 0;		break;
-	case Facing::Right:		moveX = 1;	moveY = 0;		break;
+	case Facing::Up:
+		moveX = 0;	
+		moveY = -1;		
+		if(!isObstructed(tileX,tileY-1))
+			break;
+	case Facing::Down:
+		moveX = 0;	
+		moveY = 1;		
+		if (!isObstructed(tileX, tileY +1))
+			break;
+	case Facing::Left:
+		moveX = -1; 
+		moveY = 0;		
+		if (!isObstructed(tileX-1, tileY))
+			break;
+	case Facing::Right:		
+		moveX = 1;	
+		moveY = 0;		
+		if (!isObstructed(tileX+1, tileY))
+			break;
+	default:
+		moveX = 0;
+		moveY = 0;
 	}
 }
 

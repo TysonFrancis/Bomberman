@@ -5,8 +5,9 @@ using namespace Constants;
 
 Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 	bool timer, int d, int x, int y) :
-	Entity(tex, pods), remote(timer), distance(d)
+	Entity(tex, pods), remote(timer), distance(d), up(false)
 {
+	myFrame = 2;
 	tileX = x;
 	tileY = y;
 	setTexture(sf::IntRect({ 0, 48 }, { _tileSize, _tileSize }));
@@ -15,7 +16,7 @@ Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 
 void Bomb::update()
 {
-	if (myTick >= _fps * 3 && !remote)	// If 3 seconds and no remote explode
+	if (myTick >= _fps * 2.5 && !remote)	// If 3 seconds and no remote explode
 		explode();
 
 	animate();
@@ -25,12 +26,20 @@ void Bomb::animate()
 {
 	myTick++;
 
-	if (myTick % 18 != 0)						// Changes size every 18 ticks
+	if (myTick % 15 != 0)						// Changes size every 15 ticks
 		return;
 
 	if (state == State::Living)					// Alive animations
 	{
-		myFrame = (myFrame + 1) % _moveFrames;		// Loop through frames for pulsing animation
+		if (up)
+			myFrame++;
+		else
+			myFrame--;
+
+		if (myFrame == 0)
+			up = true;
+		else if (myFrame == 2)
+			up = false;
 
 		setTexture(sf::IntRect({ myFrame * 16, 48 }, { _tileSize, _tileSize }));
 
@@ -59,6 +68,7 @@ void Bomb::explode()
 	propogate(1, 0);		// Checks right
 }
 
+
 // *** Private helper method *** //
 
 void Bomb::propogate(int xDir, int yDir)
@@ -86,6 +96,7 @@ void Bomb::propogate(int xDir, int yDir)
 						// destroyed, so stop checking in that direction and exit loop
 	}
 }
+
 
 // *** Public debugging method *** //
 

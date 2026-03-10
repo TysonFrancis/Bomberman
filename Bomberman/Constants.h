@@ -11,7 +11,7 @@ namespace Constants
 	static constexpr float _scale = 3.f;
 	static constexpr int _tileSize = 16;
 	static constexpr int _scaledTile = static_cast<int>(_tileSize * _scale);
-	static constexpr int _halfTile = 16;
+	static constexpr int _halfTile = 8;
 	static constexpr int _halfScaled = static_cast<int>(_halfTile * _scale);
 
 	// Window size

@@ -17,8 +17,8 @@ void Player::update()
 	if (state == State::Living)
 	{
 		// Update tile position based on current world position
-		tileX = static_cast<int>((sprite.getPosition().x - _halfTile) / _scaledTile);
-		tileY = static_cast<int>((sprite.getPosition().y - _halfTile) / _scaledTile);
+		tileX = static_cast<int>((sprite.getPosition().x ) / _scaledTile);
+		tileY = static_cast<int>((sprite.getPosition().y ) / _scaledTile);
 
 		// Determine total direction held
 		joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
