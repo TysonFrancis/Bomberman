@@ -19,7 +19,7 @@ namespace Constants
 	static constexpr unsigned int _windowHeight = _rows * _scaledTile;
 
 	// Animation stuff, most likely more to come maybe
-	static constexpr unsigned int _fps = 60;
+	static constexpr unsigned int _fps = 10;
 	static constexpr unsigned int _moveFrames = 3;
 
 	static constexpr sf::IntRect _emptyFrame({ 0, 0 }, { 0, 0 });
