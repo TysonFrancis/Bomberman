@@ -15,7 +15,7 @@ Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 
 void Bomb::update()
 {
-	if (myTick >= _fps * 3 && !remote)	// If 3 seconds and no remote explode
+	if (myTick >= _fps * 2.5 && !remote)	// If 3 seconds and no remote explode
 		explode();
 
 	animate();
@@ -25,7 +25,7 @@ void Bomb::animate()
 {
 	myTick++;
 
-	if (myTick % 18 != 0)						// Changes size every 18 ticks
+	if (myTick % 15 != 0)						// Changes size every 18 ticks
 		return;
 
 	if (state == State::Living)					// Alive animations
