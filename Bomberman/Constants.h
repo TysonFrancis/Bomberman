@@ -26,6 +26,12 @@ namespace Constants
 	static constexpr int _explosionOffset = 80;
 	static constexpr int _explosionStartX = 32;
 	static constexpr int _explosionStartY = 96;
+	static constexpr int _explosionTickSpeed = 6;
+
+	static constexpr int _bombTickSpeed = 15;
+	static constexpr float _bombTimer = 2.5;
+
+	static constexpr int _wallTickSpeed = 6;
 
 	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });
 	static constexpr sf::IntRect _emptyFrame({ 0, 0 }, { 0, 0 });

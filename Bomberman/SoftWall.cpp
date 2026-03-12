@@ -26,7 +26,7 @@ void SoftWall::animate()
 {
 	myTick++;
 
-	if (myTick % 10 != 0)			// Might need to change this timing? but seems ok to me		- D
+	if (myTick % _wallTickSpeed != 0)			// Might need to change this timing? but seems ok to me		- D
 		return;
 
 	if (myFrame < 6)				// Keep incrementing frame until finished with death animation

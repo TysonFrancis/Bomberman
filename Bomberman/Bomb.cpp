@@ -18,7 +18,7 @@ Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 
 void Bomb::update()
 {
-	if (myTick >= _fps * 2.5 && !remote)	// If 2.5 seconds and no remote explode
+	if (myTick >= _fps * _bombTimer && !remote)	// If 2.5 seconds and no remote explode
 		explode();
 
 	animate();
@@ -28,7 +28,7 @@ void Bomb::animate()
 {
 	myTick++;
 
-	if (myTick % 15 != 0)						// Changes size every 15 ticks
+	if (myTick % _bombTickSpeed != 0)
 		return;
 
 	if (state == State::Living)					// Alive animations
@@ -101,8 +101,12 @@ void Bomb::propogate(int xDir, int yDir)
 			continue;								// Skip to next iteration
 		}
 
-		// If pod is filled, spawn end explosion in place
-		explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
+		if (pods[yPos][xPos].isBomb)
+		{
+			pods[yPos][xPos].filled = false;
+			pods[yPos][xPos].isBomb = false;
+			explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
+		}
 		
 		if (pods[yPos][xPos].isSoft)			// If a soft wall is in the way,
 		{										// delete it and stop checking in that direction

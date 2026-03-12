@@ -5,7 +5,8 @@
 using namespace Constants;
 
 Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
-	int x, int y, Facing dir, bool isEnd) : Entity(tex, pods), row(1), end(isEnd)
+	int x, int y, Facing dir, bool isEnd) :
+		Entity(tex, pods), row(1), end(isEnd), shrink(false)
 {
 	tileX = x;
 	tileY = y;
@@ -17,28 +18,49 @@ Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 
 void Explosion::update()
 {
-	if (state == State::Living)		// Only thing to do is animate, and only does that when alive
-		animate();
+	if (myTick >= _explosionTickSpeed * 6)		// If been living for 7 or more frames
+		die();
+
+	animate();
 }
 
 void Explosion::animate()
 {
 	myTick++;
 
-	if (myTick % 15 != 0)		// Same speed to match with soft wall dying, need to look at emulator 
+	if (myTick % _explosionTickSpeed != 0)
 		return;
 
-	if (myFrame >= 1)			// Once frame advances past 1, switch to second row explosions
-		row = 2;
-
-	if (myFrame < 4)			// Keep incrementing frame until finished with death animation
+	if (state == State::Living)
 	{
-		myFrame++;
+		if (shrink)								// If it should get smaller, frame--,
+			myFrame--;
+		else										// Otherwise, frame++
+			myFrame++;
+
+		if (myFrame <= 0)							// If at smallest size, enlarge
+			shrink = false;
+		else if (myFrame >= 3)						// If at largest size, shrink
+			shrink = true;
+
+		if (myFrame > 1)				// If frame advances past 1, switch to second row explosions
+			row = 2;
+		if (myFrame < 2 && shrink)		// If frame is less than 2 and it should get smaller, switch to first row
+			row = 1;
+
 		setTexture();
+
+		return;
 	}
 
-	if (myFrame >= 4)			// Once animation is finished, fully die
+	if (myFrame <= 0 && state == State::Dying)
 		state = State::Dead;
+
+}
+
+void Explosion::die()
+{
+	state = State::Dying;
 }
 
 
@@ -88,12 +110,22 @@ void Explosion::setTexture()
 
 std::ostream& operator<<(std::ostream& os, const Explosion& explosion)
 {
-	if(explosion.end)
+	if(explosion.dir == Entity::Facing::None)
+	{
 		os << "Position: (" << explosion.tileX << ", " << explosion.tileY << ")\t"
 			<< "frame: " << explosion.myFrame << "\trow: " << explosion.row
-			<< "\tend: " << (explosion.end ? "true" : "false") << "\n";
-	else
-		os << "Not end\n";
+			<< "\tend: " << (explosion.end ? "true" : "false")
+			<< "\tstate: ";
+
+		switch (explosion.state)
+		{
+		case Entity::State::Living:	std::cout << "living";	break;
+		case Entity::State::Dying:	std::cout << "dying";	break;
+		case Entity::State::Dead:	std::cout << "dead";	break;
+		}
+
+		std::cout << "";
+	}
 
 	return os;
 }

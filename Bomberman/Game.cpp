@@ -131,13 +131,18 @@ void Game::update()
         for (size_t i = 0; i < explosions.size(); i++)
         {
             explosions[i].update();
+            std::cout << explosions[i] << "\tsize: " << explosions.size() << "\n";
 
-            if (explosions[i].intersects(bomber))
-                bomber.die();
+            //if (explosions[i].intersects(bomber))
+              //  bomber.die();
 
             for (Enemy& enemy : enemies)
                 if(explosions[i].intersects(enemy))
                     enemy.die();
+
+            for (Bomb& bomb : bombs)
+                if (explosions[i].intersects(bomb))
+                    bomb.explode();
 
             if (explosions[i].getState() == Entity::State::Dead)
             {

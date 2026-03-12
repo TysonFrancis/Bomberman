@@ -33,6 +33,7 @@ void Player::update()
 			if (!pods[tileY][tileX].filled && bombs.size() < maxBombs)
 			{
 				pods[tileY][tileX].filled = true;
+				pods[tileY][tileX].isBomb = true;
 				bombs.push_back(Bomb(sprite.getTexture(), pods, explosions, remote, blast, tileX, tileY));
 			}
 	}

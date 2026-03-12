@@ -13,6 +13,7 @@ public:
 
 	void update();
 	void animate();
+	void die();
 
 	friend std::ostream& operator<<(std::ostream&, const Explosion&);
 	Explosion& operator=(const Explosion&);
@@ -22,4 +23,5 @@ private:
 
 	int row;
 	bool end;
+	bool shrink;
 };
