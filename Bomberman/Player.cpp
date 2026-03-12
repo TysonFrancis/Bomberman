@@ -42,8 +42,6 @@ void Player::update()
 	// otherwise waits for animation to finish and fully die
 	if(state == State::Dead)
 	{
-		//std::cout << "Died...\tlives: " << lives - 1 << "\n";
-
 		if(lives - 1 > 0)
 		{
 			lives--;
