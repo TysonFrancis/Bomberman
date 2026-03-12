@@ -19,7 +19,7 @@ Enemy::Enemy(const sf::Texture& tex, Pod (&pods)[_rows][_cols], Type input) :
 	}
 	
 	// Set texture based on enum Type
-	setTexture(sf::IntRect({ 0, 240 + static_cast<int>(type) * _tileSize}, {_tileSize, _tileSize}));
+	setTexture(sf::IntRect({ 0, 240 + static_cast<int>(type) * _tileSize}, _tile));
 	changeDirection();
 }
 
@@ -123,9 +123,9 @@ void Enemy::animate()
 		myFrame = (myFrame + 1) % _moveFrames;			// Loop through frames for walking animation
 
 		if(facing == Facing::Left)
-			setTexture(sf::IntRect({ myFrame * _tileSize + 48, 240 }, { _tileSize, _tileSize }));
+			setTexture(sf::IntRect({ myFrame * _tileSize + 48, 240 }, _tile));
 		else
-			setTexture(sf::IntRect({ myFrame * _tileSize, 240 }, { _tileSize, _tileSize }));
+			setTexture(sf::IntRect({ myFrame * _tileSize, 240 }, _tile));
 
 		return;
 	}
@@ -142,13 +142,12 @@ void Enemy::animate()
 			state = State::Dead;
 
 		int deathRow = 240;							// Deafault to pink death row
-
 		if (type == Type::Onil || type == Type::Doria)
 			deathRow = 288;							// Set to blue death row
 		else if (type == Type::Dahl || type == Type::Ovape)
 			deathRow = 272;							// Set to purple death row
 
-		setTexture(sf::IntRect({ myFrame * _tileSize + 112, deathRow }, { _tileSize, _tileSize }));
+		setTexture(sf::IntRect({ myFrame * _tileSize + 112, deathRow }, _tile));
 	}
 }
 
@@ -159,7 +158,7 @@ void Enemy::die()
 
 	state = State::Dying;
 	myFrame = myTick = 0;
-	setTexture(sf::IntRect({ 96, 240 + static_cast<int>(type) * _tileSize }, { _tileSize, _tileSize }));
+	setTexture(sf::IntRect({ 96, 240 + static_cast<int>(type) * _tileSize }, _tile));
 }
 
 

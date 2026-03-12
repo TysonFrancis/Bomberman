@@ -32,7 +32,7 @@ public:
 	bool intersects(Entity&) const;
 	bool intersects(float, float) const;
 
-	Entity& operator=(const Entity& other);
+	Entity& operator=(const Entity&);
 
 protected:
 	sf::Sprite sprite;
@@ -46,5 +46,4 @@ protected:
 	int myFrame;
 
 	int tileX, tileY;
-	int worldX, worldY;
 };

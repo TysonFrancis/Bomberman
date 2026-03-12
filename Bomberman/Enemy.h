@@ -15,7 +15,7 @@ public:
 	void die();
 
 	friend std::ostream& operator<<(std::ostream&, const Enemy&);
-	Enemy& operator=(const Enemy& other);
+	Enemy& operator=(const Enemy&);
 
 private:
 	bool isObstructed(int, int);

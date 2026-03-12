@@ -1,10 +1,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-#include "Pod.h"
 #include "Entity.h"
-#include "Constants.h"
+#include "Pod.h"
 #include "Bomb.h"
+#include "Explosion.h"
+#include "Constants.h"
 
 /*
 	Player class that extends entity not owning its own sprite,
@@ -15,20 +16,22 @@
 class Player : public Entity
 {
 public:
-	Player(const sf::Texture&, Pod (&pods)[Constants::_rows][Constants::_cols], std::vector<Bomb>& bombs);
+	Player(const sf::Texture&, Pod (&pods)[Constants::_rows][Constants::_cols],
+		std::vector<Bomb>&, std::vector<Explosion>&);
 
 	void update();
 	void animate();
 	void die();
 
 	friend std::ostream& operator<<(std::ostream&, const Player&);
-	Player& operator=(const Player& other);
+	Player& operator=(const Player&);
 
 private:
 	void moveLogic();
 	bool isObstructed(int, int);
 
 	std::vector<Bomb>& bombs;
+	std::vector<Explosion>& explosions;
 
 	float speed;
 

@@ -51,7 +51,6 @@
 
 		powerups at (0, 0),
 		screts at(0, 16)
-
 */
 
 class Animations

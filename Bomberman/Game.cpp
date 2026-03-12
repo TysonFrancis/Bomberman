@@ -9,7 +9,7 @@ using sf::Keyboard::Scancode;
 
 Game::Game() : title(animations.getTitle()),                    // Load title sprite
     background(animations.getBackground()),                     // Load background sprite
-    bomber(animations.getEntities(), pods, bombs),              // Load bomber sprite
+    bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber sprite
     window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     state(GameState::Title)                                     // Set state to title screen
@@ -30,14 +30,6 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
     background.setTextureRect(sf::IntRect({ 0, 0 }, { 496, 208 }));
     background.setScale({ _scale, _scale });
 
-    /*enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Dahl));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Doria));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Minvo));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Onil));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Ovape));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pass));
-    enemies.push_back(Enemy(animations.getEntities(), pods, Enemy::Type::Pontan));*/
-
     // Create pod system of walls and border
     for (int row = 0; row < _rows; row++)
         for (int col = 0; col < _cols; col++)
@@ -46,9 +38,11 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
 			bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
             bool isSoft = (rand() % 4 == 0 && (row > 2 || col > 2)); // Can't spawn in top 2 x 2 by player
 
-            // Tile*'s deleted in pod desturctor, so no memory leak
-            if (isInnerWall || isBorder)    // Set border
+            if (isInnerWall || isBorder)
+            {
                 pods[row][col].filled = true;
+                pods[row][col].isHard = true;
+            }
             else if(isSoft)
             {
                 pods[row][col].filled = true;
@@ -71,7 +65,7 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
             y = rand() % 11 + 2;
         } while (pods[y][x].filled);
 
-        enemy.setPosition(sf::Vector2f(x * _scaledTile -_halfScaled, y * _scaledTile -_halfScaled));
+        enemy.setPosition(sf::Vector2f(x * _scaledTile - _halfScaled, y * _scaledTile - _halfScaled));
 		enemies.push_back(enemy);
     }
 }
@@ -134,6 +128,17 @@ void Game::update()
             }
         }
 
+        for (size_t i = 0; i < explosions.size(); i++)
+        {
+            explosions[i].update();
+
+            if (explosions[i].getState() == Entity::State::Dead)
+            {
+                explosions.erase(explosions.begin() + i);
+                i--;
+            }
+        }
+
         for (size_t i = 0; i < softWalls.size(); i++)
         {
             softWalls[i].update();
@@ -162,8 +167,6 @@ void Game::render()
     {
     case(GameState::Playing):
         window.draw(background);
-
-        // Removed drawing pods lets FREAKING go
 
         for (Bomb& bomb : bombs)
             window.draw(bomb);

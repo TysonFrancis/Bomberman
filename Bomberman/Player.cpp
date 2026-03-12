@@ -4,12 +4,14 @@
 using namespace Constants;
 using namespace sf::Keyboard;
 
-Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols], std::vector<Bomb>& bombs) :
-	Entity(tex, pods), bombs(bombs), speed(4.f), joyX(0), joyY(0),
-	lives(3), blast(1), maxBombs(1), remote(false)
+Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
+	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
+		Entity(tex, pods), bombs(bombs), explosions(explosions), speed(4.f),
+		joyX(0), joyY(0), lives(3), blast(2), maxBombs(10), remote(false)
 {
-	setTexture(sf::IntRect({ 64, 0 }, { _tileSize, _tileSize }));
-	setPosition({ _scaledTile + _halfScaled, _scaledTile + _halfScaled });
+	tileX = tileY = 1;
+	setTexture(sf::IntRect({ 64, 0 }, _tile));
+	setPosition({ tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled });
 }
 
 void Player::update()
@@ -31,7 +33,7 @@ void Player::update()
 			if (!pods[tileY][tileX].filled && bombs.size() < maxBombs)
 			{
 				pods[tileY][tileX].filled = true;
-				bombs.push_back(Bomb(getSprite().getTexture(), pods, remote, blast, tileX, tileY));
+				bombs.push_back(Bomb(sprite.getTexture(), pods, explosions, remote, blast, tileX, tileY));
 			}
 	}
 
@@ -46,8 +48,8 @@ void Player::update()
 			lives--;
 			state = State::Living;
 
-			setTexture(sf::IntRect({ 64, 0 }, { _tileSize, _tileSize }));
-			setPosition({ _scaledTile + _halfScaled, _scaledTile + _halfScaled });
+			setTexture(sf::IntRect({ 64, 0 }, _tile));
+			setPosition({ tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled });
 		}
 	}
 
@@ -82,7 +84,7 @@ void Player::animate()
 				yOffset = 16;
 
 			// Apply selected texture
-			setTexture(sf::IntRect({ myFrame * _tileSize + xOffset, yOffset }, { _tileSize, _tileSize }));
+			setTexture(sf::IntRect({ myFrame * _tileSize + xOffset, yOffset }, _tile));
 		}
 
 		return;
@@ -93,7 +95,7 @@ void Player::animate()
 		if (myFrame < 7)						// Keep incrementing frame until finished with death animation
 		{
 			myFrame++;
-			setTexture(sf::IntRect({ myFrame * _tileSize, 32 }, { _tileSize, _tileSize }));
+			setTexture(sf::IntRect({ myFrame * _tileSize, 32 }, _tile));
 		}
 
 		if (myFrame >= 7)						// Once animation is finished, fully die
@@ -108,6 +110,7 @@ void Player::die()
 
 	state = State::Dying;
 	myFrame = myTick = 0;
+	tileX = tileY = 1;
 }
 
 
@@ -180,272 +183,4 @@ Player& Player::operator=(const Player& other)
 	if (this != &other)
 		Entity::operator=(other);
 	return *this;
-}	  
-
-// Adapted collision logic to new
-// pod system but not working at all
-/*// Right
-if (joyX > 0 && x < _cols - 1)
-{
-	// Check pod directly next for collisions and stop
-	if (pods[y][x + 1].filled)
-	{
-		if (intersects(x + 1, y))
-		{
-			joyX = 0;
-		}
-	}
-	// If colliding on diagonals, autocorrect
-	else
-	{
-		if (pods[y + 1][x + 1].filled)
-		{
-			if (intersects(x + 1, y + 1))
-			{
-				joyY = -1;
-			}
-		}
-		if (pods[y - 1][x + 1].filled)
-		{
-
-			if (intersects(x + 1, y - 1))
-			{
-				joyY = 1;
-			}
-		}
-	}
 }
-
-// Left
-if (joyX < 0 && x > 0)
-{
-	// Check pod directly next for collisions and stop
-	if (pods[y][x - 1].filled)
-	{
-		if (intersects(x - 1, y))
-		{
-			joyX = 0;
-		}
-	}
-	// If colliding on diagonals, autocorrect
-	else
-	{
-		if (pods[y + 1][x - 1].filled)
-		{
-			if (intersects(x - 1, y + 1))
-			{
-				joyY = -1;
-			}
-		}
-		if (pods[y - 1][x - 1].filled)
-		{
-
-			if (intersects(x - 1, y - 1))
-			{
-				joyY = 1;
-			}
-		}
-	}
-}
-
-// Down
-if (joyY > 0 && y < _rows - 1)
-{
-	// Check pod directly next for collisions and stop
-	if (pods[y + 1][x].filled)
-	{
-		if (intersects(x, y + 1))
-		{
-			joyY = 0;
-		}
-	}
-	// If colliding on diagonals, autocorrect
-	else
-	{
-		if (pods[y + 1][x + 1].filled)
-		{
-			if (intersects(x + 1, y + 1))
-			{
-				joyX = -1;
-			}
-		}
-		if (pods[y + 1][x - 1].filled)
-		{
-
-			if (intersects(x - 1, y + 1))
-			{
-				joyX = 1;
-			}
-		}
-	}
-}
-
-// Up
-if (joyY < 0 && y > 0)
-{
-	// Check pod directly next for collisions and stop
-	if (pods[y - 1][x].filled)
-	{
-		if (intersects(x, y - 1))
-		{
-			joyY = 0;
-		}
-	}
-	// If colliding on diagonals, autocorrect
-	else
-	{
-		if (pods[y - 1][x + 1].filled)
-		{
-			if (intersects(x + 1, y - 1))
-			{
-				joyX = -1;
-			}
-		}
-		if (pods[y - 1][x - 1].filled)
-		{
-
-			if (intersects(x - 1, y - 1))
-			{
-				joyX = 1;
-			}
-		}
-	}
-}*/
-
-// Original collision logic with pod and tile*
-/*// Collision logic
-if (joyX != 0 || joyY != 0)
-{
-	// Collide while moving right
-	if (joyX > 0 && x < _cols)
-	{
-		// Check pod directly next for collisions and stop
-		if (pods[y][x + 1].getTile() != nullptr)
-		{
-			if (intersects(pods[y][x + 1]))
-			{
-				if (pods[y][x + 1].getTile()->isObstruction())
-					joyX = 0;
-			}
-		}
-		// If colliding on diagonals, autocorrect
-		else{
-			if (pods[y + 1][x + 1].getTile() != nullptr)
-			{
-				if (intersects(pods[y + 1][x + 1]))
-				{
-					if (pods[y + 1][x + 1].getTile()->isObstruction())
-						joyY = -1;
-				}
-			}
-			if (pods[y - 1][x + 1].getTile() != nullptr)
-			{
-
-				if (intersects(pods[y - 1][x + 1]))
-				{
-					if (pods[y - 1][x + 1].getTile()->isObstruction())
-						joyY = 1;
-				}
-			}
-		}
-	}
-
-	// Collide while moving left
-	if (joyX < 0 && x > 0)
-	{
-		//Check next pod if colliding stop
-		if (pods[y][x - 1].getTile() != nullptr)
-		{
-			if (intersects(pods[y][x - 1]))
-			{
-				if (pods[y][x - 1].getTile()->isObstruction())
-					joyX = 0;
-			}
-		}
-		// If colliding on diagonals, autocorrect
-		else{
-			if (pods[y + 1][x - 1].getTile() != nullptr)
-			{
-				if (intersects(pods[y + 1][x - 1]))
-				{
-					if (pods[y + 1][x - 1].getTile()->isObstruction())
-						joyY = -1;
-				}
-			}
-			if (pods[y - 1][x - 1].getTile() != nullptr)
-			{
-				if (intersects(pods[y - 1][x - 1]))
-				{
-					if (pods[y - 1][x - 1].getTile()->isObstruction())
-						joyY = 1;
-				}
-			}
-		}
-	}
-
-	// Collide while moving down
-	if (joyY > 0 && y < _rows)
-	{
-		// Check the pod directly next to it, if colliding stop
-		if (pods[y + 1][x].getTile() != nullptr)
-		{
-			if (intersects(pods[y + 1][x]))
-			{
-				if (pods[y + 1][x].getTile()->isObstruction())
-					joyY = 0;
-			}
-		}
-		// If colliding on diagonals, autocorrect
-		else{
-			if (pods[y + 1][x + 1].getTile() != nullptr)
-			{
-				if (intersects(pods[y + 1][x + 1]))
-				{
-					if (pods[y + 1][x + 1].getTile()->isObstruction())
-						joyX = -1;
-				}
-			}
-			if (pods[y + 1][x - 1].getTile() != nullptr)
-			{
-				if (intersects(pods[y + 1][x - 1]))
-				{
-					if (pods[y + 1][x - 1].getTile()->isObstruction())
-						joyX = 1;
-				}
-			}
-		}
-	}
-
-	// Collide while moving up
-	if (joyY < 0 && y > 0)
-	{
-		// Check pod directly next to, if colliding stop
-		if (pods[y - 1][x].getTile() != nullptr)
-		{
-			if (intersects(pods[y - 1][x]))
-			{
-				if (pods[y - 1][x].getTile()->isObstruction())
-					joyY = 0;
-			}
-		}
-		// If colliding on diagonals, autocorrect
-		else{
-			if (pods[y - 1][x + 1].getTile() != nullptr)
-			{
-				if (intersects(pods[y - 1][x + 1]))
-				{
-					if (pods[y - 1][x + 1].getTile()->isObstruction())
-						joyX = -1;
-				}
-			}
-			if (pods[y - 1][x - 1].getTile() != nullptr)
-			{
-				if (intersects(pods[y - 1][x - 1]))
-				{
-					if (pods[y - 1][x - 1].getTile()->isObstruction())
-						joyX = 1;
-				}
-			}
-		}
-	}
-}*/

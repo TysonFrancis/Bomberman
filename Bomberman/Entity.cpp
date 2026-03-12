@@ -4,7 +4,7 @@ using namespace Constants;
 
 Entity::Entity(const sf::Texture& tex, Pod(&pods)[_rows][_cols]) :
 	sprite(tex), pods(pods), state(State::Living), dir(Facing::None),
-	myTick(0), myFrame(0), tileX(0), tileY(0), worldX(0), worldY(0)
+	myTick(0), myFrame(0), tileX(0), tileY(0)
 {
 	setOrigin({ Constants::_halfTile, Constants::_halfTile });
 	setScale({ Constants::_scale, Constants::_scale });
@@ -58,8 +58,6 @@ Entity& Entity::operator=(const Entity& other)
 
 		tileX = other.tileX;
 		tileY = other.tileY;
-		worldX = other.worldX;
-		worldY = other.worldY;
 	}
 
 	return *this;

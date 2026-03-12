@@ -14,5 +14,5 @@ public:
 	void animate();
 	void die();
 
-	SoftWall& operator=(const SoftWall& other);
+	SoftWall& operator=(const SoftWall&);
 };

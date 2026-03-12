@@ -1,24 +1,30 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Pod.h"
-#include "Constants.h"
+
 #include "Entity.h"
+#include "Pod.h"
+#include "Explosion.h"
+#include "Constants.h"
 
 class Bomb : public Entity
 {
 public:
-	Bomb(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols], bool, int, int, int);
+	Bomb(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols],
+		std::vector<Explosion>&, bool, int, int, int);
 
 	void update();
 	void animate();
 	void explode();
 
-	Bomb& operator=(const Bomb& other);
+	friend std::ostream& operator<<(std::ostream&, const Bomb&);
+	Bomb& operator=(const Bomb&);
 
 private:
 	void propogate(int, int);
 
+	std::vector<Explosion>& explosions;
+
 	int distance;
 	bool remote; // Checks if player has remote power up
-	bool up;
+	bool shrink;
 };

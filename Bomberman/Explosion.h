@@ -8,11 +8,18 @@
 class Explosion : public Entity
 {
 public:
-	Explosion(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols], int, int, Facing);
+	Explosion(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols],
+		int, int, Facing, bool);
 
 	void update();
 	void animate();
-	void propogate();
 
-	Explosion& operator=(const Explosion& other);
+	friend std::ostream& operator<<(std::ostream&, const Explosion&);
+	Explosion& operator=(const Explosion&);
+
+private:
+	void setTexture(Facing);
+
+	int row;
+	bool end;
 };

@@ -6,38 +6,35 @@ SoftWall::SoftWall(const sf::Texture& tex, Pod(&pods)[_rows][_cols], int x, int 
 {
 	tileX = x;
 	tileY = y;
-	setTexture(sf::IntRect({ 64, 48 }, { _tileSize, _tileSize }));
+	setTexture(sf::IntRect({ 64, 48 }, _tile));
 	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
 }
 
 void SoftWall::update()
 {
-	if(pods[tileY][tileX].filled)		// If pod is filled, nothing to do, can skip everything
+	if(pods[tileY][tileX].filled)	// If pod is filled, nothing to do, can skip everything
 		return;
 
-	die();			// Can safely call die() since only here if pod is empty
+	die();							// Can safely call die() since only here if pod is empty
 
-	// Animate
-	animate();
+	if (state == State::Dying)		// Only animate if dying, no reason to execute
+		animate();
 }
 
 void SoftWall::animate()
 {
-	if (state != State::Dying)	// Only animate if dying, no reason to continue
-		return;
-
 	myTick++;
 
-	if (myTick % 3 != 0)		// Might need to change this? but seems ok to me
+	if (myTick % 10 != 0)			// Might need to change this timing? but seems ok to me		- D
 		return;
 
-	if (myFrame < 6)						// Keep incrementing frame until finished with death animation
+	if (myFrame < 6)				// Keep incrementing frame until finished with death animation
 	{
 		myFrame++;
-		setTexture(sf::IntRect({ myFrame * _tileSize + 64, 48 }, { _tileSize, _tileSize }));
+		setTexture(sf::IntRect({ myFrame * _tileSize + 64, 48 }, _tile));
 	}
 
-	if (myFrame >= 6)						// Once animation is finished, fully die
+	if (myFrame >= 6)				// Once animation is finished, fully die
 		state = State::Dead;
 }
 

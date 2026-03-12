@@ -1,16 +1,17 @@
 #include "Bomb.h"
+
 #include <iostream>
 
 using namespace Constants;
 
 Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
-	bool timer, int d, int x, int y) :
-	Entity(tex, pods), remote(timer), distance(d), up(false)
+	std::vector<Explosion>& explosions, bool timer, int d, int x, int y) :
+		Entity(tex, pods), explosions(explosions), remote(timer), distance(d), shrink(false)
 {
 	myFrame = 2;
 	tileX = x;
 	tileY = y;
-	setTexture(sf::IntRect({ 0, 48 }, { _tileSize, _tileSize }));
+	setTexture(sf::IntRect({ 32, 48 }, _tile));
 	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
 }
 
@@ -31,17 +32,17 @@ void Bomb::animate()
 
 	if (state == State::Living)					// Alive animations
 	{
-		if (up)
+		if (shrink)								// If it should get smaller, frame++,
 			myFrame++;
-		else
+		else										// Otherwise, frame--
 			myFrame--;
 
-		if (myFrame == 0)
-			up = true;
-		else if (myFrame == 2)
-			up = false;
+		if (myFrame <= 0)							// If at largest size, shrink
+			shrink = true;
+		else if (myFrame >= 2)						// If at smallest size, enlarge
+			shrink = false;
 
-		setTexture(sf::IntRect({ myFrame * 16, 48 }, { _tileSize, _tileSize }));
+		setTexture(sf::IntRect({ myFrame * _tileSize, 48 }, _tile));
 
 		return;
 	}
@@ -50,7 +51,7 @@ void Bomb::animate()
 	if (myFrame < 4)							// Keep incrementing frame until finished with death animation
 	{
 		myFrame++;
-		setTexture(sf::IntRect({ myFrame * 16, 48 }, { _tileSize, _tileSize }));
+		setTexture(sf::IntRect({ myFrame * _tileSize, 48 }, _tile));
 	}
 
 	else										// Set to empty texture to let background through after fully dies
@@ -61,10 +62,16 @@ void Bomb::explode()
 {
 	state = State::Dead;
 	pods[tileY][tileX].filled = false;
+	myFrame = myTick = 0;
+	explosions.push_back(Explosion(sprite.getTexture(), pods, tileX, tileY, dir, false));
 
+	dir = Facing::Up;
 	propogate(0, -1);		// Checks up
+	dir = Facing::Down;
 	propogate(0, 1);		// Checks down
+	dir = Facing::Left;
 	propogate(-1, 0);		// Checks left
+	dir = Facing::Right;
 	propogate(1, 0);		// Checks right
 }
 
@@ -79,26 +86,36 @@ void Bomb::propogate(int xDir, int yDir)
 		int yPos = tileY + yDir * d;
 
 		if (xPos < 0 || xPos >= _cols ||
-			yPos < 0 || yPos >= _rows)			// If out of bounds, stop checking in that direction, exit loop
+			yPos < 0 || yPos >= _rows ||
+			pods[yPos][xPos].isHard)			// If out of bounds or hard wall, stop checking in that direction, exit loop
 			break;
 
 		if (!pods[yPos][xPos].filled)			// Skip to next check if empty tile
-			continue;		// This skips to next loop iteration
+		{
+			explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
+			continue;
+		}
+
+		explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
 		
 		if (pods[yPos][xPos].isSoft)			// If a soft wall is in the way,
 		{										// delete it and stop checking in that direction
 			pods[yPos][xPos].filled = false;
 			pods[yPos][xPos].isSoft = false;
+			break;								// Since loop continues if empty, if it reaches this point, it
+												// means it's a soft wall that was just destroyed, so exit loop
 		}
-
-		break;			// Since loop continues if empty, if it reaches this point,
-						// it means it's a hard wall, or a soft wall that was just
-						// destroyed, so stop checking in that direction and exit loop
 	}
 }
 
 
-// *** Public debugging method *** //
+// *** Public debugging methods *** //
+
+std::ostream& operator<<(std::ostream& os, const Bomb& bomb)
+{
+	return os << "Position: (" << bomb.tileX << ", " << bomb.tileY << ")\t"
+		<< "frame: " << bomb.myFrame << "\n";
+}
 
 Bomb& Bomb::operator=(const Bomb& other)
 {
