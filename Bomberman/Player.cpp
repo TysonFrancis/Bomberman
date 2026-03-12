@@ -7,11 +7,11 @@ using namespace sf::Keyboard;
 Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
 		Entity(tex, pods), bombs(bombs), explosions(explosions), speed(4.f),
-		joyX(0), joyY(0), lives(3), blast(2), maxBombs(10), remote(false)
+		joyX(0), joyY(0), lives(3), blast(2), maxBombs(3), remote(false)
 {
 	tileX = tileY = 1;
 	setTexture(sf::IntRect({ 64, 0 }, _tile));
-	setPosition({ tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled });
+	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
 }
 
 void Player::update()
@@ -49,7 +49,7 @@ void Player::update()
 			state = State::Living;
 
 			setTexture(sf::IntRect({ 64, 0 }, _tile));
-			setPosition({ tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled });
+			setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
 		}
 	}
 

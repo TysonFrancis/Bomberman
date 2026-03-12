@@ -11,13 +11,14 @@ Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 	myFrame = 2;
 	tileX = x;
 	tileY = y;
+
 	setTexture(sf::IntRect({ 32, 48 }, _tile));
 	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
 }
 
 void Bomb::update()
 {
-	if (myTick >= _fps * 2.5 && !remote)	// If 3 seconds and no remote explode
+	if (myTick >= _fps * 2.5 && !remote)	// If 2.5 seconds and no remote explode
 		explode();
 
 	animate();
@@ -65,6 +66,7 @@ void Bomb::explode()
 	myFrame = myTick = 0;
 	explosions.push_back(Explosion(sprite.getTexture(), pods, tileX, tileY, dir, false));
 
+	// Need to make better selection than this for direction	- D
 	dir = Facing::Up;
 	propogate(0, -1);		// Checks up
 	dir = Facing::Down;
@@ -90,12 +92,16 @@ void Bomb::propogate(int xDir, int yDir)
 			pods[yPos][xPos].isHard)			// If out of bounds or hard wall, stop checking in that direction, exit loop
 			break;
 
-		if (!pods[yPos][xPos].filled)			// Skip to next check if empty tile
+		if (!pods[yPos][xPos].filled)			// If pod is empty,
 		{
-			explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
-			continue;
+			if (d == distance)						// If at end of range, spawn end explosion
+				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
+			else									// Else, spawn interior explosion
+				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
+			continue;								// Skip to next iteration
 		}
 
+		// If pod is filled, spawn end explosion in place
 		explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
 		
 		if (pods[yPos][xPos].isSoft)			// If a soft wall is in the way,

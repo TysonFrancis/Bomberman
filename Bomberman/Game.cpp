@@ -132,6 +132,13 @@ void Game::update()
         {
             explosions[i].update();
 
+            if (explosions[i].intersects(bomber))
+                bomber.die();
+
+            for (Enemy& enemy : enemies)
+                if(explosions[i].intersects(enemy))
+                    enemy.die();
+
             if (explosions[i].getState() == Entity::State::Dead)
             {
                 explosions.erase(explosions.begin() + i);
@@ -207,8 +214,8 @@ void Game::startRound()
 
         //window.clear();   - - -   Commented out until something else to display
         //window.display(); // So it doesn't hang lol
-    }
-    */
+    }*/
+    
     state = GameState::Playing;
 }
 

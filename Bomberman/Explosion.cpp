@@ -10,15 +10,14 @@ Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 	tileX = x;
 	tileY = y;
 	this->dir = dir;
-	state = State::Dying;
 
-	setTexture(dir);
+	setTexture();
 	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
 }
 
 void Explosion::update()
 {
-	if (state == State::Dying)
+	if (state == State::Living)		// Only thing to do is animate, and only does that when alive
 		animate();
 }
 
@@ -26,82 +25,61 @@ void Explosion::animate()
 {
 	myTick++;
 
-	if (myTick % 15 != 0)
+	if (myTick % 15 != 0)		// Same speed to match with soft wall dying, need to look at emulator 
 		return;
 
-	if (myFrame == 1)
-		row++;
+	if (myFrame >= 1)			// Once frame advances past 1, switch to second row explosions
+		row = 2;
 
-	if (myFrame < 4)				// Keep incrementing frame until finished with death animation
+	if (myFrame < 4)			// Keep incrementing frame until finished with death animation
 	{
 		myFrame++;
-		setTexture(dir);
+		setTexture();
 	}
 
-	if (myFrame >= 4)				// Once animation is finished, fully die
+	if (myFrame >= 4)			// Once animation is finished, fully die
 		state = State::Dead;
 }
 
 
 // *** Private helper method *** //
 
-void Explosion::setTexture(Facing dir)
+void Explosion::setTexture()
 {
-	int newFrame;
+	// Helper variables to reduce redundant code
+	int leftX, rightX, baseX, upY, downY, baseY;
 
-	if (row == 1)
-	{
-		if (!end)
-		{
-			switch (dir)
-			{
-			case Facing::Up:	Entity::setTexture(sf::IntRect({ myFrame * _explosionOffset + 32, 80 }, _tile));	break;
-			case Facing::Down:	Entity::setTexture(sf::IntRect({ myFrame * _explosionOffset + 32, 112 }, _tile));	break;
-			case Facing::Left:	Entity::setTexture(sf::IntRect({ myFrame * _explosionOffset + 16, 96 }, _tile));	break;
-			case Facing::Right:	Entity::setTexture(sf::IntRect({ myFrame * _explosionOffset + 48, 96 }, _tile));	break;
-			case Facing::None:	Entity::setTexture(sf::IntRect({ myFrame * _explosionOffset + 32, 96 }, _tile));	break;
-			}
-		}
+	// Base location setup
+	baseX = myFrame * _explosionOffset + _explosionStartX;
+	baseY = _explosionStartY;
 
-		else
-		{
-			switch (dir)
-			{
-			case Facing::Up:	Entity::setTexture(sf::IntRect({ myFrame * _explosionOffset + 32, 64 }, _tile));	break;
-			case Facing::Down:	Entity::setTexture(sf::IntRect({ myFrame * _explosionOffset + 32, 128 }, _tile));	break;
-			case Facing::Left:	Entity::setTexture(sf::IntRect({ myFrame * _explosionOffset + 16, 80 }, _tile));	break;
-			case Facing::Right:	Entity::setTexture(sf::IntRect({ myFrame * _explosionOffset + 48, 112 }, _tile));	break;
-			case Facing::None:	Entity::setTexture(sf::IntRect({ myFrame * _explosionOffset + 32, 96 }, _tile));	break;
-			}
-		}
+	if (row >= 2)					// If on row two,
+	{									// offset the frame count by 2 for BaseX + move down baseY
+		baseX = (myFrame - 2) * _explosionOffset + _explosionStartX;
+		baseY += _explosionOffset;
 	}
-	else
+
+	// Specific location setup after row check
+	leftX = baseX - _tileSize;
+	rightX = baseX + _tileSize;
+	upY = baseY - _tileSize;
+	downY = baseY + _tileSize;
+
+	if (end)						// If edge explosion,
+	{									// offset directions by a tile size
+		leftX -= _tileSize;
+		rightX += _tileSize;
+		upY -= _tileSize;
+		downY += _tileSize;
+	}
+
+	switch (dir)					// Apply selected texture
 	{
-		newFrame = myFrame - 2;
-
-		if (!end)
-		{
-			switch (dir)
-			{
-			case Facing::Up:	Entity::setTexture(sf::IntRect({ newFrame * _explosionOffset + 32, 160 }, _tile));	break;
-			case Facing::Down:	Entity::setTexture(sf::IntRect({ newFrame * _explosionOffset + 32, 192 }, _tile));	break;
-			case Facing::Left:	Entity::setTexture(sf::IntRect({ newFrame * _explosionOffset + 16, 176 }, _tile));	break;
-			case Facing::Right:	Entity::setTexture(sf::IntRect({ newFrame * _explosionOffset + 48, 176 }, _tile));	break;
-			case Facing::None:	Entity::setTexture(sf::IntRect({ newFrame * _explosionOffset + 32, 176 }, _tile));	break;
-			}
-		}
-
-		else
-		{
-			switch (dir)
-			{
-			case Facing::Up:	Entity::setTexture(sf::IntRect({ newFrame * _explosionOffset + 32, 144 }, _tile));	break;
-			case Facing::Down:	Entity::setTexture(sf::IntRect({ newFrame * _explosionOffset + 32, 208 }, _tile));	break;
-			case Facing::Left:	Entity::setTexture(sf::IntRect({ newFrame * _explosionOffset + 16, 160 }, _tile));	break;
-			case Facing::Right:	Entity::setTexture(sf::IntRect({ newFrame * _explosionOffset + 48, 192 }, _tile));	break;
-			case Facing::None:	Entity::setTexture(sf::IntRect({ newFrame * _explosionOffset + 32, 176 }, _tile));	break;
-			}
-		}
+	case Facing::Up:	Entity::setTexture(sf::IntRect({ baseX,  upY   }, _tile));	break;
+	case Facing::Down:	Entity::setTexture(sf::IntRect({ baseX,  downY }, _tile));	break;
+	case Facing::Left:	Entity::setTexture(sf::IntRect({ leftX,  baseY }, _tile));	break;
+	case Facing::Right:	Entity::setTexture(sf::IntRect({ rightX, baseY }, _tile));	break;
+	case Facing::None:	Entity::setTexture(sf::IntRect({ baseX,	 baseY }, _tile));	break;
 	}
 }
 
@@ -110,8 +88,14 @@ void Explosion::setTexture(Facing dir)
 
 std::ostream& operator<<(std::ostream& os, const Explosion& explosion)
 {
-	return os << "Position: (" << explosion.tileX << ", " << explosion.tileY << ")\t"
-		<< "frame: " << explosion.myFrame << "\trow: " << explosion.row << "\n";
+	if(explosion.end)
+		os << "Position: (" << explosion.tileX << ", " << explosion.tileY << ")\t"
+			<< "frame: " << explosion.myFrame << "\trow: " << explosion.row
+			<< "\tend: " << (explosion.end ? "true" : "false") << "\n";
+	else
+		os << "Not end\n";
+
+	return os;
 }
 
 Explosion& Explosion::operator=(const Explosion& other)

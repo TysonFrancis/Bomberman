@@ -18,7 +18,7 @@ public:
 	Explosion& operator=(const Explosion&);
 
 private:
-	void setTexture(Facing);
+	void setTexture();
 
 	int row;
 	bool end;

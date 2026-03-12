@@ -97,9 +97,6 @@ void Enemy::update()
 		case Type::Pontan: //pontan, alwyays chases, moves through soft blocks
 			break;
 		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Y))
-			die();
 	}
 
 	// Animation

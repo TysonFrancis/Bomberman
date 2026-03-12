@@ -6,6 +6,7 @@ SoftWall::SoftWall(const sf::Texture& tex, Pod(&pods)[_rows][_cols], int x, int 
 {
 	tileX = x;
 	tileY = y;
+
 	setTexture(sf::IntRect({ 64, 48 }, _tile));
 	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
 }

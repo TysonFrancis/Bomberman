@@ -30,9 +30,11 @@ bool Entity::intersects(Entity& other) const
 	return false;
 }
 
-// Takes in coordinates of the pod to check, and creates an sf::FloatRect of the area to check for an intersection
-// with the entity's sprite, similar to how you could use getGlobalBounds() on an sf::RectangleShape, this is just manual.
-// Since there's no shape and just boolean values I have to create the rectangle to make the comparison myself.
+// Takes in coordinates of the pod to check, and creates an sf::FloatRect
+// of the area to check for an intersection with the entity's sprite,
+// similar to how you could use getGlobalBounds() on an sf::RectangleShape,
+// this is just manual. Since there's no shape and just boolean values
+// I have to create the rectangle to make the comparison myself.
 bool Entity::intersects(float x, float y) const
 {
 	if (this->getSprite().getGlobalBounds(). // At position (tileX * game tile scale, tileY * game tile scale), with size of game tile scale
