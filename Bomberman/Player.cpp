@@ -130,11 +130,16 @@ void Player::moveLogic()
 {
 	int nextX = tileX + joyX;			// Calculate next tile position based on input to avoid 
 	int nextY = tileY + joyY;			// repeated if blocks of y + 1, y - 1, x + 1, x - 1, etc.
-
-	if (joyX != 0)						// If moving horizontally,
+	
+	if (joyX > 0)			//If moving right, only check if collision if person is on the right half of the tile
 	{
-		if (isObstructed(nextX, tileY))		// If pod in next tile is solid and colliding, stop
-			joyX = 0;
+		if (pods[tileY][nextX].filled)
+		{
+			if ((tileX * _scaledTile + _halfScaled) <= getSprite().getPosition().x)
+			{
+				joyX = 0;
+			}
+		}
 		else
 		{										// If colliding on diagonals, autocorrect
 			if (joyY >= 0 && tileY < _rows - 1 && isObstructed(nextX, tileY + 1))
@@ -144,10 +149,49 @@ void Player::moveLogic()
 		}
 	}
 
-	if (joyY != 0)						// If moving vertically,
+	if (joyX < 0)			//If moving left, only check if collision if person is on the right half of the tile
 	{
-		if (isObstructed(tileX, nextY))		// If pod in next tile is solid and colliding, stop
-			joyY = 0;
+		if (pods[tileY][nextX].filled)
+		{
+			if ((tileX * _scaledTile + _halfScaled) >= getSprite().getPosition().x)
+			{
+				joyX = 0;
+			}
+		}
+		else
+		{										// If colliding on diagonals, autocorrect
+			if (joyY >= 0 && tileY < _rows - 1 && isObstructed(nextX, tileY + 1))
+				joyY = -1;
+			else if (joyY <= 0 && tileY > 0 && isObstructed(nextX, tileY - 1))
+				joyY = 1;
+		}
+	}
+	if (joyY > 0)			//If moving down, only check if collision if person is on the lower half of the tile
+	{
+		if (pods[nextY][tileX].filled)
+		{
+			if ((tileY * _scaledTile + _halfScaled) <= getSprite().getPosition().y)
+			{
+				joyY = 0;
+			}
+		}
+		else
+		{										// If colliding on diagonals, autocorrect
+			if (joyX >= 0 && tileX < _cols - 1 && isObstructed(tileX + 1, nextY))
+				joyX = -1;
+			else if (joyX <= 0 && tileX > 0 && isObstructed(tileX - 1, nextY))
+				joyX = 1;
+		}
+	}
+	if (joyY < 0)			//If moving up, only check if collision if person is on the upper half of the tile
+	{
+		if (pods[nextY][tileX].filled)
+		{
+			if ((tileY * _scaledTile + _halfScaled) >= getSprite().getPosition().y)
+			{
+				joyY = 0;
+			}
+		}
 		else
 		{										// If colliding on diagonals, autocorrect
 			if (joyX >= 0 && tileX < _cols - 1 && isObstructed(tileX + 1, nextY))
