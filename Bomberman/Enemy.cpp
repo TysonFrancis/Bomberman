@@ -180,23 +180,27 @@ void Enemy::changeDirection()
 	case Facing::Up:
 		moveX = 0;	
 		moveY = -1;		
-		if(!isObstructed(tileX,tileY-1))
+		if(!pods[tileY-1][tileX].filled)
 			break;
+		[[fallthrough]];
 	case Facing::Down:
 		moveX = 0;	
 		moveY = 1;		
-		if (!isObstructed(tileX, tileY +1))
+		if (!pods[tileY+1][tileX].filled)
 			break;
+		[[fallthrough]];
 	case Facing::Left:
 		moveX = -1; 
 		moveY = 0;		
-		if (!isObstructed(tileX-1, tileY))
+		if (!pods[tileY][tileX-1].filled)
 			break;
-	case Facing::Right:		
+		[[fallthrough]];
+	case Facing::Right:
 		moveX = 1;	
 		moveY = 0;		
-		if (!isObstructed(tileX+1, tileY))
+		if (!pods[tileY][tileX+1].filled)
 			break;
+		[[fallthrough]];
 	default:
 		moveX = 0;
 		moveY = 0;
