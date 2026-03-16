@@ -35,66 +35,39 @@ void Enemy::update()
 		tileX = static_cast<int>((getSprite().getPosition().x ) / _scaledTile);
 		tileY = static_cast<int>((getSprite().getPosition().y ) / _scaledTile);
 
-		bool pause = (rand() % 9 == 0);
-
-		if (static_cast<int>(sprite.getPosition().x) % _scaledTile != _halfScaled ||
-			static_cast<int>(sprite.getPosition().y) % _scaledTile != _halfScaled)
-			pause = false;
+		
 
 		switch (type)
 		{
 		case Type::Ballom: //ballom, random movement
-			if (!pause)
-			{
-				int nextX = tileX + moveX;			// Calculate next tile position based on input to avoid 
-				int nextY = tileY + moveY;			// repeated if blocks of y + 1, y - 1, x + 1, x - 1, etc.
-
-				if (moveX != 0)						// If moving horizontally,
-					if (isObstructed(nextX, tileY))		// If pod in next tile is solid and colliding, stop + change direction
-					{
-						changeDirection();			//recovery variables say that when colliding into a wall recenter in the pod
-						double recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
-						moveX = recoverX/speed;
-						double recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
-						moveY = recoverY / speed;
-					}
-
-				if (moveY != 0)						// If moving vertically,
-					if (isObstructed(tileX, nextY))		// If pod in next tile is solid and colliding, stop + change direction
-					{
-						changeDirection();			//recovery variables say that when colliding into a wall recenter in the pod
-						double recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
-						moveY = recoverY/speed;
-						double recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
-						moveX = recoverX / speed;
-					}
-
-				move({ (float)(moveX * speed), (float)(moveY * speed) });
-			}
-
-			else
-				changeDirection();
+			randomMove(false);
 			break;
 
-		case Type::Onil: //onil, chases player if close
+		case Type::Onil: //onil, chases player if seen on y axis
+			chasePlayer(false, true);
 			break;
 
-		case Type::Dahl: //dahl, random movement
+		case Type::Dahl: //dahl, chases player if seen on X axis
+			chasePlayer(true, false);
 			break;
 
-		case Type::Minvo: //minvo, chases player
+		case Type::Minvo: //minvo, chases player if seen on either axis
+			chasePlayer(true, true);
 			break;
 
 		case Type::Doria: //doria, chases, avoids bombs, moves through soft blocks
 			break;
 
 		case Type::Ovape: //ovape, random movement, moves through soft blocks
+			randomMove(true);
 			break;
 
-		case Type::Pass: //pass, always chases if encountered
+		case Type::Pass: //pass, always chases if encountered, changes direction at most junctions
+			chasePlayer(true, true);
 			break;
 
 		case Type::Pontan: //pontan, alwyays chases, moves through soft blocks
+			chasePlayer(true, true);
 			break;
 		}
 	}
@@ -236,4 +209,49 @@ Enemy& Enemy::operator=(const Enemy& other)
 	if (this != &other)
 		Entity::operator=(other);
 	return *this;
+}
+
+void Enemy::randomMove(bool canPhase)
+{
+	bool paused = (rand() % 9 == 0);
+
+	if (static_cast<int>(sprite.getPosition().x) % _scaledTile != _halfScaled ||
+		static_cast<int>(sprite.getPosition().y) % _scaledTile != _halfScaled)
+		paused = false;
+
+	if (!paused)
+	{
+		int nextX = tileX + moveX;			// Calculate next tile position based on input to avoid 
+		int nextY = tileY + moveY;			// repeated if blocks of y + 1, y - 1, x + 1, x - 1, etc.
+
+		if (moveX != 0)						// If moving horizontally,
+			if (isObstructed(nextX, tileY))		// If pod in next tile is solid and colliding, stop + change direction
+			{
+				changeDirection();			//recovery variables say that when colliding into a wall recenter in the pod
+				double recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
+				moveX = recoverX / speed;
+				double recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
+				moveY = recoverY / speed;
+			}
+
+		if (moveY != 0)						// If moving vertically,
+			if (isObstructed(tileX, nextY))		// If pod in next tile is solid and colliding, stop + change direction
+			{
+				changeDirection();			//recovery variables say that when colliding into a wall recenter in the pod
+				double recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
+				moveY = recoverY / speed;
+				double recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
+				moveX = recoverX / speed;
+			}
+
+		move({ (float)(moveX * speed), (float)(moveY * speed) });
+
+	}
+	else
+		changeDirection();
+}
+
+void Enemy::chasePlayer(bool x, bool y)
+{
+
 }
