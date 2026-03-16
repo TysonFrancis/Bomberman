@@ -168,7 +168,7 @@ bool Enemy::isObstructed(int checkX, int checkY)
 		return true;
 
 	// return if pod in question is solid and colliding
-	return pods[checkY][checkX].filled && intersects(checkX, checkY);
+	return pods[checkY][checkX].isFilled && intersects(checkX, checkY);
 }
 
 void Enemy::changeDirection()
@@ -180,25 +180,25 @@ void Enemy::changeDirection()
 	case Facing::Up:
 		moveX = 0;	
 		moveY = -1;		
-		if(!pods[tileY-1][tileX].filled)
+		if(!pods[tileY-1][tileX].isFilled)
 			break;
 		[[fallthrough]];
 	case Facing::Down:
 		moveX = 0;	
 		moveY = 1;		
-		if (!pods[tileY+1][tileX].filled)
+		if (!pods[tileY+1][tileX].isFilled)
 			break;
 		[[fallthrough]];
 	case Facing::Left:
 		moveX = -1; 
 		moveY = 0;		
-		if (!pods[tileY][tileX-1].filled)
+		if (!pods[tileY][tileX-1].isFilled)
 			break;
 		[[fallthrough]];
 	case Facing::Right:
 		moveX = 1;	
 		moveY = 0;		
-		if (!pods[tileY][tileX+1].filled)
+		if (!pods[tileY][tileX+1].isFilled)
 			break;
 		[[fallthrough]];
 	default:
