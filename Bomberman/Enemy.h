@@ -17,11 +17,12 @@ public:
 	friend std::ostream& operator<<(std::ostream&, const Enemy&);
 	Enemy& operator=(const Enemy&);
 
+	Type type;
 private:
 	bool isObstructed(int, int);
 	void changeDirection();
 
-	Type type;
+	
 	float speed;
 	double moveX, moveY;
 	Entity::Facing lastFacing;

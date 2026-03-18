@@ -12,6 +12,8 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	tileX = tileY = 1;
 	setTexture(sf::IntRect({ 64, 0 }, _tile));
 	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
+
+	remote = true;//For testing
 }
 
 void Player::update()
@@ -36,6 +38,15 @@ void Player::update()
 				pods[tileY][tileX].isBomb = true;
 				bombs.push_back(Bomb(sprite.getTexture(), pods, explosions, remote, blast, tileX, tileY));
 			}
+
+		//Remote Detonation
+		if(wait >0)
+			wait--;
+		if ((isKeyPressed(Scancode::X)) && remote&& bombs.size()>0&& wait==0)
+		{
+			bombs[0].explode();
+			wait = 10;
+		}
 	}
 
 	// Handles respwawning if player dies but has lives left,

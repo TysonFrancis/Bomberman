@@ -20,8 +20,9 @@ void Bomb::update()
 {
 	if (myTick >= _fps * _bombTimer && !remote)	// If 2.5 seconds and no remote explode
 		explode();
-
 	animate();
+	if (willExplode && now + 5 == myTick)
+		explode();
 }
 
 void Bomb::animate()
@@ -58,6 +59,13 @@ void Bomb::animate()
 	else										// Set to empty texture to let background through after fully dies
 		setTexture(_emptyFrame);
 }
+
+void Bomb::delay()
+{
+	willExplode = true;
+	now = myTick;
+}
+
 
 void Bomb::explode()
 {
