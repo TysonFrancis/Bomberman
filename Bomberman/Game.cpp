@@ -136,8 +136,6 @@ void Game::update()
             }
         }
 
-        std::cout << "\nScore: " << score;
-
         for (size_t i = 0; i < bombs.size(); i++)
         {
             bombs[i].update();
@@ -170,7 +168,7 @@ void Game::update()
                 i--;
             }
         }
-		std::cout << "\nExplosions: " << explosions.size();
+		//std::cout << "\nExplosions: " << explosions.size();
 
         for (size_t i = 0; i < softWalls.size(); i++)
         {
