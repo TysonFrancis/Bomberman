@@ -119,7 +119,7 @@ void Game::update()
                     combo += 1;
                 else combo = 1;
 
-				int type = static_cast<int>(enemies[i].type);
+				int type = static_cast<int>(enemies[i].getType());
                 switch (type)//Update score when enemy dies
                 {
                 case 0: case 1: points = (type + 1) * 100 * combo; break;

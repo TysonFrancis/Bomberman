@@ -143,7 +143,7 @@ bool Enemy::isObstructed(int checkX, int checkY,bool phase)
 
 	// return if pod in question is solid and colliding
 	if(!phase)
-		return pods[checkY][checkX].filled && intersects(checkX, checkY);
+		return pods[checkY][checkX].isFilled && intersects(checkX, checkY);
 	return pods[checkY][checkX].isHard && intersects(checkX, checkY);
 }
 
@@ -156,13 +156,13 @@ void Enemy::changeDirection(bool phase)
 	case Facing::Up:
 		moveX = 0;	
 		moveY = -1;		
-		if(!pods[tileY-1][tileX].filled)
+		if(!pods[tileY-1][tileX].isFilled)
 			break;
 		[[fallthrough]];
 	case Facing::Down:
 		moveX = 0;	
 		moveY = 1;		
-		if (!phase&&!pods[tileY+1][tileX].filled)
+		if (!phase&&!pods[tileY+1][tileX].isFilled)
 			break;
 		if (phase && !pods[tileY + 1][tileX].isHard)
 			break;
@@ -170,7 +170,7 @@ void Enemy::changeDirection(bool phase)
 	case Facing::Left:
 		moveX = -1; 
 		moveY = 0;		
-		if (!phase&&!pods[tileY][tileX-1].filled)
+		if (!phase&&!pods[tileY][tileX-1].isFilled)
 			break;
 		if (phase && !pods[tileY][tileX - 1].isHard)
 			break;
@@ -178,7 +178,7 @@ void Enemy::changeDirection(bool phase)
 	case Facing::Right:
 		moveX = 1;	
 		moveY = 0;		
-		if (!phase&&!pods[tileY][tileX+1].filled)
+		if (!phase&&!pods[tileY][tileX+1].isFilled)
 			break;
 		if (phase && !pods[tileY][tileX + 1].isHard)
 			break;
