@@ -90,7 +90,11 @@ void Game::events()
 
     // If on title screen and enter is pressed, start game
     if (state == GameState::Title && isKeyPressed(Scancode::Enter))
-        startRound();
+    {
+        state = GameState::RoundStart;
+        audio.getRoundStart().play(); // Play silly music
+        textObjects.push_back(new Text("Stage 1", { 0, 0 }));
+    }
 }
 
 // Sprite updater, calls each sprites update method
@@ -164,6 +168,16 @@ void Game::update()
 
     case(GameState::Title):
     case(GameState::RoundStart):
+
+        // Wait for music to finish
+        if (audio.getRoundStart().getStatus() == sf::SoundSource::Status::Stopped)
+        {
+            // PROBLEM: might cause issues later if other text gets added to the screen before the stage number
+            // CTRL+F and search "PROBLEM" if need to come back to this later
+            //textObjects.pop_back();
+            state = GameState::Playing;
+        }
+
     case(GameState::GameOver): break;
     }
 }
@@ -195,31 +209,15 @@ void Game::render()
         break;
 
     case(GameState::Title):         window.draw(title);             break;
-	case(GameState::RoundStart):    /* Draw current round??? */
+	case(GameState::RoundStart):
+        for (Text* text : textObjects)
+            for (sf::Sprite* glyph : text->sprites)
+                window.draw(*glyph);
+
 	case(GameState::GameOver):      /* Draw game over screen??? */  break;
     }
 
     window.display();
-}
-
-void Game::startRound()
-{/*
-    state = GameState::RoundStart;
-    audio.getRoundStart().play(); // Play silly music
-
-    // Wait for music to finish
-    while (audio.getRoundStart().getStatus() != sf::SoundSource::Status::Stopped)
-    {
-        // Is this what you meant by should we have text on screen Emery???
-        // I agree a blank screen with no text isn't great, and if you don't have
-        // audio on you might think the game is loading slow. I'm going to disable the screen
-        // clearing for now so it stays on title until we have something else to display. - Dylan
-
-        //window.clear();   - - -   Commented out until something else to display
-        //window.display(); // So it doesn't hang lol
-    }*/
-    
-    state = GameState::Playing;
 }
 
 // Called when window is closed, used to
