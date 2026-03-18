@@ -66,6 +66,11 @@ void Bomb::delay()
 	now = myTick;
 }
 
+bool Bomb::getWillExplode()
+{
+	return willExplode;
+}
+
 
 void Bomb::explode()
 {

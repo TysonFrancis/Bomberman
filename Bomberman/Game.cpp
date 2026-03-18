@@ -8,7 +8,7 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
     bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber entity
     window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
-    frame(0)                                                    // Set frame count to 0
+    frame(0), score(0)                                          // Set frame and score to 0
 {
     srand(time(NULL));
 
@@ -55,7 +55,7 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
     // Make 5 enemies and put them in positions that are empty
     for (int i = 0; i < 5; i++)
     {
-        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Ballom,bomber);
+        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Ballom, bomber);
         int x, y;
 
         do
@@ -104,11 +104,9 @@ void Game::events()
 // with current frame and increments frame counter
 void Game::update()
 {
-    std::cout << "GameState: ";
 	switch(s_gameState)
     {
 	case(GameState::Playing):
-        std::cout << "Playing\t";
         bomber.update();
 
         int type, points;
@@ -128,7 +126,7 @@ void Game::update()
                     combo += 1;
                 else combo = 1;
 
-				int type = static_cast<int>(enemies[i].type);
+				int type = static_cast<int>(enemies[i].getType());
                 switch (type)//Update score when enemy dies
                 {
                 case 0: case 1: points = (type + 1) * 100 * combo; break;
@@ -168,7 +166,7 @@ void Game::update()
                     enemy.die();
 
             for (Bomb& bomb : bombs)
-                if (explosions[i].intersects(bomb) && !bomb.willExplode)
+                if (explosions[i].intersects(bomb) && !bomb.getWillExplode())
 					bomb.delay();//Explodes in 3 frames
 
             if (explosions[i].getState() == Entity::State::Dead)
@@ -192,12 +190,9 @@ void Game::update()
 
         break;
 
-    case(GameState::Title):
-        std::cout << "Title\t";     break;
-    case(GameState::RoundStart):
-        std::cout << "RoundStart\t";       break;
-    case(GameState::GameOver):
-        std::cout << "GamneOver\t"; frame++;  break;
+    case(GameState::Title):     break;
+    case(GameState::RoundStart):       break;
+    case(GameState::GameOver): frame++;  break;
     }
 }
 
@@ -221,9 +216,6 @@ void Game::render()
             window.draw(explosion);
 
         window.draw(bomber);
-
-        for (SoftWall& wall : softWalls)
-            window.draw(wall);
 
         for (Enemy& enemy : enemies)
             window.draw(enemy);

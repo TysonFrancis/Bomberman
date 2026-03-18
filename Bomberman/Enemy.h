@@ -15,10 +15,11 @@ public:
 	void animate();
 	void die();
 
+	Type getType();
+
 	friend std::ostream& operator<<(std::ostream&, const Enemy&);
 	Enemy& operator=(const Enemy&);
 
-	Type type;
 private:
 	bool isObstructed(int, int, bool);
 	void changeDirection(bool);

@@ -15,13 +15,10 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	tileX = tileY = 1;
 	setTexture(sf::IntRect({ 64, 0 }, _tile));
 	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
-
-	remote = true;//For testing
 }
 
 void Player::update()
 {
-	std::cout << *this << "\n";
 	if (state == State::Living)
 	{
 		// Update tile position based on current world position
