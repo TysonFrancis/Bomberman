@@ -15,10 +15,12 @@ public:
 	void update();
 	void animate();
 	void explode();
+	void delay();
 
 	friend std::ostream& operator<<(std::ostream&, const Bomb&);
 	Bomb& operator=(const Bomb&);
 
+	bool willExplode = false; //Used to delay explosion 
 private:
 	void propogate(int, int);
 
@@ -27,4 +29,5 @@ private:
 	int distance;
 	bool remote; // Checks if player has remote power up
 	bool shrink;
+	int now; // Used to delay explosion 
 };

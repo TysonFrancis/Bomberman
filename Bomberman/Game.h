@@ -54,4 +54,8 @@ private:
 
 	sf::RenderWindow window;
 	GameState state;
+
+	int score=0;
+	int streak; //Checks if the player has killed enemies in quick sucession
+	int combo;
 };
