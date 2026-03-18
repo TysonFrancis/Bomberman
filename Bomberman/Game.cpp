@@ -9,7 +9,7 @@ using sf::Keyboard::Scancode;
 
 Game::Game() : title(animations.getTitle()),                    // Load title sprite
     background(animations.getBackground()),                     // Load background sprite
-    bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber sprite
+    bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber entity
     window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     state(GameState::Title)                                     // Set state to title screen
@@ -36,21 +36,20 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
         {
 			bool isInnerWall = col % 2 == 0 && row % 2 == 0;
 			bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
-            bool isSoft = (rand() % 4 == 0 && (row > 2 || col > 2)); // Can't spawn in top 2 x 2 by player
+            bool isSoft = (rand() % 4 == 0) && (row > 2 || col > 2); // Can't spawn in top 2 x 2 by player
 
             if (isInnerWall || isBorder)
             {
-                pods[row][col].filled = true;
+                pods[row][col].isFilled = true;
                 pods[row][col].isHard = true;
             }
             else if(isSoft)
             {
-                pods[row][col].filled = true;
+                pods[row][col].isFilled = true;
 				pods[row][col].isSoft = true;
+                //pods[row][col].isExit = true;
 				softWalls.push_back(SoftWall(animations.getEntities(), pods, col, row));
             }
-            else
-				pods[row][col].filled = false;
         }
 
     // Make 5 enemies and put them in positions that are empty
@@ -63,7 +62,7 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
         {
             x = rand() % 29 + 2;
             y = rand() % 11 + 2;
-        } while (pods[y][x].filled);
+        } while (pods[y][x].isFilled);
 
         enemy.setPosition(sf::Vector2f(x * _scaledTile - _halfScaled, y * _scaledTile - _halfScaled));
 		enemies.push_back(enemy);
@@ -154,8 +153,8 @@ void Game::update()
         {
             explosions[i].update();
 
-            /*if (explosions[i].intersects(bomber))
-                bomber.die();*/
+            if (explosions[i].intersects(bomber))
+                bomber.die();
 
             for (Enemy& enemy : enemies)
                 if(explosions[i].intersects(enemy))
@@ -202,6 +201,9 @@ void Game::render()
     case(GameState::Playing):
         window.draw(background);
 
+        for (SoftWall& wall : softWalls)
+            window.draw(wall);
+
         for (Bomb& bomb : bombs)
             window.draw(bomb);
 
@@ -212,9 +214,6 @@ void Game::render()
 
         for (Enemy& enemy : enemies)
             window.draw(enemy);
-
-        for (SoftWall& wall : softWalls)
-            window.draw(wall);
 
         break;
 

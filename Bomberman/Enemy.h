@@ -21,6 +21,8 @@ public:
 private:
 	bool isObstructed(int, int);
 	void changeDirection();
+	void randomMove(bool);
+	void chasePlayer(bool, bool);
 
 	
 	float speed;

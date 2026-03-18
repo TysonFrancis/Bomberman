@@ -70,7 +70,7 @@ void Bomb::delay()
 void Bomb::explode()
 {
 	state = State::Dead;
-	pods[tileY][tileX].filled = false;
+	pods[tileY][tileX].isFilled = false;
 	myFrame = myTick = 0;
 	explosions.push_back(Explosion(sprite.getTexture(), pods, tileX, tileY, dir, false));
 
@@ -100,7 +100,7 @@ void Bomb::propogate(int xDir, int yDir)
 			pods[yPos][xPos].isHard)			// If out of bounds or hard wall, stop checking in that direction, exit loop
 			break;
 
-		if (!pods[yPos][xPos].filled)			// If pod is empty,
+		if (!pods[yPos][xPos].isFilled)			// If pod is empty,
 		{
 			if (d == distance)						// If at end of range, spawn end explosion
 				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
@@ -111,14 +111,14 @@ void Bomb::propogate(int xDir, int yDir)
 
 		if (pods[yPos][xPos].isBomb)
 		{
-			pods[yPos][xPos].filled = false;
+			pods[yPos][xPos].isFilled = false;
 			pods[yPos][xPos].isBomb = false;
 			explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
 		}
 		
 		if (pods[yPos][xPos].isSoft)			// If a soft wall is in the way,
-		{										// delete it and stop checking in that direction
-			pods[yPos][xPos].filled = false;
+		{
+			pods[yPos][xPos].isFilled = false;
 			pods[yPos][xPos].isSoft = false;
 			break;								// Since loop continues if empty, if it reaches this point, it
 												// means it's a soft wall that was just destroyed, so exit loop

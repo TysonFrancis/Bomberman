@@ -13,10 +13,18 @@ SoftWall::SoftWall(const sf::Texture& tex, Pod(&pods)[_rows][_cols], int x, int 
 
 void SoftWall::update()
 {
-	if(pods[tileY][tileX].filled)	// If pod is filled, nothing to do, can skip everything
+	if (pods[tileY][tileX].isSoft ||	// If pod is soft wall, or dead, return
+		state == State::Dead)
 		return;
+					// Once here, bomb has deleted the softwall,
+					// now determine if pod is the exit or regular
 
-	die();							// Can safely call die() since only here if pod is empty
+	if (pods[tileY][tileX].isExit)		// If pod is exit tile, set textrue to exit and fully die
+	{
+		setTexture(sf::IntRect({ 176, 48 }, _tile));
+	}
+	else								// Else, die
+		die();
 
 	if (state == State::Dying)		// Only animate if dying, no reason to execute
 		animate();

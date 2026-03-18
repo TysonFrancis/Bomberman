@@ -3,10 +3,8 @@
 class Pod
 {
 public:
-	Pod() : filled(true), isSoft(false), isHard(false), isBomb(false) {}
+	Pod() : isFilled(false), isHard(false),
+		isSoft(false), isBomb(false), isExit(false) {}
 
-	bool filled;
-	bool isSoft;
-	bool isHard;
-	bool isBomb;
+	bool isFilled, isHard, isSoft, isBomb, isExit;
 };

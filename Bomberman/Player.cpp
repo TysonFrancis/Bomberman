@@ -32,9 +32,9 @@ void Player::update()
 
 		// Spawn a bomb
 		if (isKeyPressed(Scancode::Z))
-			if (!pods[tileY][tileX].filled && bombs.size() < maxBombs)
+			if (!pods[tileY][tileX].isFilled && bombs.size() < maxBombs)
 			{
-				pods[tileY][tileX].filled = true;
+				pods[tileY][tileX].isFilled = true;
 				pods[tileY][tileX].isBomb = true;
 				bombs.push_back(Bomb(sprite.getTexture(), pods, explosions, remote, blast, tileX, tileY));
 			}
@@ -142,7 +142,7 @@ void Player::moveLogic()
 	
 	if (joyX > 0)			//If moving right, only check if collision if person is on the right half of the tile
 	{
-		if (pods[tileY][nextX].filled)
+		if (pods[tileY][nextX].isFilled)
 		{
 			if ((tileX * _scaledTile + _halfScaled) <= getSprite().getPosition().x)
 			{
@@ -160,7 +160,7 @@ void Player::moveLogic()
 
 	if (joyX < 0)			//If moving left, only check if collision if person is on the right half of the tile
 	{
-		if (pods[tileY][nextX].filled)
+		if (pods[tileY][nextX].isFilled)
 		{
 			if ((tileX * _scaledTile + _halfScaled) >= getSprite().getPosition().x)
 			{
@@ -177,7 +177,7 @@ void Player::moveLogic()
 	}
 	if (joyY > 0)			//If moving down, only check if collision if person is on the lower half of the tile
 	{
-		if (pods[nextY][tileX].filled)
+		if (pods[nextY][tileX].isFilled)
 		{
 			if ((tileY * _scaledTile + _halfScaled) <= getSprite().getPosition().y)
 			{
@@ -194,7 +194,7 @@ void Player::moveLogic()
 	}
 	if (joyY < 0)			//If moving up, only check if collision if person is on the upper half of the tile
 	{
-		if (pods[nextY][tileX].filled)
+		if (pods[nextY][tileX].isFilled)
 		{
 			if ((tileY * _scaledTile + _halfScaled) >= getSprite().getPosition().y)
 			{
@@ -220,7 +220,7 @@ bool Player::isObstructed(int checkX, int checkY)
 		return true;
 	
 	// return if pod in question is solid and colliding
-	return pods[checkY][checkX].filled && intersects(checkX, checkY);
+	return pods[checkY][checkX].isFilled && intersects(checkX, checkY);
 }
 
 
