@@ -56,7 +56,7 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
     // Make 5 enemies and put them in positions that are empty
     for (int i = 0; i < 5; i++)
     {
-        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Ballom);
+        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Ballom,bomber);
         int x, y;
 
         do
@@ -187,11 +187,11 @@ void Game::render()
 
         window.draw(bomber);
 
-        for (Enemy& enemy : enemies)
-            window.draw(enemy);
-
         for (SoftWall& wall : softWalls)
             window.draw(wall);
+
+        for (Enemy& enemy : enemies)
+            window.draw(enemy);
 
         break;
 
