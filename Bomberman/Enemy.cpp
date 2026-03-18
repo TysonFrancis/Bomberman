@@ -156,9 +156,7 @@ void Enemy::changeDirection(bool phase)
 	case Facing::Up:
 		moveX = 0;	
 		moveY = -1;		
-		if(!phase&&!pods[tileY-1][tileX].filled)
-			break;
-		if (phase && !pods[tileY - 1][tileX].isHard)
+		if(!pods[tileY-1][tileX].filled)
 			break;
 		[[fallthrough]];
 	case Facing::Down:
