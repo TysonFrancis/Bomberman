@@ -36,6 +36,11 @@ public:
 	void startRound();
 	void closeGame();
 
+	// For player to be able to access and change
+	// game state if say player dies or finds exit,
+	// also prefixed with s_ to know its static
+	inline static GameState s_gameState = GameState::Title;
+
 private:
 	Animations animations;
 
@@ -50,8 +55,10 @@ private:
 
 	Audio audio;
 	sf::Sprite title;
+	sf::Sprite endTitle;
 	sf::Sprite background;
 
 	sf::RenderWindow window;
-	GameState state;
+
+	int frame;	// For end screen timing and program exiting
 };

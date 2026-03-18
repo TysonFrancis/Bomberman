@@ -1,18 +1,14 @@
 #include "Game.h"
 #include <iostream>
-#include "time.h"
 
 using namespace Constants;
 
-using sf::Keyboard::isKeyPressed;
-using sf::Keyboard::Scancode;
-
-Game::Game() : title(animations.getTitle()),                    // Load title sprite
+Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sprites
     background(animations.getBackground()),                     // Load background sprite
     bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber entity
     window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
-    state(GameState::Title)                                     // Set state to title screen
+    frame(0)                                                    // Set frame count to 0
 {
     srand(time(NULL));
 
@@ -25,6 +21,10 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
     title.setOrigin({ 128.f, 120.f });
     title.setScale({ _scale * 0.875f, _scale * 0.875f});        // Best ratio fit for title screen
     title.setPosition({ _windowWidth / 2.f, _windowHeight / 2.f });
+
+    // Set to other title screen with same everything else as title
+    endTitle = title;
+    endTitle.setTextureRect(sf::IntRect({ 256, 0 }, { 256, 240 }));
 
     // Set background sprite on right texture and scale to fit window
     background.setTextureRect(sf::IntRect({ 0, 0 }, { 496, 208 }));
@@ -84,12 +84,19 @@ void Game::run()
 // Handles window events like game starting and closing
 void Game::events()
 {
+    // Close game after 3 seconds of end title
+    if (frame >= _fps * 3)
+        closeGame();
+
+    // Close game if window is closed or escape key pressed
     while (const std::optional event = window.pollEvent())
-        if (event->is<sf::Event::Closed>() || isKeyPressed(Scancode::Escape))
+        if (event->is<sf::Event::Closed>() ||
+            sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape))
             closeGame();
 
     // If on title screen and enter is pressed, start game
-    if (state == GameState::Title && isKeyPressed(Scancode::Enter))
+    if (s_gameState == GameState::Title &&
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
         startRound();
 }
 
@@ -97,9 +104,11 @@ void Game::events()
 // with current frame and increments frame counter
 void Game::update()
 {
-	switch(state)
+    std::cout << "GameState: ";
+	switch(s_gameState)
     {
 	case(GameState::Playing):
+        std::cout << "Playing\t";
         bomber.update();
 
         for (size_t i = 0; i < enemies.size(); i++)
@@ -163,8 +172,11 @@ void Game::update()
         break;
 
     case(GameState::Title):
+        std::cout << "Title\t";     break;
     case(GameState::RoundStart):
-    case(GameState::GameOver): break;
+        std::cout << "RoundStart\t";       break;
+    case(GameState::GameOver):
+        std::cout << "GamneOver\t"; frame++;  break;
     }
 }
 
@@ -173,7 +185,7 @@ void Game::render()
 {
     window.clear();
 
-    switch(state)
+    switch(s_gameState)
     {
     case(GameState::Playing):
         window.draw(background);
@@ -194,9 +206,9 @@ void Game::render()
 
         break;
 
-    case(GameState::Title):         window.draw(title);             break;
-	case(GameState::RoundStart):    /* Draw current round??? */
-	case(GameState::GameOver):      /* Draw game over screen??? */  break;
+    case(GameState::Title):       window.draw(title);          break;
+    case(GameState::RoundStart):  /* Draw current round??? */  break;
+    case(GameState::GameOver):    window.draw(endTitle);       break;
     }
 
     window.display();
@@ -219,7 +231,7 @@ void Game::startRound()
         //window.display(); // So it doesn't hang lol
     }*/
     
-    state = GameState::Playing;
+    s_gameState = GameState::Playing;
 }
 
 // Called when window is closed, used to

@@ -23,6 +23,8 @@ namespace Constants
 	static constexpr unsigned int _fps = 60;
 	static constexpr unsigned int _moveFrames = 3;
 
+	static constexpr int _enemyStartY = 240;
+
 	static constexpr int _explosionOffset = 80;
 	static constexpr int _explosionStartX = 32;
 	static constexpr int _explosionStartY = 96;

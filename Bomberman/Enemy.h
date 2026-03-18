@@ -27,4 +27,6 @@ private:
 	float speed;
 	double moveX, moveY;
 	Entity::Facing lastFacing;
+
+	int enemyFrameYPos;
 };
