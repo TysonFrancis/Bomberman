@@ -22,7 +22,8 @@ public:
 	void update();
 	void animate();
 	void die();
-
+	int getX() { return tileX; };
+	int getY() { return tileY; };
 	friend std::ostream& operator<<(std::ostream&, const Player&);
 	Player& operator=(const Player&);
 
@@ -41,4 +42,5 @@ private:
 	int blast;		// Used to determine blast radius of bombs
 	int maxBombs;	// Used to determine how many bombs player can have out at once
 	bool remote;	// Used to determine if player has remote control powerup, default false
+	int wait =0;		// Delay between exploding bombs
 };

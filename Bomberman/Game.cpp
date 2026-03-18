@@ -55,7 +55,7 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
     // Make 5 enemies and put them in positions that are empty
     for (int i = 0; i < 5; i++)
     {
-        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Ballom);
+        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Ballom,bomber);
         int x, y;
 
         do
@@ -111,6 +111,8 @@ void Game::update()
         std::cout << "Playing\t";
         bomber.update();
 
+        int type, points;
+
         for (size_t i = 0; i < enemies.size(); i++)
         {
             enemies[i].update();
@@ -118,8 +120,26 @@ void Game::update()
             if (enemies[i].intersects(bomber))
                 bomber.die();
 
+            streak -= 1;
             if (enemies[i].getState() == Entity::State::Dead)
             {
+                //Check for combo kills
+                if (streak > 0)
+                    combo += 1;
+                else combo = 1;
+
+				int type = static_cast<int>(enemies[i].type);
+                switch (type)//Update score when enemy dies
+                {
+                case 0: case 1: points = (type + 1) * 100 * combo; break;
+				case 2: case 3: points = (type - 1) * 200 * combo; break;
+				case 4: case 5: points = (type - 3) * 1000 * combo; break;
+				case 6: case 7: points= (type - 5) * 2000 * combo; break;
+                }
+				score += points;
+                streak = 20; //Waits 20 frames to check for other deaths
+
+                //Display score after death using points
                 enemies.erase(enemies.begin() + i);
                 i--;
             }
@@ -148,8 +168,8 @@ void Game::update()
                     enemy.die();
 
             for (Bomb& bomb : bombs)
-                if (explosions[i].intersects(bomb))
-                    bomb.explode();
+                if (explosions[i].intersects(bomb) && !bomb.willExplode)
+					bomb.delay();//Explodes in 3 frames
 
             if (explosions[i].getState() == Entity::State::Dead)
             {
@@ -157,6 +177,7 @@ void Game::update()
                 i--;
             }
         }
+		//std::cout << "\nExplosions: " << explosions.size();
 
         for (size_t i = 0; i < softWalls.size(); i++)
         {
@@ -200,6 +221,9 @@ void Game::render()
             window.draw(explosion);
 
         window.draw(bomber);
+
+        for (SoftWall& wall : softWalls)
+            window.draw(wall);
 
         for (Enemy& enemy : enemies)
             window.draw(enemy);
