@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Pod.h"
+#include "Animations.h"
 #include "Constants.h"
 
 /*
@@ -17,7 +18,7 @@ public:
 	enum class State { Living, Dying, Dead };
 	enum class Facing { Up, Down, Left, Right, None };
 
-	Entity(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols]);
+	Entity(const Animations&, Pod(&pods)[Constants::_rows][Constants::_cols]);
 
 	const sf::Sprite& getSprite() const;
 	State getState() const;
@@ -36,6 +37,7 @@ public:
 
 protected:
 	sf::Sprite sprite;
+	const Animations& frames;
 
 	Pod(&pods)[Constants::_rows][Constants::_cols];
 

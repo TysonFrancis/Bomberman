@@ -4,9 +4,9 @@
 
 using namespace Constants;
 
-Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
-	std::vector<Explosion>& explosions, bool timer, int d, int x, int y, const Animations& frames) :
-		Entity(tex, pods), explosions(explosions), remote(timer), distance(d), shrink(false), frames(frames)
+Bomb::Bomb(const Animations& frames, Pod(&pods)[_rows][_cols],
+	std::vector<Explosion>& explosions, bool timer, int d, int x, int y) :
+		Entity(frames, pods), explosions(explosions), remote(timer), distance(d), shrink(false)
 {
 	myFrame = 2;
 	tileX = x;
@@ -80,7 +80,7 @@ void Bomb::explode()
 	pods[tileY][tileX].isFilled = false;
 	//pods[tileY][tileX].isBomb = false;
 	myFrame = myTick = 0;
-	explosions.push_back(Explosion(sprite.getTexture(), pods, tileX, tileY, Facing::None, false, frames));
+	explosions.push_back(Explosion(frames, pods, tileX, tileY, Facing::None, false));
 
 	// Need to make better selection than this for direction	- D
 	dir = Facing::Up;
@@ -111,9 +111,9 @@ void Bomb::propogate(int xDir, int yDir)
 		if (!pods[yPos][xPos].isFilled)			// If pod is empty,
 		{
 			if (d == distance)						// If at end of range, spawn end explosion
-				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true, frames));
+				explosions.push_back(Explosion(frames, pods, xPos, yPos, dir, true));
 			else									// Else, spawn interior explosion
-				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false, frames));
+				explosions.push_back(Explosion(frames, pods, xPos, yPos, dir, false));
 			continue;								// Skip to next iteration
 		}
 
@@ -121,7 +121,7 @@ void Bomb::propogate(int xDir, int yDir)
 		{
 			pods[yPos][xPos].isFilled = false;
 			pods[yPos][xPos].isBomb = false;
-			explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false, frames));
+			explosions.push_back(Explosion(frames, pods, xPos, yPos, dir, false));
 		}
 		
 		if (pods[yPos][xPos].isSoft)			// If a soft wall is in the way,

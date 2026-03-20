@@ -7,7 +7,7 @@ using std::endl;
 
 Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sprites
     background(animations.getBackground()),                     // Load background sprite
-    bomber(animations.getEntities(), pods, bombs, explosions, animations),  // Load bomber entity
+    bomber(animations, pods, bombs, explosions),                // Load bomber entity
     window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     gameTick(0), score(0), streak(0), combo(0), enemyType(0)    // Set misc values to 0
@@ -50,14 +50,14 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
                 pods[row][col].isFilled = true;
 				pods[row][col].isSoft = true;
                 //pods[row][col].isExit = true;
-				softWalls.push_back(SoftWall(animations.getEntities(), pods, col, row));
+				softWalls.push_back(SoftWall(animations, pods, col, row));
             }
         }
 
     // Make 5 enemies and put them in positions that are empty
     for (int i = 0; i < 5; i++)
     {
-        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Ballom, bomber);
+        Enemy enemy(animations, pods, Enemy::Type::Ballom, bomber);
         int x, y;
 
         do

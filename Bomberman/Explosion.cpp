@@ -4,9 +4,9 @@
 
 using namespace Constants;
 
-Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
-	int x, int y, Facing dir, bool isEnd, const Animations& frames) :
-		Entity(tex, pods), row(1), end(isEnd), shrink(false), frames(frames)
+Explosion::Explosion(const Animations& frames, Pod(&pods)[_rows][_cols],
+	int x, int y, Facing dir, bool isEnd) :
+		Entity(frames, pods), row(1), end(isEnd), shrink(false)
 {
 	tileX = x;
 	tileY = y;
@@ -14,7 +14,7 @@ Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 	type = setType(dir);
 
 	//setTexture();
-	Entity::setTexture(frames.getExplosion(type)[0]);
+	Entity::setTexture(frames.getExplosionFrames(type)[0]);
 	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
 }
 
@@ -61,7 +61,7 @@ void Explosion::animate()
 
 		// Make a local reference to the explosion frames vector based on explosion type
 		// auto -> std::vector<sf::IntRect>
-		const auto& explosionTextures = frames.getExplosion(type);
+		const auto& explosionTextures = frames.getExplosionFrames(type);
 
 		if (myFrame < 0 || myFrame >= explosionTextures.size())
 		{

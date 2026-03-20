@@ -27,14 +27,34 @@ const sf::Texture& Animations::getMisc() const			{ return misc; }
 const sf::Texture& Animations::getTitle() const			{ return title; }
 const sf::Image&   Animations::getIcon() const			{ return icon; }
 
+const std::vector<sf::IntRect>& Animations::getPlayerFrames(WalkingDirection dir) const
+{
+	return playerTable.at(dir);
+}
+
+const std::vector<sf::IntRect>& Animations::getEnemyFrames(WalkingDirection dir) const
+{
+	return enemyTable.at(dir);
+}
+
 // Return the vector of frames for the given explosion type
 
 // Unordered maps work with keys and values, we already set the values
 // to be vectors of frames for each explosion type in the constructor,
 // so we just need to return the vector for the given explosion type key
-const std::vector<sf::IntRect>& Animations::getExplosion(ExplosionType type) const
+const std::vector<sf::IntRect>& Animations::getExplosionFrames(ExplosionType type) const
 {
 	return explosionTable.at(type);		// Return vector of frames for given type
+}
+
+void Animations::setPlayerFrames()
+{
+
+}
+
+void Animations::setEnemyFrames()
+{
+
 }
 
 void Animations::setExplosionFrames()

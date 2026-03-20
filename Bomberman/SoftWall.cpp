@@ -2,7 +2,7 @@
 
 using namespace Constants;
 
-SoftWall::SoftWall(const sf::Texture& tex, Pod(&pods)[_rows][_cols], int x, int y) : Entity(tex, pods)
+SoftWall::SoftWall(const Animations& frames, Pod(&pods)[_rows][_cols], int x, int y) : Entity(frames, pods)
 {
 	tileX = x;
 	tileY = y;
