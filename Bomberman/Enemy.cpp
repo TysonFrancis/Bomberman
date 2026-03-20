@@ -3,8 +3,8 @@
 
 using namespace Constants;
 
-Enemy::Enemy(const sf::Texture& tex, Pod(&pods)[_rows][_cols], Type input, Player(&play)) :
-	Entity(tex, pods), type(input), speed(0.f), moveX(0), moveY(0),
+Enemy::Enemy(const Animations& frames, Pod(&pods)[_rows][_cols], Type input, Player(&play)) :
+	Entity(frames, pods), type(input), speed(0.f), moveX(0), moveY(0),
 	lastFacing(Facing::Left), play(play), enemyFrameYPos(static_cast<int>(type) * _tileSize + _enemyStartY)
 {
 	switch (type)

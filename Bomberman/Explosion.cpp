@@ -4,9 +4,9 @@
 
 using namespace Constants;
 
-Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
-	int x, int y, Facing dir, bool isEnd, const Animations& frames) :
-		Entity(tex, pods), row(1), end(isEnd), shrink(false), frames(frames)
+Explosion::Explosion(const Animations& frames, Pod(&pods)[_rows][_cols],
+	int x, int y, Facing dir, bool isEnd) :
+		Entity(frames, pods), row(1), end(isEnd), shrink(false)
 {
 	tileX = x;
 	tileY = y;

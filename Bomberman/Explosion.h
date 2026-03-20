@@ -9,8 +9,8 @@
 class Explosion : public Entity
 {
 public:
-	Explosion(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols],
-		int, int, Facing, bool, const Animations&);
+	Explosion(const Animations&, Pod(&pods)[Constants::_rows][Constants::_cols],
+		int, int, Facing, bool);
 
 	void update();
 	void animate();
@@ -27,6 +27,5 @@ private:
 	bool end;
 	bool shrink;
 
-	const Animations& frames;
 	ExplosionType type;
 };

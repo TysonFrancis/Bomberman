@@ -17,8 +17,8 @@
 class Player : public Entity
 {
 public:
-	Player(const sf::Texture&, Pod (&pods)[Constants::_rows][Constants::_cols],
-		std::vector<Bomb>&, std::vector<Explosion>&, const Animations&);
+	Player(const Animations&, Pod (&pods)[Constants::_rows][Constants::_cols],
+		std::vector<Bomb>&, std::vector<Explosion>&);
 
 	void update();
 	void animate();
@@ -31,8 +31,6 @@ public:
 private:
 	void moveLogic();
 	bool isObstructed(int, int);
-
-	const Animations& frames;
 
 	std::vector<Bomb>& bombs;
 	std::vector<Explosion>& explosions;

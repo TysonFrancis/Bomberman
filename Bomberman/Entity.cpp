@@ -2,8 +2,9 @@
 
 using namespace Constants;
 
-Entity::Entity(const sf::Texture& tex, Pod(&pods)[_rows][_cols]) :
-	sprite(tex), pods(pods), state(State::Living), dir(Facing::None),
+Entity::Entity(const Animations& frames, Pod(&pods)[_rows][_cols]) :
+	sprite(frames.getEntities()), frames(frames), pods(pods),
+	state(State::Living), dir(Facing::None),
 	myTick(0), myFrame(0), tileX(0), tileY(0)
 {
 	setOrigin({ Constants::_halfTile, Constants::_halfTile });

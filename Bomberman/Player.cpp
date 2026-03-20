@@ -7,10 +7,10 @@ using namespace sf::Keyboard;
 
 using std::cout;
 
-Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
-	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions, const Animations& frames) :
-		Entity(tex, pods), bombs(bombs), explosions(explosions), speed(4.f),
-		joyX(0), joyY(0), lives(3), blast(2), maxBombs(3), remote(false), frames(frames)
+Player::Player(const Animations& frames, Pod (&pods)[_rows][_cols],
+	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
+		Entity(frames, pods), bombs(bombs), explosions(explosions), speed(4.f),
+		joyX(0), joyY(0), lives(3), blast(2), maxBombs(3), remote(false)
 {
 	tileX = tileY = 1;
 	setTexture(sf::IntRect({ 64, 0 }, _tile));
@@ -41,7 +41,7 @@ void Player::update()
 			{
 				pods[tileY][tileX].isFilled = true;
 				pods[tileY][tileX].isBomb = true;
-				bombs.push_back(Bomb(sprite.getTexture(), pods, explosions, remote, blast, tileX, tileY, frames));
+				bombs.push_back(Bomb(frames, pods, explosions, remote, blast, tileX, tileY));
 			}
 
 		//Remote Detonation

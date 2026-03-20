@@ -9,7 +9,7 @@ class Enemy : public Entity
 public:
 	enum class Type { Ballom, Onil, Dahl, Minvo, Doria, Ovape, Pass, Pontan };
 
-	Enemy(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols], Type,Player(&play));
+	Enemy(const Animations&, Pod(&pods)[Constants::_rows][Constants::_cols], Type,Player(&play));
 
 	void update();
 	void animate();

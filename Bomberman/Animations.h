@@ -63,6 +63,11 @@ enum class ExplosionType				// Enum to represent different explosion types,
 	EndUp, EndDown, EndLeft, EndRight
 };
 
+enum class WalkingDirection				// Enum to represent different walking directions,
+{										// used as key for player and enemy frame hash tables
+	Up, Down, Left, Right
+};
+
 class Animations
 {
 public:
@@ -74,9 +79,13 @@ public:
 	const sf::Texture& getTitle() const;
 	const sf::Image& getIcon() const;
 
-	const std::vector<sf::IntRect>& getExplosion(ExplosionType) const;
+	const std::vector<sf::IntRect>& getPlayerFrames(WalkingDirection) const;
+	const std::vector<sf::IntRect>& getEnemyFrames(WalkingDirection) const;
+	const std::vector<sf::IntRect>& getExplosionFrames(ExplosionType) const;
 
 private:
+	void setPlayerFrames();
+	void setEnemyFrames();
 	void setExplosionFrames();
 
 	sf::Texture entities;
@@ -85,6 +94,8 @@ private:
 	sf::Texture title;
 	sf::Image icon;
 
-	// Hash table of explosion frames, with explosion type as key and vector of frames as value
+	// Hash table of entity frames, with enum class types as key and vector of frames as value
+	std::unordered_map<WalkingDirection, std::vector<sf::IntRect>> playerTable;
+	std::unordered_map<WalkingDirection, std::vector<sf::IntRect>> enemyTable;
 	std::unordered_map<ExplosionType, std::vector<sf::IntRect>> explosionTable;
 };
