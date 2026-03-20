@@ -18,6 +18,7 @@ Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 
 void Explosion::update()
 {
+	std::cout << *this;
 	if (myTick >= _explosionTickSpeed * 6)		// If been living for 7 or more frames
 		die();
 
@@ -69,7 +70,7 @@ void Explosion::animate()
 
 void Explosion::die()
 {
-	state = State::Dying;
+	state = State::Dead;
 }
 
 
@@ -112,6 +113,9 @@ void Explosion::setTexture()
 	case Facing::Right:	Entity::setTexture(sf::IntRect({ rightX, baseY }, _tile));	break;
 	case Facing::None:	Entity::setTexture(sf::IntRect({ baseX,	 baseY }, _tile));	break;
 	}
+
+	if(dir == Facing::None)
+	std::cout << "\tbaseX: " << baseX << "\tbaseY: " << baseY << "\t";
 }
 
 
@@ -123,7 +127,8 @@ std::ostream& operator<<(std::ostream& os, const Explosion& explosion)
 	{
 		os << "Position: (" << explosion.tileX << ", " << explosion.tileY << ")\t"
 			<< "frame: " << explosion.myFrame << "\trow: " << explosion.row
-			<< "\tend: " << (explosion.end ? "true" : "false")
+			<< "\tshrink: " << std::boolalpha << explosion.shrink;
+			/* << "\tend: " << (explosion.end ? "true" : "false")
 			<< "\tstate: ";
 
 		switch (explosion.state)
@@ -131,9 +136,9 @@ std::ostream& operator<<(std::ostream& os, const Explosion& explosion)
 		case Entity::State::Living:	std::cout << "living";	break;
 		case Entity::State::Dying:	std::cout << "dying";	break;
 		case Entity::State::Dead:	std::cout << "dead";	break;
-		}
+		}*/
 
-		std::cout << "";
+		std::cout << "\t";
 	}
 
 	return os;

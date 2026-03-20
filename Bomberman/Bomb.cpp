@@ -20,9 +20,10 @@ void Bomb::update()
 {
 	if (myTick >= _fps * _bombTimer && !remote)	// If 2.5 seconds and no remote explode
 		explode();
-	animate();
-	if (willExplode && now + 5 == myTick)
+	if (willExplode && now + 5 <= myTick)
 		explode();
+
+	animate();
 }
 
 void Bomb::animate()
@@ -85,6 +86,7 @@ void Bomb::explode()
 {
 	state = State::Dead;
 	pods[tileY][tileX].isFilled = false;
+	pods[tileY][tileX].isBomb = false;
 	myFrame = myTick = 0;
 	explosions.push_back(Explosion(sprite.getTexture(), pods, tileX, tileY, dir, false));
 

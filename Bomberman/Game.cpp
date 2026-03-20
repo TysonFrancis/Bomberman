@@ -173,7 +173,8 @@ void Game::update()
                 i--;
             }
         }
-		//std::cout << "\nExplosions: " << explosions.size();
+        if(explosions.size() != 0)
+        std::cout << "\n";
 
         for (size_t i = 0; i < softWalls.size(); i++)
         {
