@@ -34,15 +34,18 @@ void Bomb::animate()
 
 	if (state == State::Living)					// Alive animations
 	{
-		if (shrink)								// If it should get smaller, frame++,
-			myFrame++;
-		else										// Otherwise, frame--
-			myFrame--;
+		myFrame += shrink ? 1 : -1;
 
 		if (myFrame <= 0)							// If at largest size, shrink
 			shrink = true;
-		else if (myFrame >= 2)						// If at smallest size, enlarge
+		else if (myFrame >= _bombFrames - 1)		// If at smallest size, enlarge
 			shrink = false;
+
+		if (myFrame < 0 || myFrame >= _bombFrames)
+		{
+			std::cout << "Bomb frame OOB: " << myFrame << "\n";
+			return;
+		}
 
 		setTexture(sf::IntRect({ myFrame * _tileSize, 48 }, _tile));
 

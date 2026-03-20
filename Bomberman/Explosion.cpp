@@ -33,20 +33,30 @@ void Explosion::animate()
 
 	if (state == State::Living)
 	{
-		if (shrink)								// If it should get smaller, frame--,
-			myFrame--;
-		else										// Otherwise, frame++
-			myFrame++;
+		myFrame += shrink ? -1 : 1;
 
 		if (myFrame <= 0)							// If at smallest size, enlarge
+		{
+			myFrame = 0;
 			shrink = false;
-		else if (myFrame >= 3)						// If at largest size, shrink
+		}
+
+		else if (myFrame >= _explosionFrames - 1)	// If at largest size, shrink
+		{
+			myFrame = 3;
 			shrink = true;
+		}
 
 		if (myFrame > 1)				// If frame advances past 1, switch to second row explosions
 			row = 2;
 		if (myFrame < 2 && shrink)		// If frame is less than 2 and it should get smaller, switch to first row
 			row = 1;
+
+		if (myFrame < 0 || myFrame >= _explosionFrames)
+		{
+			std::cout << "Explosion frame OOB: " << myFrame << "\n";
+			return;
+		}
 
 		setTexture();
 
@@ -55,7 +65,6 @@ void Explosion::animate()
 
 	if (myFrame <= 0 && state == State::Dying)
 		state = State::Dead;
-
 }
 
 void Explosion::die()

@@ -36,10 +36,12 @@ namespace Constants
 	static constexpr int _explosionOffset = 80;
 	static constexpr int _explosionStartX = 32;
 	static constexpr int _explosionStartY = 96;
+	static constexpr int _explosionFrames = 4;
 	static constexpr int _explosionTickSpeed = 6;
 																	// Bombs
 	static constexpr int _bombY = 48;
 	static constexpr int _bombTickSpeed = 15;
+	static constexpr int _bombFrames = 3;
 	static constexpr float _bombTimer = 2.5f;
 																	// SoftWalls
 	static constexpr int _wallTickSpeed = 6;
