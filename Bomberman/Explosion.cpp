@@ -13,8 +13,8 @@ Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 	this->dir = dir;
 	type = setType(dir);
 
-	setTexture();
-	//Entity::setTexture(frames.getExplosion(type)[0]);
+	//setTexture();
+	Entity::setTexture(frames.getExplosion(type)[0]);
 	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
 }
 
@@ -59,21 +59,21 @@ void Explosion::animate()
 		if (myFrame < 2 && shrink)		// If frame is less than 2 and it should get smaller, switch to first row
 			row = 1;
 
-		//// Make a local reference to the explosion frames vector based on explosion type
-		//// auto -> std::vector<sf::IntRect>
-		//const auto& explosionTextures = frames.getExplosion(type);
+		// Make a local reference to the explosion frames vector based on explosion type
+		// auto -> std::vector<sf::IntRect>
+		const auto& explosionTextures = frames.getExplosion(type);
 
-		//if (myFrame < 0 || myFrame >= explosionTextures.size())
-		//{
-		//	std::cout << "Frame OOB: " << myFrame << " size: " << explosionTextures.size() << "\n";
-		//	return;
-		//}
+		if (myFrame < 0 || myFrame >= explosionTextures.size())
+		{
+			std::cout << "Frame OOB: " << myFrame << " size: " << explosionTextures.size() << "\n";
+			return;
+		}
 
-		//// Set texture based on explosion type and current
-		//// frame, using the explosion frame hash table
-		//Entity::setTexture(explosionTextures[myFrame]);
+		// Set texture based on explosion type and current
+		// frame, using the explosion frame hash table
+		Entity::setTexture(explosionTextures[myFrame]);
 
-		setTexture();
+		//setTexture();
 
 		return;
 	}

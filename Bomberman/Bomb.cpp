@@ -46,7 +46,7 @@ void Bomb::animate()
 		else if (myFrame >= 2)						// If at smallest size, enlarge
 			shrink = false;
 
-		setTexture(sf::IntRect({ myFrame * _tileSize, 48 }, _tile));
+		setTexture(sf::IntRect({ myFrame * _tileSize, _bombY }, _tile));
 
 		return;
 	}
@@ -55,7 +55,7 @@ void Bomb::animate()
 	if (myFrame < 4)							// Keep incrementing frame until finished with death animation
 	{
 		myFrame++;
-		setTexture(sf::IntRect({ myFrame * _tileSize, 48 }, _tile));
+		setTexture(sf::IntRect({ myFrame * _tileSize, _bombY }, _tile));
 	}
 
 	else										// Set to empty texture to let background through after fully dies
