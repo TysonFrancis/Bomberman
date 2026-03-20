@@ -2,13 +2,15 @@
 #include <iostream>
 
 using namespace Constants;
+using std::cout;
+using std::endl;
 
 Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sprites
-    background(animations.getBackground()),                     // Load background sprite
-    bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber entity
-    window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
-        "Bomberman", sf::Style::Titlebar | sf::Style::Close),
-    frame(0), score(0)                                          // Set frame and score to 0
+background(animations.getBackground()),                         // Load background sprite
+bomber(animations.getEntities(), pods, bombs, explosions),      // Load bomber entity
+window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window with title and size
+    "Bomberman", sf::Style::Titlebar | sf::Style::Close),
+    gameTick(0), score(0), streak(0), combo(0), enemyType(0)    // Set misc values to 0
 {
     srand(time(NULL));
 
@@ -19,7 +21,7 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
     // Set title sprite on right texture, scale to fit and position in middle of window
     title.setTextureRect(sf::IntRect({ 0, 0 }, { 256, 240 }));
     title.setOrigin({ 128.f, 120.f });
-    title.setScale({ _scale * 0.875f, _scale * 0.875f});        // Best ratio fit for title screen
+    title.setScale({ _scale * 0.875f, _scale * 0.875f });        // Best ratio fit for title screen
     title.setPosition({ _windowWidth / 2.f, _windowHeight / 2.f });
 
     // Set to other title screen with same everything else as title
@@ -34,8 +36,8 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
     for (int row = 0; row < _rows; row++)
         for (int col = 0; col < _cols; col++)
         {
-			bool isInnerWall = col % 2 == 0 && row % 2 == 0;
-			bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
+            bool isInnerWall = col % 2 == 0 && row % 2 == 0;
+            bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
             bool isSoft = (rand() % 4 == 0) && (row > 2 || col > 2); // Can't spawn in top 2 x 2 by player
 
             if (isInnerWall || isBorder)
@@ -43,12 +45,12 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
                 pods[row][col].isFilled = true;
                 pods[row][col].isHard = true;
             }
-            else if(isSoft)
+            else if (isSoft)
             {
                 pods[row][col].isFilled = true;
-				pods[row][col].isSoft = true;
+                pods[row][col].isSoft = true;
                 //pods[row][col].isExit = true;
-				softWalls.push_back(SoftWall(animations.getEntities(), pods, col, row));
+                softWalls.push_back(SoftWall(animations.getEntities(), pods, col, row));
             }
         }
 
@@ -65,7 +67,7 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
         } while (pods[y][x].isFilled);
 
         enemy.setPosition(sf::Vector2f(x * _scaledTile - _halfScaled, y * _scaledTile - _halfScaled));
-		enemies.push_back(enemy);
+        enemies.push_back(enemy);
     }
 }
 
@@ -84,10 +86,6 @@ void Game::run()
 // Handles window events like game starting and closing
 void Game::events()
 {
-    // Close game after 3 seconds of end title
-    if (frame >= _fps * 3)
-        closeGame();
-
     // Close game if window is closed or escape key pressed
     while (const std::optional event = window.pollEvent())
         if (event->is<sf::Event::Closed>() ||
@@ -104,12 +102,10 @@ void Game::events()
 // with current frame and increments frame counter
 void Game::update()
 {
-	switch(s_gameState)
+    switch (s_gameState)
     {
-	case(GameState::Playing):
+    case(GameState::Playing):
         bomber.update();
-
-        int type, points;
 
         for (size_t i = 0; i < enemies.size(); i++)
         {
@@ -126,18 +122,20 @@ void Game::update()
                     combo += 1;
                 else combo = 1;
 
-				int type = static_cast<int>(enemies[i].getType());
-                switch (type)//Update score when enemy dies
+                enemyType = static_cast<int>(enemies[i].getType());
+
+                switch (enemyType)//Update score when enemy dies
                 {
-                case 0: case 1: points = (type + 1) * 100 * combo; break;
-				case 2: case 3: points = (type - 1) * 200 * combo; break;
-				case 4: case 5: points = (type - 3) * 1000 * combo; break;
-				case 6: case 7: points= (type - 5) * 2000 * combo; break;
+                case 0: case 1: score += (enemyType + 1) * 100 * combo; break;
+                case 2: case 3: score += (enemyType - 1) * 200 * combo; break;
+                case 4: case 5: score += (enemyType - 3) * 1000 * combo; break;
+                case 6: case 7: score += (enemyType - 5) * 2000 * combo; break;
                 }
-				score += points;
+
                 streak = 20; //Waits 20 frames to check for other deaths
 
                 //Display score after death using points
+
                 enemies.erase(enemies.begin() + i);
                 i--;
             }
@@ -162,12 +160,12 @@ void Game::update()
                 bomber.die();
 
             for (Enemy& enemy : enemies)
-                if(explosions[i].intersects(enemy))
+                if (explosions[i].intersects(enemy))
                     enemy.die();
 
             for (Bomb& bomb : bombs)
                 if (explosions[i].intersects(bomb) && !bomb.getWillExplode())
-					bomb.delay();//Explodes in 3 frames
+                    bomb.delay();//Explodes in 3 frames
 
             if (explosions[i].getState() == Entity::State::Dead)
             {
@@ -175,7 +173,6 @@ void Game::update()
                 i--;
             }
         }
-		//std::cout << "\nExplosions: " << explosions.size();
 
         for (size_t i = 0; i < softWalls.size(); i++)
         {
@@ -190,9 +187,9 @@ void Game::update()
 
         break;
 
-    case(GameState::Title):     break;
-    case(GameState::RoundStart):       break;
-    case(GameState::GameOver): frame++;  break;
+    case(GameState::Title):
+    case(GameState::RoundStart):               break;
+    case(GameState::GameOver):    gameTick++;  break;
     }
 }
 
@@ -201,7 +198,7 @@ void Game::render()
 {
     window.clear();
 
-    switch(s_gameState)
+    switch (s_gameState)
     {
     case(GameState::Playing):
         window.draw(background);
@@ -246,7 +243,7 @@ void Game::startRound()
         //window.clear();   - - -   Commented out until something else to display
         //window.display(); // So it doesn't hang lol
     }*/
-    
+
     s_gameState = GameState::Playing;
 }
 

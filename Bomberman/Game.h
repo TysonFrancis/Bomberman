@@ -60,8 +60,9 @@ private:
 
 	sf::RenderWindow window;
 
-	int frame;	// For end screen timing and program exiting
+	int gameTick;
 	int score;
 	int streak; //Checks if the player has killed enemies in quick sucession
 	int combo;
+	int enemyType;
 };

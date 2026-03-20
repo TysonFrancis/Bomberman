@@ -19,15 +19,15 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 
 void Player::update()
 {
+	// If on exit tile or fully dead end game
+	if (pods[tileY][tileX].isExit || lives <= 0 && myTick >= _fps)
+		Game::s_gameState = GameState::GameOver;
+
 	if (state == State::Living)
 	{
 		// Update tile position based on current world position
-		tileX = static_cast<int>((sprite.getPosition().x ) / _scaledTile);
-		tileY = static_cast<int>((sprite.getPosition().y ) / _scaledTile);
-
-		// If on exit tile or fully dead end game
-		if (pods[tileY][tileX].isExit || lives <= 0 && myTick >= _fps)
-			Game::s_gameState = GameState::GameOver;
+		tileX = static_cast<int>((sprite.getPosition().x) / _scaledTile);
+		tileY = static_cast<int>((sprite.getPosition().y) / _scaledTile);
 
 		// Determine total direction held
 		joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
@@ -69,15 +69,14 @@ void Player::update()
 		}
 	}
 
-	// Animation
 	animate();
 }
 
 void Player::animate()
 {
-	myTick++;								// Increment tick every update
+	myTick++;
 
-	if (myTick % 5 != 0)					// Only update frame every 5 ticks, 60fps -> 12 frames per second
+	if (myTick % _playerTickSpeed != 0)
 		return;
 
 	if (state == State::Living)								// Alive animations
@@ -108,17 +107,14 @@ void Player::animate()
 	
 	if (state == State::Dying)				// Death animation
 	{
-		if (myFrame < 7)						// Keep incrementing frame until finished with death animation
+		if (myFrame < _playerDeathFrames)		// Keep incrementing frame until finished with death animation
 		{
 			myFrame++;
-			setTexture(sf::IntRect({ myFrame * _tileSize, 32 }, _tile));
+			setTexture(sf::IntRect({ myFrame * _tileSize, _playerDeathY }, _tile));
 		}
 
-		if (myFrame >= 7)						// Once animation is finished, fully die
-		{
-			cout << "\nDEAD!!!!!!\n";
+		if (myFrame >= _playerDeathFrames)		// Once animation is finished, fully die
 			state = State::Dead;
-		}
 	}
 }
 

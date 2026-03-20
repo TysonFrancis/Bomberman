@@ -9,12 +9,11 @@ class Enemy : public Entity
 public:
 	enum class Type { Ballom, Onil, Dahl, Minvo, Doria, Ovape, Pass, Pontan };
 
-	Enemy(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols], Type,Player(&play));
+	Enemy(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols], Type, Player(&play));
 
 	void update();
 	void animate();
 	void die();
-	Type getType() { return type; };
 
 	Type getType();
 
@@ -25,7 +24,7 @@ private:
 	bool isObstructed(int, int, bool);
 	void changeDirection(bool);
 	void randomMove(bool);
-	void chasePlayer(bool, bool,bool);
+	void chasePlayer(bool, bool, bool);
 	bool lineOfSight(bool, bool);
 
 	Player(&play);
