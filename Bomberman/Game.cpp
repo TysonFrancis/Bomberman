@@ -164,8 +164,8 @@ void Game::update()
                     enemy.die();
 
             for (Bomb& bomb : bombs)
-                if (explosions[i].intersects(bomb) && !bomb.getWillExplode())
-                    bomb.delay();//Explodes in 3 frames
+                if (explosions[i].intersects(bomb) && !bomb.willExplode)
+					bomb.delay();//Explodes in 3 frames
 
             if (explosions[i].getState() == Entity::State::Dead)
             {
@@ -173,6 +173,7 @@ void Game::update()
                 i--;
             }
         }
+		//std::cout << "\nExplosions: " << explosions.size();
 
         for (size_t i = 0; i < softWalls.size(); i++)
         {
