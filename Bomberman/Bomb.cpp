@@ -37,9 +37,15 @@ void Bomb::animate()
 		myFrame += shrink ? 1 : -1;
 
 		if (myFrame <= 0)							// If at largest size, shrink
+		{
+			//myFrame = 0;
 			shrink = true;
+		}
 		else if (myFrame >= _bombFrames - 1)		// If at smallest size, enlarge
+		{
+			//myFrame = _bombFrames - 1;
 			shrink = false;
+		}
 
 		if (myFrame < 0 || myFrame >= _bombFrames)
 		{
@@ -114,10 +120,10 @@ void Bomb::propogate(int xDir, int yDir)
 				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
 			else									// Else, spawn interior explosion
 				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
-			for (int i = 0; i < explosions.size(); i++)
+			/*for (int i = 0; i < explosions.size(); i++)
 			{
-				if(explosions[i].xTile==Xpos)
-			}
+				if(explosions[i].tileX==Xpos)
+			}*/
 			continue;								// Skip to next iteration
 		}
 

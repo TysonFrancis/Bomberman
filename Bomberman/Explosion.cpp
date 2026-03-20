@@ -37,13 +37,13 @@ void Explosion::animate()
 
 		if (myFrame <= 0)							// If at smallest size, enlarge
 		{
-			myFrame = 0;
+			//myFrame = 0;
 			shrink = false;
 		}
 
 		else if (myFrame >= _explosionFrames - 1)	// If at largest size, shrink
 		{
-			myFrame = 3;
+			//myFrame = 3;
 			shrink = true;
 		}
 

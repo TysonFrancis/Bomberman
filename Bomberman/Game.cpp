@@ -164,7 +164,7 @@ void Game::update()
                     enemy.die();
 
             for (Bomb& bomb : bombs)
-                if (explosions[i].intersects(bomb) && !bomb.willExplode)
+                if (explosions[i].intersects(bomb) && !bomb.getWillExplode())
 					bomb.delay();//Explodes in 3 frames
 
             if (explosions[i].getState() == Entity::State::Dead)

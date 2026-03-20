@@ -10,7 +10,7 @@ using std::cout;
 Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
 		Entity(tex, pods), bombs(bombs), explosions(explosions), speed(4.f),
-		joyX(0), joyY(0), lives(3), blast(2), maxBombs(3), remote(false)
+		joyX(0), joyY(0), lives(3), blast(2), maxBombs(6), remote(false)
 {
 	tileX = tileY = 1;
 	setTexture(sf::IntRect({ 64, 0 }, _tile));
