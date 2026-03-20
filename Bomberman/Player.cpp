@@ -1,8 +1,11 @@
 #include "Player.h"
+#include "Game.h"
 #include <iostream>
 
 using namespace Constants;
 using namespace sf::Keyboard;
+
+using std::cout;
 
 Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
@@ -12,17 +15,19 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	tileX = tileY = 1;
 	setTexture(sf::IntRect({ 64, 0 }, _tile));
 	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
-
-	remote = true;//For testing
 }
 
 void Player::update()
 {
+	// If on exit tile or fully dead end game
+	if (pods[tileY][tileX].isExit || lives <= 0 && myTick >= _fps)
+		Game::s_gameState = GameState::GameOver;
+
 	if (state == State::Living)
 	{
 		// Update tile position based on current world position
-		tileX = static_cast<int>((sprite.getPosition().x ) / _scaledTile);
-		tileY = static_cast<int>((sprite.getPosition().y ) / _scaledTile);
+		tileX = static_cast<int>((sprite.getPosition().x) / _scaledTile);
+		tileY = static_cast<int>((sprite.getPosition().y) / _scaledTile);
 
 		// Determine total direction held
 		joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
@@ -53,25 +58,25 @@ void Player::update()
 	// otherwise waits for animation to finish and fully die
 	if(state == State::Dead)
 	{
-		if(lives - 1 > 0)
-		{
-			lives--;
-			state = State::Living;
+		if(lives != 0)
+		lives--;
 
+		if(lives > 0)
+		{
+			state = State::Living;
 			setTexture(sf::IntRect({ 64, 0 }, _tile));
 			setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
 		}
 	}
 
-	// Animation
 	animate();
 }
 
 void Player::animate()
 {
-	myTick++;								// Increment tick every update
+	myTick++;
 
-	if (myTick % 5 != 0)					// Only update frame every 5 ticks, 60fps -> 12 frames per second
+	if (myTick % _playerTickSpeed != 0)
 		return;
 
 	if (state == State::Living)								// Alive animations
@@ -102,13 +107,13 @@ void Player::animate()
 	
 	if (state == State::Dying)				// Death animation
 	{
-		if (myFrame < 7)						// Keep incrementing frame until finished with death animation
+		if (myFrame < _playerDeathFrames)		// Keep incrementing frame until finished with death animation
 		{
 			myFrame++;
-			setTexture(sf::IntRect({ myFrame * _tileSize, 32 }, _tile));
+			setTexture(sf::IntRect({ myFrame * _tileSize, _playerDeathY }, _tile));
 		}
 
-		if (myFrame >= 7)						// Once animation is finished, fully die
+		if (myFrame >= _playerDeathFrames)		// Once animation is finished, fully die
 			state = State::Dead;
 	}
 }
@@ -228,8 +233,10 @@ bool Player::isObstructed(int checkX, int checkY)
 
 std::ostream& operator<<(std::ostream& os, const Player& player)
 {
-	return os << "Position: (" << player.tileX << ", " << player.tileY << ")\t"
-		<< "JoyX: " << player.joyX << "\tJoyY : " << player.joyY << "\n";
+	return os /*<< "Position: (" << player.tileX << ", " << player.tileY << ')'
+		<< "\tJoyX: " << player.joyX << "\tJoyY : " << player.joyY*/
+		<< "\tTick: " << player.myTick << "\tFrame: " <<player.myFrame
+		<< "\tLives: " << player.lives << "\n";
 }
 
 Player& Player::operator=(const Player& other)

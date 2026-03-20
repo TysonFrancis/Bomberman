@@ -1,18 +1,16 @@
 #include "Game.h"
 #include <iostream>
-#include "time.h"
 
 using namespace Constants;
+using std::cout;
+using std::endl;
 
-using sf::Keyboard::isKeyPressed;
-using sf::Keyboard::Scancode;
-
-Game::Game() : title(animations.getTitle()),                    // Load title sprite
-    background(animations.getBackground()),                     // Load background sprite
-    bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber entity
-    window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
-        "Bomberman", sf::Style::Titlebar | sf::Style::Close),
-    state(GameState::Title)                                     // Set state to title screen
+Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sprites
+background(animations.getBackground()),                         // Load background sprite
+bomber(animations.getEntities(), pods, bombs, explosions),      // Load bomber entity
+window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window with title and size
+    "Bomberman", sf::Style::Titlebar | sf::Style::Close),
+    gameTick(0), score(0), streak(0), combo(0), enemyType(0)    // Set misc values to 0
 {
     srand(time(NULL));
 
@@ -23,8 +21,12 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
     // Set title sprite on right texture, scale to fit and position in middle of window
     title.setTextureRect(sf::IntRect({ 0, 0 }, { 256, 240 }));
     title.setOrigin({ 128.f, 120.f });
-    title.setScale({ _scale * 0.875f, _scale * 0.875f});        // Best ratio fit for title screen
+    title.setScale({ _scale * 0.875f, _scale * 0.875f });        // Best ratio fit for title screen
     title.setPosition({ _windowWidth / 2.f, _windowHeight / 2.f });
+
+    // Set to other title screen with same everything else as title
+    endTitle = title;
+    endTitle.setTextureRect(sf::IntRect({ 256, 0 }, { 256, 240 }));
 
     // Set background sprite on right texture and scale to fit window
     background.setTextureRect(sf::IntRect({ 0, 0 }, { 496, 208 }));
@@ -34,8 +36,8 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
     for (int row = 0; row < _rows; row++)
         for (int col = 0; col < _cols; col++)
         {
-			bool isInnerWall = col % 2 == 0 && row % 2 == 0;
-			bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
+            bool isInnerWall = col % 2 == 0 && row % 2 == 0;
+            bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
             bool isSoft = (rand() % 4 == 0) && (row > 2 || col > 2); // Can't spawn in top 2 x 2 by player
 
             if (isInnerWall || isBorder)
@@ -43,19 +45,19 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
                 pods[row][col].isFilled = true;
                 pods[row][col].isHard = true;
             }
-            else if(isSoft)
+            else if (isSoft)
             {
                 pods[row][col].isFilled = true;
-				pods[row][col].isSoft = true;
+                pods[row][col].isSoft = true;
                 //pods[row][col].isExit = true;
-				softWalls.push_back(SoftWall(animations.getEntities(), pods, col, row));
+                softWalls.push_back(SoftWall(animations.getEntities(), pods, col, row));
             }
         }
 
     // Make 5 enemies and put them in positions that are empty
     for (int i = 0; i < 5; i++)
     {
-        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Ballom,bomber);
+        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Ballom, bomber);
         int x, y;
 
         do
@@ -65,7 +67,7 @@ Game::Game() : title(animations.getTitle()),                    // Load title sp
         } while (pods[y][x].isFilled);
 
         enemy.setPosition(sf::Vector2f(x * _scaledTile - _halfScaled, y * _scaledTile - _halfScaled));
-		enemies.push_back(enemy);
+        enemies.push_back(enemy);
     }
 }
 
@@ -84,12 +86,15 @@ void Game::run()
 // Handles window events like game starting and closing
 void Game::events()
 {
+    // Close game if window is closed or escape key pressed
     while (const std::optional event = window.pollEvent())
-        if (event->is<sf::Event::Closed>() || isKeyPressed(Scancode::Escape))
+        if (event->is<sf::Event::Closed>() ||
+            sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape))
             closeGame();
 
     // If on title screen and enter is pressed, start game
-    if (state == GameState::Title && isKeyPressed(Scancode::Enter))
+    if (s_gameState == GameState::Title &&
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
         startRound();
 }
 
@@ -97,12 +102,10 @@ void Game::events()
 // with current frame and increments frame counter
 void Game::update()
 {
-	switch(state)
+    switch (s_gameState)
     {
-	case(GameState::Playing):
+    case(GameState::Playing):
         bomber.update();
-
-        int type, points;
 
         for (size_t i = 0; i < enemies.size(); i++)
         {
@@ -119,18 +122,20 @@ void Game::update()
                     combo += 1;
                 else combo = 1;
 
-			    type = static_cast<int>(enemies[i].getType());
-                switch (type)//Update score when enemy dies
+                enemyType = static_cast<int>(enemies[i].getType());
+
+                switch (enemyType)//Update score when enemy dies
                 {
-                case 0: case 1: points = (type + 1) * 100 * combo; break;
-				case 2: case 3: points = (type - 1) * 200 * combo; break;
-				case 4: case 5: points = (type - 3) * 1000 * combo; break;
-				case 6: case 7: points= (type - 5) * 2000 * combo; break;
+                case 0: case 1: score += (enemyType + 1) * 100 * combo; break;
+                case 2: case 3: score += (enemyType - 1) * 200 * combo; break;
+                case 4: case 5: score += (enemyType - 3) * 1000 * combo; break;
+                case 6: case 7: score += (enemyType - 5) * 2000 * combo; break;
                 }
-				score += points;
+
                 streak = 20; //Waits 20 frames to check for other deaths
 
                 //Display score after death using points
+
                 enemies.erase(enemies.begin() + i);
                 i--;
             }
@@ -155,12 +160,12 @@ void Game::update()
                 bomber.die();
 
             for (Enemy& enemy : enemies)
-                if(explosions[i].intersects(enemy))
+                if (explosions[i].intersects(enemy))
                     enemy.die();
 
             for (Bomb& bomb : bombs)
                 if (explosions[i].intersects(bomb) && !bomb.willExplode)
-					bomb.delay();//Explodes in 5 frames
+					bomb.delay();//Explodes in 3 frames
 
             if (explosions[i].getState() == Entity::State::Dead)
             {
@@ -168,7 +173,7 @@ void Game::update()
                 i--;
             }
         }
-		std::cout << "\nExplosions: " << explosions.size();
+		//std::cout << "\nExplosions: " << explosions.size();
 
         for (size_t i = 0; i < softWalls.size(); i++)
         {
@@ -184,8 +189,8 @@ void Game::update()
         break;
 
     case(GameState::Title):
-    case(GameState::RoundStart):
-    case(GameState::GameOver): break;
+    case(GameState::RoundStart):               break;
+    case(GameState::GameOver):    gameTick++;  break;
     }
 }
 
@@ -194,7 +199,7 @@ void Game::render()
 {
     window.clear();
 
-    switch(state)
+    switch (s_gameState)
     {
     case(GameState::Playing):
         window.draw(background);
@@ -210,17 +215,14 @@ void Game::render()
 
         window.draw(bomber);
 
-        for (SoftWall& wall : softWalls)
-            window.draw(wall);
-
         for (Enemy& enemy : enemies)
             window.draw(enemy);
 
         break;
 
-    case(GameState::Title):         window.draw(title);             break;
-	case(GameState::RoundStart):    /* Draw current round??? */
-	case(GameState::GameOver):      /* Draw game over screen??? */  break;
+    case(GameState::Title):       window.draw(title);          break;
+    case(GameState::RoundStart):  /* Draw current round??? */  break;
+    case(GameState::GameOver):    window.draw(endTitle);       break;
     }
 
     window.display();
@@ -242,8 +244,8 @@ void Game::startRound()
         //window.clear();   - - -   Commented out until something else to display
         //window.display(); // So it doesn't hang lol
     }*/
-    
-    state = GameState::Playing;
+
+    s_gameState = GameState::Playing;
 }
 
 // Called when window is closed, used to
