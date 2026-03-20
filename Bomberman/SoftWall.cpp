@@ -20,9 +20,7 @@ void SoftWall::update()
 					// now determine if pod is the exit or regular
 
 	if (pods[tileY][tileX].isExit)		// If pod is exit tile, set textrue to exit and fully die
-	{
 		setTexture(sf::IntRect({ 176, 48 }, _tile));
-	}
 	else								// Else, die
 		die();
 

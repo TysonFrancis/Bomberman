@@ -5,6 +5,7 @@
 #include "Pod.h"
 #include "Bomb.h"
 #include "Explosion.h"
+#include "Animations.h"
 #include "Constants.h"
 
 /*
@@ -17,7 +18,7 @@ class Player : public Entity
 {
 public:
 	Player(const sf::Texture&, Pod (&pods)[Constants::_rows][Constants::_cols],
-		std::vector<Bomb>&, std::vector<Explosion>&);
+		std::vector<Bomb>&, std::vector<Explosion>&, const Animations&);
 
 	void update();
 	void animate();
@@ -30,6 +31,8 @@ public:
 private:
 	void moveLogic();
 	bool isObstructed(int, int);
+
+	const Animations& frames;
 
 	std::vector<Bomb>& bombs;
 	std::vector<Explosion>& explosions;

@@ -2,13 +2,15 @@
 #include <iostream>
 
 using namespace Constants;
+using std::cout;
+using std::endl;
 
 Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sprites
     background(animations.getBackground()),                     // Load background sprite
-    bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber entity
+    bomber(animations.getEntities(), pods, bombs, explosions, animations),  // Load bomber entity
     window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
-    frame(0), score(0)                                          // Set frame and score to 0
+    gameTick(0), score(0), streak(0), combo(0), enemyType(0)    // Set misc values to 0
 {
     srand(time(NULL));
 
@@ -84,10 +86,6 @@ void Game::run()
 // Handles window events like game starting and closing
 void Game::events()
 {
-    // Close game after 3 seconds of end title
-    if (frame >= _fps * 3)
-        closeGame();
-
     // Close game if window is closed or escape key pressed
     while (const std::optional event = window.pollEvent())
         if (event->is<sf::Event::Closed>() ||
@@ -109,8 +107,6 @@ void Game::update()
 	case(GameState::Playing):
         bomber.update();
 
-        int type, points;
-
         for (size_t i = 0; i < enemies.size(); i++)
         {
             enemies[i].update();
@@ -126,18 +122,20 @@ void Game::update()
                     combo += 1;
                 else combo = 1;
 
-				int type = static_cast<int>(enemies[i].getType());
-                switch (type)//Update score when enemy dies
+                enemyType = static_cast<int>(enemies[i].getType());
+
+                switch (enemyType)//Update score when enemy dies
                 {
-                case 0: case 1: points = (type + 1) * 100 * combo; break;
-				case 2: case 3: points = (type - 1) * 200 * combo; break;
-				case 4: case 5: points = (type - 3) * 1000 * combo; break;
-				case 6: case 7: points= (type - 5) * 2000 * combo; break;
+                case 0: case 1: score += (enemyType + 1) * 100 * combo; break;
+				case 2: case 3: score += (enemyType - 1) * 200 * combo; break;
+				case 4: case 5: score += (enemyType - 3) * 1000 * combo; break;
+				case 6: case 7: score += (enemyType - 5) * 2000 * combo; break;
                 }
-				score += points;
+
                 streak = 20; //Waits 20 frames to check for other deaths
 
                 //Display score after death using points
+
                 enemies.erase(enemies.begin() + i);
                 i--;
             }
@@ -175,7 +173,6 @@ void Game::update()
                 i--;
             }
         }
-		//std::cout << "\nExplosions: " << explosions.size();
 
         for (size_t i = 0; i < softWalls.size(); i++)
         {
@@ -190,9 +187,9 @@ void Game::update()
 
         break;
 
-    case(GameState::Title):     break;
-    case(GameState::RoundStart):       break;
-    case(GameState::GameOver): frame++;  break;
+    case(GameState::Title):
+    case(GameState::RoundStart):               break;
+    case(GameState::GameOver):    gameTick++;  break;
     }
 }
 
@@ -224,7 +221,8 @@ void Game::render()
 
     case(GameState::Title):       window.draw(title);          break;
     case(GameState::RoundStart):  /* Draw current round??? */  break;
-    case(GameState::GameOver):    window.draw(endTitle);       break;
+    case(GameState::GameOver):    //if (gameTick > _fps * 2)
+                                      window.draw(endTitle);   break;
     }
 
     window.display();

@@ -5,8 +5,8 @@
 using namespace Constants;
 
 Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
-	std::vector<Explosion>& explosions, bool timer, int d, int x, int y) :
-		Entity(tex, pods), explosions(explosions), remote(timer), distance(d), shrink(false)
+	std::vector<Explosion>& explosions, bool timer, int d, int x, int y, const Animations& frames) :
+		Entity(tex, pods), explosions(explosions), remote(timer), distance(d), shrink(false), frames(frames)
 {
 	myFrame = 2;
 	tileX = x;
@@ -20,9 +20,11 @@ void Bomb::update()
 {
 	if (myTick >= _fps * _bombTimer && !remote)	// If 2.5 seconds and no remote explode
 		explode();
-	animate();
 	if (willExplode && now + 5 == myTick)
 		explode();
+
+	if(state == State::Living)
+		animate();
 }
 
 void Bomb::animate()
@@ -76,8 +78,9 @@ void Bomb::explode()
 {
 	state = State::Dead;
 	pods[tileY][tileX].isFilled = false;
+	//pods[tileY][tileX].isBomb = false;
 	myFrame = myTick = 0;
-	explosions.push_back(Explosion(sprite.getTexture(), pods, tileX, tileY, dir, false));
+	explosions.push_back(Explosion(sprite.getTexture(), pods, tileX, tileY, Facing::None, false, frames));
 
 	// Need to make better selection than this for direction	- D
 	dir = Facing::Up;
@@ -108,9 +111,9 @@ void Bomb::propogate(int xDir, int yDir)
 		if (!pods[yPos][xPos].isFilled)			// If pod is empty,
 		{
 			if (d == distance)						// If at end of range, spawn end explosion
-				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
+				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true, frames));
 			else									// Else, spawn interior explosion
-				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
+				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false, frames));
 			continue;								// Skip to next iteration
 		}
 
@@ -118,7 +121,7 @@ void Bomb::propogate(int xDir, int yDir)
 		{
 			pods[yPos][xPos].isFilled = false;
 			pods[yPos][xPos].isBomb = false;
-			explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
+			explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false, frames));
 		}
 		
 		if (pods[yPos][xPos].isSoft)			// If a soft wall is in the way,

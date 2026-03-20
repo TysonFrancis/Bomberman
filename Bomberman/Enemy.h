@@ -14,7 +14,6 @@ public:
 	void update();
 	void animate();
 	void die();
-	Type getType() { return type; };
 
 	Type getType();
 

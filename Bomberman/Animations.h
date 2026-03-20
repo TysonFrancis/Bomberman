@@ -1,5 +1,9 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <unordered_map>
+#include <vector>
+
+#include "Constants.h"
 
 /*
 	Texture and image handler class, loads in all items and sets
@@ -53,6 +57,12 @@
 		screts at(0, 16)
 */
 
+enum class ExplosionType				// Enum to represent different explosion types,
+{										// used as key for explosion frame hash table
+	Center, Up, Down, Left, Right,
+	EndUp, EndDown, EndLeft, EndRight
+};
+
 class Animations
 {
 public:
@@ -64,10 +74,17 @@ public:
 	const sf::Texture& getTitle() const;
 	const sf::Image& getIcon() const;
 
+	const std::vector<sf::IntRect>& getExplosion(ExplosionType) const;
+
 private:
+	void setExplosionFrames();
+
 	sf::Texture entities;
 	sf::Texture background;
 	sf::Texture misc;
 	sf::Texture title;
 	sf::Image icon;
+
+	// Hash table of explosion frames, with explosion type as key and vector of frames as value
+	std::unordered_map<ExplosionType, std::vector<sf::IntRect>> explosionTable;
 };

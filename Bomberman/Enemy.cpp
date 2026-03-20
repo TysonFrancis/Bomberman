@@ -5,18 +5,18 @@ using namespace Constants;
 
 Enemy::Enemy(const sf::Texture& tex, Pod(&pods)[_rows][_cols], Type input, Player(&play)) :
 	Entity(tex, pods), type(input), speed(0.f), moveX(0), moveY(0),
-	lastFacing(Facing::Left), play(play), enemyFrameYPos(static_cast<int>(type)* _tileSize + _enemyStartY)
+	lastFacing(Facing::Left), play(play), enemyFrameYPos(static_cast<int>(type) * _tileSize + _enemyStartY)
 {
 	switch (type)
 	{
-	case Type::Doria:	speed = 1.5f; eratic = 11; break;
+	case Type::Doria:	speed = 1.5f;	eratic = 11;	break;
 	case Type::Ballom:
-	case Type::Ovape:	speed = 2.f; eratic = 9;  break;
+	case Type::Ovape:	speed = 2.f;	eratic = 9;		break;
 	case Type::Onil:
-	case Type::Dahl:	speed = 2.5f; eratic = 5; break;
-	case Type::Minvo:	speed = 3.f; eratic = 4; break;
-	case Type::Pass:	speed = 3.5f; eratic = 3; break;
-	case Type::Pontan:  speed = 4.f; eratic = 5; break;
+	case Type::Dahl:	speed = 2.5f;	eratic = 5;		break;
+	case Type::Minvo:	speed = 3.f;	eratic = 4;		break;
+	case Type::Pass:	speed = 3.5f;	eratic = 3;		break;
+	case Type::Pontan:  speed = 4.f;	eratic = 5;		break;
 	}
 	
 	// Set texture based on enum Type
@@ -29,62 +29,34 @@ void Enemy::update()
 	if (state == State::Dead)		// Nothing to do if dead, can skip everything
 		return;
 
-	// Calculate where to put enemy Y frame and store
-	// in variable instead of repeating everywhere
-	enemyFrameYPos = static_cast<int>(type) * _tileSize + _enemyStartY;
-
 	// Movement
 	if (state == State::Living)
 	{
 		// Update tile position based on current world position
-		tileX = static_cast<int>((getSprite().getPosition().x ) / _scaledTile);
-		tileY = static_cast<int>((getSprite().getPosition().y ) / _scaledTile);
+		tileX = static_cast<int>((getSprite().getPosition().x) / _scaledTile);
+		tileY = static_cast<int>((getSprite().getPosition().y) / _scaledTile);
 
 		switch (type)
 		{
-		case Type::Ballom: //ballom, random movement
-			randomMove(false);
-			break;
-
-		case Type::Onil: //onil, chases player if seen on y axis
-			chasePlayer(false, true, false);
-			break;
-
-		case Type::Dahl: //dahl, chases player if seen on X axis
-			chasePlayer(true, false,false);
-			break;
-
-		case Type::Minvo: //minvo, chases player if seen on either axis
-			chasePlayer(true, true,false);
-			break;
-
-		case Type::Doria: //doria, chases, avoids bombs, moves through soft blocks
-			chasePlayer(true, true, true);
-			break;
-
-		case Type::Ovape: //ovape, random movement, moves through soft blocks
-			randomMove(true);
-			break;
-
-		case Type::Pass: //pass, always chases if encountered, changes direction at most junctions
-			chasePlayer(true, true,true);
-			break;
-
-		case Type::Pontan: //pontan, alwyays chases, moves through soft blocks
-			chasePlayer(true, true,true);
-			break;
+		case Type::Ballom:  randomMove(false);					break;  // Ballom, random movement
+		case Type::Onil:    chasePlayer(false, true, false);	break;  // Onil,   chases player if seen on y axis
+		case Type::Dahl:    chasePlayer(true, false, false);	break;  // Dahl,   chases player if seen on X axis
+		case Type::Minvo:   chasePlayer(true, true, false);		break;  // Minvo,  chases player if seen on either axis
+		case Type::Doria:   chasePlayer(true, true, true);		break;  // Doria,  chases, avoids bombs, moves through soft blocks
+		case Type::Ovape:   randomMove(true);					break;  // Ovape,  random movement, moves through soft blocks
+		case Type::Pass:    chasePlayer(true, true, true);		break;	// Pass,   always chases if encountered, changes direction at most junctions
+		case Type::Pontan:	chasePlayer(true, true, true);		break;  // Pontan, alwyays chases, moves through soft blocks
 		}
 	}
 
-	// Animation
 	animate();
 }
 
 void Enemy::animate()
 {
-	myTick++;								// Increment tick every update
+	myTick++;
 
-	if(myTick % 10 != 0)					// Only update frame every 10 ticks, 60fps -> 6 frames per second
+	if(myTick % _enemyTickSpeed != 0)
 		return;
 
 	if (dir == Facing::Left || dir == Facing::Right)
@@ -109,19 +81,19 @@ void Enemy::animate()
 		if (myTick < _fps)						// Don't continue with death animation until after 1 second
 			return;
 
-		if (myFrame < 4)						// Keep incrementing frame until finished with death animation
+		if (myFrame < _enemyColorDeathFrames)	// Keep incrementing frame until finished with death animation
 			myFrame++;
 
-		if (myFrame >= 4)						// Once animation is finished, fully die
+		if (myFrame >= _enemyColorDeathFrames)	// Once animation is finished, fully die
 			state = State::Dead;
 
 		int deathRow = _enemyStartY;				// Deafault to pink death row
 		if (type == Type::Onil || type == Type::Doria)
-			deathRow += _tileSize * 3;							// Set to blue death row
+			deathRow += 48;							// Set to blue death row
 		else if (type == Type::Dahl || type == Type::Ovape)
-			deathRow += _tileSize * 2;							// Set to purple death row
+			deathRow += 32;							// Set to purple death row
 
-		setTexture(sf::IntRect({ myFrame * _tileSize + 112, deathRow }, _tile));
+		setTexture(sf::IntRect({ myFrame * _tileSize + _enemyColorDeathX, deathRow }, _tile));
 	}
 }
 
@@ -132,7 +104,7 @@ void Enemy::die()
 
 	state = State::Dying;
 	myFrame = myTick = 0;
-	setTexture(sf::IntRect({ 96, enemyFrameYPos }, _tile));
+	setTexture(sf::IntRect({ _enemyDeathX, enemyFrameYPos }, _tile));
 }
 
 Enemy::Type Enemy::getType()
@@ -162,31 +134,31 @@ void Enemy::changeDirection(bool phase)
 	switch (dir)
 	{
 	case Facing::Up:
-		moveX = 0;	
-		moveY = -1;		
-		if(!pods[tileY-1][tileX].isFilled)
+		moveX = 0;
+		moveY = -1;
+		if (!pods[tileY - 1][tileX].isFilled)
 			break;
 		[[fallthrough]];
 	case Facing::Down:
-		moveX = 0;	
-		moveY = 1;		
-		if (!phase&&!pods[tileY+1][tileX].isFilled)
+		moveX = 0;
+		moveY = 1;
+		if (!phase && !pods[tileY + 1][tileX].isFilled)
 			break;
 		if (phase && !pods[tileY + 1][tileX].isHard)
 			break;
 		[[fallthrough]];
 	case Facing::Left:
-		moveX = -1; 
-		moveY = 0;		
-		if (!phase&&!pods[tileY][tileX-1].isFilled)
+		moveX = -1;
+		moveY = 0;
+		if (!phase && !pods[tileY][tileX - 1].isFilled)
 			break;
 		if (phase && !pods[tileY][tileX - 1].isHard)
 			break;
 		[[fallthrough]];
 	case Facing::Right:
-		moveX = 1;	
-		moveY = 0;		
-		if (!phase&&!pods[tileY][tileX+1].isFilled)
+		moveX = 1;
+		moveY = 0;
+		if (!phase && !pods[tileY][tileX + 1].isFilled)
 			break;
 		if (phase && !pods[tileY][tileX + 1].isHard)
 			break;
@@ -198,35 +170,7 @@ void Enemy::changeDirection(bool phase)
 }
 
 
-// *** Public debugging methods *** //
-
-std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
-{
-	out << "Enemy type: ";
-
-	switch (enemy.type)
-	{
-	case Enemy::Type::Ballom:	out << "Ballom";	break;
-	case Enemy::Type::Onil:		out << "Onil";		break;
-	case Enemy::Type::Dahl:		out << "Dahl";		break;
-	case Enemy::Type::Minvo:	out << "Minvo";		break;
-	case Enemy::Type::Doria:	out << "Doria";		break;
-	case Enemy::Type::Ovape:	out << "Ovape";		break;
-	case Enemy::Type::Pass:		out << "Pass";		break;
-	case Enemy::Type::Pontan:	out << "Pontan";	break;
-	}
-
-	out << "\n";
-
-	return out;
-}
-
-Enemy& Enemy::operator=(const Enemy& other)
-{
-	if (this != &other)
-		Entity::operator=(other);
-	return *this;
-}
+// *** Private helper methods *** //
 
 void Enemy::randomMove(bool canPhase)
 {
@@ -335,4 +279,35 @@ void Enemy::chasePlayer(bool x, bool y,bool phase)
 bool Enemy::lineOfSight(bool xy, bool phase)	//xy-0means x direction, 1 means y
 {
 	return true;
+}
+
+
+// *** Public debugging methods *** //
+
+std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
+{
+	out << "Enemy type: ";
+
+	switch (enemy.type)
+	{
+	case Enemy::Type::Ballom:	out << "Ballom";	break;
+	case Enemy::Type::Onil:		out << "Onil";		break;
+	case Enemy::Type::Dahl:		out << "Dahl";		break;
+	case Enemy::Type::Minvo:	out << "Minvo";		break;
+	case Enemy::Type::Doria:	out << "Doria";		break;
+	case Enemy::Type::Ovape:	out << "Ovape";		break;
+	case Enemy::Type::Pass:		out << "Pass";		break;
+	case Enemy::Type::Pontan:	out << "Pontan";	break;
+	}
+
+	out << "\n";
+
+	return out;
+}
+
+Enemy& Enemy::operator=(const Enemy& other)
+{
+	if (this != &other)
+		Entity::operator=(other);
+	return *this;
 }
