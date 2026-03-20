@@ -106,22 +106,26 @@ void Bomb::propogate(int xDir, int yDir)
 				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
 			else									// Else, spawn interior explosion
 				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
+			for (int i = 0; i < explosions.size(); i++)
+			{
+				if(explosions[i].xTile==Xpos)
+			}
 			continue;								// Skip to next iteration
 		}
 
-		if (pods[yPos][xPos].isBomb)
-		{
-			pods[yPos][xPos].isFilled = false;
-			pods[yPos][xPos].isBomb = false;
-			explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
-		}
-		
-		if (pods[yPos][xPos].isSoft)			// If a soft wall is in the way,
+		else if (pods[yPos][xPos].isSoft)			// If a soft wall is in the way,
 		{
 			pods[yPos][xPos].isFilled = false;
 			pods[yPos][xPos].isSoft = false;
 			break;								// Since loop continues if empty, if it reaches this point, it
 												// means it's a soft wall that was just destroyed, so exit loop
+		}
+		
+		else if (pods[yPos][xPos].isBomb)
+		{
+			pods[yPos][xPos].isFilled = false;
+			pods[yPos][xPos].isBomb = false;
+			explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
 		}
 	}
 }
