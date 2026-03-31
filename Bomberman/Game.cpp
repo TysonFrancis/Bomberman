@@ -75,7 +75,7 @@ window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window
     // Make 5 enemies and put them in positions that are empty
     for (int i = 0; i < 5; i++)
     {
-        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Ballom, bomber);
+        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Doria, bomber);
         int x, y;
 
         do
