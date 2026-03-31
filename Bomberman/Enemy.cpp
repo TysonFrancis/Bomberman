@@ -124,6 +124,20 @@ bool Enemy::isObstructed(int checkX, int checkY, bool phase)
 	return pods[checkY][checkX].isHard && intersects(checkX, checkY);
 }
 
+
+bool Enemy::sightObstruction(int checkX, int checkY, bool phase)
+{
+	if (checkX < 0 || checkX >= _cols ||		// Out of bounds, treat as solid
+		checkY < 0 || checkY >= _rows)
+		return true;
+
+	// return if pod in question is solid and colliding
+	if (!phase)
+		return pods[checkY][checkX].isFilled;
+	return pods[checkY][checkX].isHard;
+}
+
+
 void Enemy::changeDirection(bool phase)
 {
 	dir = static_cast<Entity::Facing>(rand() % 4);
@@ -220,7 +234,7 @@ void Enemy::chasePlayer(bool x, bool y, bool phase)
 	bool found = false;
 	if (x)
 	{
-		if (tileY == play.getY() && lineOfSight(false, phase))
+		if (tileY == play.getY() && lineOfSight(0, phase))
 		{
 			if (tileX - play.getX() > 0)
 				moveX = -1;
@@ -232,7 +246,7 @@ void Enemy::chasePlayer(bool x, bool y, bool phase)
 	}
 	if (y)
 	{
-		if (tileX == play.getX() && lineOfSight(true, phase))
+		if (tileX == play.getX() && lineOfSight(1, phase))
 		{
 			if (tileY - play.getY() > 0)
 				moveY = -1;
@@ -275,7 +289,34 @@ void Enemy::chasePlayer(bool x, bool y, bool phase)
 
 bool Enemy::lineOfSight(bool xy, bool phase)	//xy-0means x direction, 1 means y
 {
-	return true;
+	bool blocked = false;
+	if (xy == 0)
+	{
+		for (int i = 1; i < (tileX - play.getX()); i++)
+		{
+			if (sightObstruction(tileX - i, tileY, phase))
+				blocked = true;
+		}
+		for (int i = 1; i < (play.getX()-tileX); i++)
+		{
+			if (sightObstruction(tileX + i, tileY, phase))
+				blocked = true;
+		}
+	}
+	else
+	{
+		for (int i = 1; i < (tileY - play.getY()); i++)
+		{
+			if (sightObstruction(tileY, tileY-i, phase))
+				blocked = true;
+		}
+		for (int i = 1; i < (play.getY() - tileY); i++)
+		{
+			if (sightObstruction(tileX, tileY+i, phase))
+				blocked = true;
+		}
+	}
+	return !blocked;
 }
 
 

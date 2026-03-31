@@ -22,6 +22,7 @@ public:
 
 private:
 	bool isObstructed(int, int, bool);
+	bool sightObstruction(int, int, bool);
 	void changeDirection(bool);
 	void randomMove(bool);
 	void chasePlayer(bool, bool, bool);
