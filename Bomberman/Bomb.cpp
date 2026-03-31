@@ -4,6 +4,8 @@
 
 using namespace Constants;
 
+using std::cout;
+
 Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 	std::vector<Explosion>& explosions, bool timer, int d, int x, int y) :
 		Entity(tex, pods), explosions(explosions), remote(timer), distance(d), shrink(false)
@@ -50,7 +52,7 @@ void Bomb::animate()
 
 		if (myFrame < 0 || myFrame >= _bombFrames)
 		{
-			std::cout << "Bomb frame OOB: " << myFrame << "\n";
+			//cout << "Bomb frame OOB: " << myFrame << "\n";
 			return;
 		}
 

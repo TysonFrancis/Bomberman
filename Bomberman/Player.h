@@ -22,8 +22,7 @@ public:
 	void update();
 	void animate();
 	void die();
-	int getX() { return tileX; };
-	int getY() { return tileY; };
+
 	friend std::ostream& operator<<(std::ostream&, const Player&);
 	Player& operator=(const Player&);
 

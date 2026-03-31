@@ -1,8 +1,6 @@
 #include "Pod.h"
 #include <iostream>
 
-using std::cout;
-
 std::ostream& operator<<(std::ostream& out, const Pod& pod)
 {
 	return out << "Pod: " << std::boolalpha

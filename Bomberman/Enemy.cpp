@@ -3,6 +3,8 @@
 
 using namespace Constants;
 
+using std::cout;
+
 Enemy::Enemy(const sf::Texture& tex, Pod(&pods)[_rows][_cols], Type input, Player(&play)) :
 	Entity(tex, pods), type(input), speed(0.f), moveX(0), moveY(0),
 	lastFacing(Facing::Left), play(play), enemyFrameYPos(static_cast<int>(type)* _tileSize + _enemyStartY)

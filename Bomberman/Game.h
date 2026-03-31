@@ -65,4 +65,6 @@ private:
 	int streak; //Checks if the player has killed enemies in quick sucession
 	int combo;
 	int enemyType;
+
+	bool isExit;
 };

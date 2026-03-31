@@ -21,6 +21,8 @@ public:
 
 	const sf::Sprite& getSprite() const;
 	State getState() const;
+	int getX() const;
+	int getY() const;
 
 	void move(sf::Vector2f);
 	void setScale(sf::Vector2f);

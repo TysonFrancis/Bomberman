@@ -12,6 +12,8 @@ Entity::Entity(const sf::Texture& tex, Pod(&pods)[_rows][_cols]) :
 
 const sf::Sprite& Entity::getSprite() const		{ return sprite; }
 Entity::State Entity::getState() const			{ return state; }
+int Entity::getX() const						{ return tileX; }
+int Entity::getY() const						{ return tileY; }
 
 void Entity::move(sf::Vector2f dir)					{ sprite.move(dir); }
 void Entity::setScale(sf::Vector2f scale)			{ sprite.setScale(scale); }

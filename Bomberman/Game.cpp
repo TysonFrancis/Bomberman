@@ -10,7 +10,8 @@ background(animations.getBackground()),                         // Load backgrou
 bomber(animations.getEntities(), pods, bombs, explosions),      // Load bomber entity
 window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window with title and size
     "Bomberman", sf::Style::Titlebar | sf::Style::Close),
-    gameTick(0), score(0), streak(0), combo(0), enemyType(0)    // Set misc values to 0
+    gameTick(0), score(0), streak(0), combo(0), enemyType(0),   // Set misc values to 0
+    isExit(false)
 {
     srand(time(NULL));
 
@@ -49,10 +50,27 @@ window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window
             {
                 pods[row][col].isFilled = true;
                 pods[row][col].isSoft = true;
-                //pods[row][col].isExit = true;
+				//pods[row][col].isExit = true;
                 softWalls.push_back(SoftWall(animations.getEntities(), pods, col, row));
             }
         }
+
+    for (size_t i = softWalls.size(); i > 0; i--)
+    {
+        if (!isExit)
+        {
+            int ran = rand() % i;
+
+            isExit = (ran == 0) ? true : false;
+            cout << "rand: " << ran << "\t\tmax: " << softWalls.size() << std::boolalpha << "\texit: " << isExit << "\n";
+
+            if (isExit)
+            {
+                pods[softWalls[i].getY()][softWalls[i].getX()].isExit = true;
+				cout << "Exit set at: (" << softWalls[i].getX() << ", " << softWalls[i].getY() << ")\n";
+            }
+        }
+    }
 
     // Make 5 enemies and put them in positions that are empty
     for (int i = 0; i < 5; i++)
@@ -173,8 +191,6 @@ void Game::update()
                 i--;
             }
         }
-        if(explosions.size() != 0)
-        std::cout << "\n";
 
         for (size_t i = 0; i < softWalls.size(); i++)
         {
@@ -182,6 +198,8 @@ void Game::update()
 
             if (softWalls[i].getState() == Entity::State::Dead)
             {
+                
+
                 softWalls.erase(softWalls.begin() + i);
                 i--;
             }
