@@ -8,9 +8,13 @@
 #include "Constants.h"
 
 /*
-	Player class that extends entity not owning its own sprite,
-	but has access to it. Appends new member variables as needed.
-	Update method takes in the current frame of animation to update the sprite.
+	Player class that extends entity and its protected
+	member variables, with added player specific ones.
+	Representing the bomber and its movement,
+	collision, and other neccessary items.
+
+	Constructor takes in a texture and 2D pod array to
+	pass to entity, as well as Bomb and Explosion vectors.
 */
 
 class Player : public Entity
@@ -41,5 +45,5 @@ private:
 	int blast;		// Used to determine blast radius of bombs
 	int maxBombs;	// Used to determine how many bombs player can have out at once
 	bool remote;	// Used to determine if player has remote control powerup, default false
-	int wait =0;		// Delay between exploding bombs
+	int wait = 0;	// Delay between exploding bombs
 };

@@ -2,8 +2,8 @@
 #include <iostream>
 
 using namespace Constants;
-using std::cout;
-using std::endl;
+
+using std::cout, std::endl;
 
 Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sprites
 background(animations.getBackground()),                         // Load background sprite
@@ -11,7 +11,7 @@ bomber(animations.getEntities(), pods, bombs, explosions),      // Load bomber e
 window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window with title and size
     "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     gameTick(0), score(0), streak(0), combo(0), enemyType(0),   // Set misc values to 0
-    isExit(false)
+    isExit(false), timerExpired(false)
 {
     srand(time(NULL));
 
@@ -50,42 +50,38 @@ window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window
             {
                 pods[row][col].isFilled = true;
                 pods[row][col].isSoft = true;
-				//pods[row][col].isExit = true;
                 softWalls.push_back(SoftWall(animations.getEntities(), pods, col, row));
             }
         }
 
-    for (size_t i = softWalls.size(); i > 0; i--)
+    // Set exit position
+    for (size_t wallCount = softWalls.size(); wallCount > 0; wallCount--)
     {
-        if (!isExit)
+        isExit = ((rand() % wallCount) == 0) ? true : false;
+
+        if (isExit)
         {
-            int ran = rand() % i;
-
-            isExit = (ran == 0) ? true : false;
-            cout << "rand: " << ran << "\t\tmax: " << softWalls.size() << std::boolalpha << "\texit: " << isExit << "\n";
-
-            if (isExit)
-            {
-                pods[softWalls[i].getY()][softWalls[i].getX()].isExit = true;
-				cout << "Exit set at: (" << softWalls[i].getX() << ", " << softWalls[i].getY() << ")\n";
-            }
+            pods[softWalls[wallCount].getY()][softWalls[wallCount].getX()].isExit = true;
+            cout << "Exit set at: (" << softWalls[wallCount].getX() << ", " << softWalls[wallCount].getY() << ")\n";
+            break;
         }
     }
 
     // Make 5 enemies and put them in positions that are empty
     for (int i = 0; i < 5; i++)
     {
-        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Doria, bomber);
+        Enemy enemy(animations.getEntities(), pods, static_cast<Enemy::Type>(rand() % 6), bomber);
         int x, y;
 
         do
         {
-            x = rand() % 29 + 2;
-            y = rand() % 11 + 2;
+            x = rand() % (_cols - 3) + 3;
+            y = rand() % (_rows - 3) + 3;
         } while (pods[y][x].isFilled);
 
-        enemy.setPosition(sf::Vector2f(x * _scaledTile - _halfScaled, y * _scaledTile - _halfScaled));
+        enemy.setPosition(x, y);
         enemies.push_back(enemy);
+        s_enemyCount++;
     }
 }
 
@@ -104,10 +100,10 @@ void Game::run()
 // Handles window events like game starting and closing
 void Game::events()
 {
-    // Close game if window is closed or escape key pressed
+    // Close game if window is closed, escape key pressed, or on game over screen and enter pressed
     while (const std::optional event = window.pollEvent())
-        if (event->is<sf::Event::Closed>() ||
-            sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape))
+        if (event->is<sf::Event::Closed>() || sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape) ||
+            s_gameState == GameState::GameOver && sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
             closeGame();
 
     // If on title screen and enter is pressed, start game
@@ -123,6 +119,13 @@ void Game::update()
     switch (s_gameState)
     {
     case(GameState::Playing):
+        gameTick++;
+
+        if (gameTick % _fps == 0)                           // Display game seconds
+            cout << "seconds: " << gameTick / _fps << endl;
+        if (gameTick / _fps >= 100 && !timerExpired)        // Spawn Pontans if past x seconds
+            spawnPontans();
+
         bomber.update();
 
         for (size_t i = 0; i < enemies.size(); i++)
@@ -155,6 +158,7 @@ void Game::update()
                 //Display score after death using points
 
                 enemies.erase(enemies.begin() + i);
+                s_enemyCount--;
                 i--;
             }
         }
@@ -198,8 +202,6 @@ void Game::update()
 
             if (softWalls[i].getState() == Entity::State::Dead)
             {
-                
-
                 softWalls.erase(softWalls.begin() + i);
                 i--;
             }
@@ -273,4 +275,46 @@ void Game::startRound()
 void Game::closeGame()
 {
     window.close();
+}
+
+
+// Called after 200 game seconds have passed on one single level,
+// removes all enemies from the board and replaces them with Pontans,
+// adding or subtracting as needed until there are 10
+void Game::spawnPontans()
+{
+    timerExpired = true;
+
+    int size = enemies.size();                              // Number of current enemies
+    int copy = std::min(size, 10);                          // Number of enemies needed to copy back to vector
+    int spawn = 10 - copy;                                  // Number of new enemies needed to spawn
+
+    std::vector<Enemy> newEnemies;
+    newEnemies.reserve(10);
+
+    for (int i = 0; i < copy; i++)                          // For how ever many enemies are currently
+    {                                                       // alive, replace them with a new Pontan
+        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
+        enemy.setPosition(enemies[i].getX(), enemies[i].getY());
+
+        newEnemies.push_back(enemy);                            // Place new enemy in Pontan vector
+    }
+
+    for (int i = 0; i < spawn; i++)                         // For how ever many new enemies to make,
+    {                                                       // place them randomly on the map
+        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
+        int x, y;
+
+        do
+        {
+            x = rand() % (_cols - 1) + 1;
+            y = rand() % (_rows - 1) + 1;
+        } while (pods[y][x].isFilled);
+
+        enemy.setPosition(x, y);
+        newEnemies.push_back(enemy);                            // Place new enemy in Pontan vector
+    }
+
+    enemies = std::move(newEnemies);                        // Copy over all Pontans back into original enemies vector
+    s_enemyCount = enemies.size();                          // Re-initialize enemy count
 }

@@ -30,18 +30,25 @@ public:
 	Game();
 
 	void run();
-	void events();
-	void update();
-	void render();
-	void startRound();
-	void closeGame();
 
 	// For player to be able to access and change
 	// game state if say player dies or finds exit,
 	// also prefixed with s_ to know its static
 	inline static GameState s_gameState = GameState::Title;
 
+	// For player to be able to know when enemy count
+	// reaches 0 without passing vector as parameter,
+	// for checking if can end the level
+	inline static int s_enemyCount = 0;
+
 private:
+	void events();
+	void update();
+	void render();
+	void startRound();
+	void closeGame();
+	void spawnPontans();
+
 	Animations animations;
 
 	Player bomber;
@@ -67,4 +74,5 @@ private:
 	int enemyType;
 
 	bool isExit;
+	bool timerExpired;
 };

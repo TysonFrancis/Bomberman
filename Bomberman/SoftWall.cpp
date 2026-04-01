@@ -2,31 +2,32 @@
 
 using namespace Constants;
 
-SoftWall::SoftWall(const sf::Texture& tex, Pod(&pods)[_rows][_cols], int x, int y) : Entity(tex, pods)
-{
-	tileX = x;
-	tileY = y;
+//using std::cout, std::endl;
 
-	setTexture(sf::IntRect({ 64, 48 }, _tile));
-	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
+SoftWall::SoftWall(const sf::Texture& tex, Pod(&pods)[_rows][_cols], int x, int y) :
+	Entity(tex, pods)
+{
+	setTexture(_softWallX, _softWallY);
+	setPosition(x, y);
 }
 
 void SoftWall::update()
 {
-	if (pods[tileY][tileX].isSoft ||	// If pod is soft wall, or dead, return
-		state == State::Dead)
+	if (pods[tileY][tileX].isSoft ||	// If pod is soft wall, or dead, or exit, return
+		state == State::Dead || state == State::Exit)
 		return;
 					// Once here, bomb has deleted the softwall,
 					// now determine if pod is the exit or regular
 
 	if (pods[tileY][tileX].isExit)		// If pod is exit tile, set textrue to exit and fully die
 	{
-		setTexture(sf::IntRect({ 176, 48 }, _tile));
+		setTexture(_exitX, _exitY);
+		state = State::Exit;
 	}
 	else								// Else, die
 		die();
 
-	if (state == State::Dying)		// Only animate if dying, no reason to execute
+	if (state == State::Dying)			// Only animate if dying, no reason to execute
 		animate();
 }
 
@@ -37,13 +38,13 @@ void SoftWall::animate()
 	if (myTick % _wallTickSpeed != 0)			// Might need to change this timing? but seems ok to me		- D
 		return;
 
-	if (myFrame < 6)				// Keep incrementing frame until finished with death animation
+	if (myFrame < _softWallDeathFrames)			// Keep incrementing frame until finished with death animation
 	{
 		myFrame++;
-		setTexture(sf::IntRect({ myFrame * _tileSize + 64, 48 }, _tile));
+		setTexture(myFrame * _tileSize + _softWallX, _softWallY);
 	}
 
-	if (myFrame >= 6)				// Once animation is finished, fully die
+	if (myFrame >= _softWallDeathFrames)		// Once animation is finished, fully die
 		state = State::Dead;
 }
 

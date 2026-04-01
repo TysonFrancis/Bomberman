@@ -4,18 +4,16 @@
 
 using namespace Constants;
 
-using std::cout;
+using std::cout, std::endl;
 
 Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 	int x, int y, Facing dir, bool isEnd) :
 		Entity(tex, pods), row(1), end(isEnd), shrink(false)
 {
-	tileX = x;
-	tileY = y;
 	this->dir = dir;
 
 	setTexture();
-	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
+	setPosition(x, y);
 }
 
 void Explosion::update()
@@ -109,11 +107,11 @@ void Explosion::setTexture()
 
 	switch (dir)					// Apply selected texture
 	{
-	case Facing::Up:	Entity::setTexture(sf::IntRect({ baseX,  upY   }, _tile));	break;
-	case Facing::Down:	Entity::setTexture(sf::IntRect({ baseX,  downY }, _tile));	break;
-	case Facing::Left:	Entity::setTexture(sf::IntRect({ leftX,  baseY }, _tile));	break;
-	case Facing::Right:	Entity::setTexture(sf::IntRect({ rightX, baseY }, _tile));	break;
-	case Facing::None:	Entity::setTexture(sf::IntRect({ baseX,	 baseY }, _tile));	break;
+	case Facing::Up:	Entity::setTexture(baseX,  upY  );	break;
+	case Facing::Down:	Entity::setTexture(baseX,  downY);	break;
+	case Facing::Left:	Entity::setTexture(leftX,  baseY);	break;
+	case Facing::Right:	Entity::setTexture(rightX, baseY);	break;
+	case Facing::None:	Entity::setTexture(baseX,  baseY);	break;
 	}
 
 	/*if(dir == Facing::None)
@@ -123,11 +121,11 @@ void Explosion::setTexture()
 
 // *** Public debugging methods *** //
 
-std::ostream& operator<<(std::ostream& os, const Explosion& explosion)
+std::ostream& operator<<(std::ostream& out, const Explosion& explosion)
 {
 	if(explosion.dir == Entity::Facing::None)
 	{
-		os << "Position: (" << explosion.tileX << ", " << explosion.tileY << ")\t"
+		out << "Position: (" << explosion.tileX << ", " << explosion.tileY << ")\t"
 			<< "frame: " << explosion.myFrame << "\trow: " << explosion.row
 			<< "\tshrink: " << std::boolalpha << explosion.shrink;
 			/* << "\tend: " << (explosion.end ? "true" : "false")
@@ -140,10 +138,10 @@ std::ostream& operator<<(std::ostream& os, const Explosion& explosion)
 		case Entity::State::Dead:	cout << "dead";	break;
 		}*/
 
-		cout << "\t";
+		out << "\t";
 	}
 
-	return os;
+	return out;
 }
 
 Explosion& Explosion::operator=(const Explosion& other)

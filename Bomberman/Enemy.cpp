@@ -3,26 +3,27 @@
 
 using namespace Constants;
 
-using std::cout;
+using std::cout, std::endl;
 
 Enemy::Enemy(const sf::Texture& tex, Pod(&pods)[_rows][_cols], Type input, Player(&play)) :
-	Entity(tex, pods), type(input), speed(0.f), moveX(0), moveY(0),
-	lastFacing(Facing::Left), play(play), enemyFrameYPos(static_cast<int>(type)* _tileSize + _enemyStartY)
+	Entity(tex, pods), play(play),
+	type(input), lastFacing(Facing::Left),
+	moveX(0.f), moveY(0.f),
+	enemyFrameYPos(static_cast<int>(type) * _tileSize + _enemyStartY)
 {
 	switch (type)
 	{
-	case Type::Doria:	speed = 1.5f;	eratic = 11;	break;
-	case Type::Ballom:
-	case Type::Ovape:	speed = 2.f;	eratic = 9;		break;
-	case Type::Onil:
-	case Type::Dahl:	speed = 2.5f;	eratic = 5;		break;
-	case Type::Minvo:	speed = 3.f;	eratic = 4;		break;
-	case Type::Pass:	speed = 3.5f;	eratic = 3;		break;
-	case Type::Pontan:  speed = 4.f;	eratic = 5;		break;
+	case Type::Ballom:	speed = 1.5f * _speedScale;	eratic = 11;	break;
+	case Type::Onil:	speed = 2.f * _speedScale;	eratic = 5;		break;
+	case Type::Dahl:	speed = 2.f * _speedScale;	eratic = 5;		break;
+	case Type::Minvo:	speed = 2.f * _speedScale;	eratic = 4;		break;
+	case Type::Doria:	speed = 1.f * _speedScale;	eratic = 11;	break;
+	case Type::Ovape:	speed = 1.5f * _speedScale;	eratic = 9;		break;
+	case Type::Pass:	speed = 2.5f * _speedScale;	eratic = 3;		break;
+	case Type::Pontan:	speed = 2.5f * _speedScale;	eratic = 5;		break;
 	}
 
-	// Set texture based on enum Type
-	setTexture(sf::IntRect({ 0, enemyFrameYPos }, _tile));
+	setTexture(0, enemyFrameYPos);		// Set texture based on enum Type
 	changeDirection(false);
 }
 
@@ -63,17 +64,25 @@ void Enemy::animate()
 
 	if (dir == Facing::Left || dir == Facing::Right)
 		lastFacing = dir;					// Update last facing if moving left or right, so if 
-	// moving up or down, it will still show the correct
+											// moving up or down, it will still show the correct
 	Facing facing = lastFacing;				// texture instead of defaulting to a set direction
 
 	if (state == State::Living)				// If alive,
 	{
-		myFrame = (myFrame + 1) % _moveFrames;			// Loop through frames for walking animation
+		if(type == Type::Pontan)					// Pontan has 4 walk frames and doesn't care about
+		{											// last direction facing, logic has to be separate
+			myFrame = (myFrame + 1) % (_moveFrames + 1);
+
+			setTexture(myFrame * _tileSize, enemyFrameYPos);
+			return;
+		}
+
+		myFrame = (myFrame + 1) % _moveFrames;		// Loop through frames for walking animation
 
 		if (facing == Facing::Left)
-			setTexture(sf::IntRect({ myFrame * _tileSize + 48, enemyFrameYPos }, _tile));
+			setTexture(myFrame * _tileSize + _enemyLeftX, enemyFrameYPos);
 		else
-			setTexture(sf::IntRect({ myFrame * _tileSize, enemyFrameYPos }, _tile));
+			setTexture(myFrame * _tileSize, enemyFrameYPos);
 
 		return;
 	}
@@ -95,7 +104,7 @@ void Enemy::animate()
 		else if (type == Type::Dahl || type == Type::Ovape)
 			deathRow += 32;							// Set to purple death row
 
-		setTexture(sf::IntRect({ myFrame * _tileSize + _enemyColorDeathX, deathRow }, _tile));
+		setTexture(myFrame * _tileSize + _enemyColorDeathX, deathRow);
 	}
 }
 
@@ -106,81 +115,10 @@ void Enemy::die()
 
 	state = State::Dying;
 	myFrame = myTick = 0;
-	setTexture(sf::IntRect({ _enemyDeathX, enemyFrameYPos }, _tile));
+	setTexture(_enemyDeathX, enemyFrameYPos);
 }
 
-Enemy::Type Enemy::getType() { return type; }
-
-
-// *** Private helper methods *** //
-
-bool Enemy::isObstructed(int checkX, int checkY, bool phase)
-{
-	if (checkX < 0 || checkX >= _cols ||		// Out of bounds, treat as solid
-		checkY < 0 || checkY >= _rows)
-		return true;
-
-	// return if pod in question is solid and colliding
-	if (!phase)
-		return pods[checkY][checkX].isFilled && intersects(checkX, checkY);
-	return pods[checkY][checkX].isHard && intersects(checkX, checkY);
-}
-
-
-bool Enemy::sightObstruction(int checkX, int checkY, bool phase)
-{
-	if (checkX < 0 || checkX >= _cols ||		// Out of bounds, treat as solid
-		checkY < 0 || checkY >= _rows)
-		return true;
-
-	// return if pod in question is solid and colliding
-	if (!phase)
-		return pods[checkY][checkX].isFilled;
-	return pods[checkY][checkX].isHard;
-}
-
-
-void Enemy::changeDirection(bool phase)
-{
-	dir = static_cast<Entity::Facing>(rand() % 4);
-
-	switch (dir)
-	{
-	case Facing::Up:
-		moveX = 0;
-		moveY = -1;
-		if (!pods[tileY - 1][tileX].isFilled)
-			break;
-		[[fallthrough]];
-	case Facing::Down:
-		moveX = 0;
-		moveY = 1;
-		if (!phase && !pods[tileY + 1][tileX].isFilled)
-			break;
-		if (phase && !pods[tileY + 1][tileX].isHard)
-			break;
-		[[fallthrough]];
-	case Facing::Left:
-		moveX = -1;
-		moveY = 0;
-		if (!phase && !pods[tileY][tileX - 1].isFilled)
-			break;
-		if (phase && !pods[tileY][tileX - 1].isHard)
-			break;
-		[[fallthrough]];
-	case Facing::Right:
-		moveX = 1;
-		moveY = 0;
-		if (!phase && !pods[tileY][tileX + 1].isFilled)
-			break;
-		if (phase && !pods[tileY][tileX + 1].isHard)
-			break;
-		[[fallthrough]];
-	default:
-		moveX = 0;
-		moveY = 0;
-	}
-}
+Enemy::Type Enemy::getType() const	{ return type; }
 
 
 // *** Private helper methods *** //
@@ -218,7 +156,7 @@ void Enemy::randomMove(bool canPhase)
 				moveX = recoverX / speed;
 			}
 
-		move({ (float)(moveX * speed), (float)(moveY * speed) });
+		move(moveX * speed, moveY * speed);
 
 	}
 	else
@@ -285,7 +223,49 @@ void Enemy::chasePlayer(bool x, bool y, bool phase)
 				moveX = recoverX / speed;
 			}
 
-		move({ (float)(moveX * speed), (float)(moveY * speed) });
+		move(moveX * speed, moveY * speed);
+	}
+}
+
+void Enemy::changeDirection(bool phase)
+{
+	dir = static_cast<Entity::Facing>(rand() % 4);
+
+	switch (dir)
+	{
+	case Facing::Up:
+		moveX = 0;
+		moveY = -1;
+		if (!pods[tileY - 1][tileX].isFilled)
+			break;
+		[[fallthrough]];
+	case Facing::Down:
+		moveX = 0;
+		moveY = 1;
+		if (!phase && !pods[tileY + 1][tileX].isFilled)
+			break;
+		if (phase && !pods[tileY + 1][tileX].isHard)
+			break;
+		[[fallthrough]];
+	case Facing::Left:
+		moveX = -1;
+		moveY = 0;
+		if (!phase && !pods[tileY][tileX - 1].isFilled)
+			break;
+		if (phase && !pods[tileY][tileX - 1].isHard)
+			break;
+		[[fallthrough]];
+	case Facing::Right:
+		moveX = 1;
+		moveY = 0;
+		if (!phase && !pods[tileY][tileX + 1].isFilled)
+			break;
+		if (phase && !pods[tileY][tileX + 1].isHard)
+			break;
+		[[fallthrough]];
+	default:
+		moveX = 0;
+		moveY = 0;
 	}
 }
 
@@ -299,7 +279,7 @@ bool Enemy::lineOfSight(bool xy, bool phase)	//xy-0means x direction, 1 means y
 			if (sightObstruction(tileX - i, tileY, phase))
 				blocked = true;
 		}
-		for (int i = 1; i < (play.getX()-tileX); i++)
+		for (int i = 1; i < (play.getX() - tileX); i++)
 		{
 			if (sightObstruction(tileX + i, tileY, phase))
 				blocked = true;
@@ -309,16 +289,40 @@ bool Enemy::lineOfSight(bool xy, bool phase)	//xy-0means x direction, 1 means y
 	{
 		for (int i = 1; i < (tileY - play.getY()); i++)
 		{
-			if (sightObstruction(tileY, tileY-i, phase))
+			if (sightObstruction(tileX, tileY - i, phase))
 				blocked = true;
 		}
 		for (int i = 1; i < (play.getY() - tileY); i++)
 		{
-			if (sightObstruction(tileX, tileY+i, phase))
+			if (sightObstruction(tileX, tileY + i, phase))
 				blocked = true;
 		}
 	}
 	return !blocked;
+}
+
+bool Enemy::isObstructed(int checkX, int checkY, bool phase)
+{
+	if (checkX < 0 || checkX >= _cols ||		// Out of bounds, treat as solid
+		checkY < 0 || checkY >= _rows)
+		return true;
+
+	// return if pod in question is solid and colliding
+	if (!phase)
+		return pods[checkY][checkX].isFilled && intersects(checkX, checkY);
+	return pods[checkY][checkX].isHard && intersects(checkX, checkY);
+}
+
+bool Enemy::sightObstruction(int checkX, int checkY, bool phase)
+{
+	if (checkX < 0 || checkX >= _cols ||		// Out of bounds, treat as solid
+		checkY < 0 || checkY >= _rows)
+		return true;
+
+	// return if pod in question is solid and colliding
+	if (!phase)
+		return pods[checkY][checkX].isFilled;
+	return pods[checkY][checkX].isHard;
 }
 
 
@@ -326,7 +330,7 @@ bool Enemy::lineOfSight(bool xy, bool phase)	//xy-0means x direction, 1 means y
 
 std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
 {
-	out << "Enemy type: ";
+	/*out << "Enemy type: ";
 
 	switch (enemy.type)
 	{
@@ -338,6 +342,16 @@ std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
 	case Enemy::Type::Ovape:	out << "Ovape";		break;
 	case Enemy::Type::Pass:		out << "Pass";		break;
 	case Enemy::Type::Pontan:	out << "Pontan";	break;
+	}*/
+
+	out << "state: ";
+
+	switch (enemy.state)
+	{
+	case Entity::State::Living:	out << "living";	break;
+	case Entity::State::Dead:	out << "dead";		break;
+	case Entity::State::Dying:	out << "dying";		break;
+	case Entity::State::Exit:	out << "exit";		break;
 	}
 
 	out << "\n";

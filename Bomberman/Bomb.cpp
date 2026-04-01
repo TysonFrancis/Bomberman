@@ -4,18 +4,17 @@
 
 using namespace Constants;
 
-using std::cout;
+using std::cout, std::endl;
 
 Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 	std::vector<Explosion>& explosions, bool timer, int d, int x, int y) :
-		Entity(tex, pods), explosions(explosions), remote(timer), distance(d), shrink(false)
+		Entity(tex, pods), explosions(explosions),
+		remote(timer), distance(d), shrink(false), now(0)
 {
 	myFrame = 2;
-	tileX = x;
-	tileY = y;
 
-	setTexture(sf::IntRect({ 32, 48 }, _tile));
-	setPosition(sf::Vector2f(tileX * _scaledTile + _halfScaled, tileY * _scaledTile + _halfScaled));
+	setTexture(32, 48);
+	setPosition(x, y);
 }
 
 void Bomb::update()
@@ -56,20 +55,17 @@ void Bomb::animate()
 			return;
 		}
 
-		setTexture(sf::IntRect({ myFrame * _tileSize, 48 }, _tile));
+		setTexture(myFrame * _tileSize, _bombY);
 
 		return;
 	}
 
 	// Death animation
-	if (myFrame < 4)							// Keep incrementing frame until finished with death animation
+	if (myFrame <= _bombFrames)						// Keep incrementing frame until finished with death animation
 	{
 		myFrame++;
-		setTexture(sf::IntRect({ myFrame * _tileSize, 48 }, _tile));
+		setTexture(myFrame * _tileSize, _bombY);
 	}
-
-	else										// Set to empty texture to let background through after fully dies
-		setTexture(_emptyFrame);
 }
 
 void Bomb::delay()

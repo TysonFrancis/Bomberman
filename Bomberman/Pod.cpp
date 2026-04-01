@@ -1,6 +1,8 @@
 #include "Pod.h"
 #include <iostream>
 
+using std::cout, std::endl;
+
 std::ostream& operator<<(std::ostream& out, const Pod& pod)
 {
 	return out << "Pod: " << std::boolalpha
@@ -9,5 +11,5 @@ std::ostream& operator<<(std::ostream& out, const Pod& pod)
 		//<< "\tsoft: " << pod.isSoft
 		<< "\tbomb: " << pod.isBomb
 		//<< "\texit: " << pod.isExit
-		<< "\n";
+		<< endl;
 }
