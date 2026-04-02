@@ -1,4 +1,8 @@
 #include "Text.h"
+#include "Constants.h"
+
+using namespace Constants;
+
 
 Text::Text(string text, sf::Vector2f position, bool isBlack)
 {
@@ -34,10 +38,11 @@ Text::Text(string text, sf::Vector2f position, bool isBlack)
 
 		// create sprite
 		sprites.push_back(new sf::Sprite(texture));												// create the actual sprite
-		sprites.at(sprites.size() - 1)->setTextureRect(sf::IntRect(glyphPosition, { 8, 8 }));	// assign the determined glyph
+		sprites.back()->setTextureRect(sf::IntRect(glyphPosition, {8, 8}));	// assign the determined glyph
+		sprites.back()->setScale({ _scale, _scale });
 
 		// position sprite
-		sprites.at(i)->setPosition({ position.x + i * 8, position.y });
+		sprites.at(i)->setPosition({ position.x + i * 8 * _scale, position.y });
 	}
 }
 
