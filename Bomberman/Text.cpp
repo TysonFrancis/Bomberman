@@ -1,5 +1,4 @@
 #include "Text.h"
-#include "Constants.h"
 
 using namespace Constants;
 
@@ -26,23 +25,23 @@ Text::Text(string text, sf::Vector2f position, bool isBlack)
 				}
 
 		// choose glyph
-		if (text.at(i) > 96 && text.at(i) < 123)				// if letter
-			glyphPosition = { (text.at(i) - 97) * 8, 256 };		// get glyph from corresponding position
-		else if (text.at(i) > 47 && text.at(i) < 58)			// if number
-			glyphPosition = { (text.at(i) - 48) * 8, 248 };		// get glyph form corresponding position
-		else													// should be > hopefully
-			glyphPosition = { 80, 248 };						// get glyph from corresponding position
+		if (text.at(i) > 96 && text.at(i) < 123)								// if letter
+			glyphPosition = { (text.at(i) - 97) * _halfTile, _letterY };		// get glyph from corresponding position
+		else if (text.at(i) > 47 && text.at(i) < 58)							// if number
+			glyphPosition = { (text.at(i) - 48) * _halfTile, _numberY };		// get glyph form corresponding position
+		else																	// should be > hopefully
+			glyphPosition = { _arrowX, _numberY };								// get glyph from corresponding position
 
 		// set color
-		glyphPosition.y += isBlack * 16;	// more evil bool math >:D
+		glyphPosition.y += isBlack * _tileSize;	// more evil bool math >:D
 
 		// create sprite
-		sprites.push_back(new sf::Sprite(texture));												// create the actual sprite
-		sprites.back()->setTextureRect(sf::IntRect(glyphPosition, {8, 8}));	// assign the determined glyph
+		sprites.push_back(new sf::Sprite(texture));									// create the actual sprite
+		sprites.back()->setTextureRect(sf::IntRect(glyphPosition, _letterTile));	// assign the determined glyph
 		sprites.back()->setScale({ _scale, _scale });
 
 		// position sprite
-		sprites.at(i)->setPosition({ position.x + i * 8 * _scale, position.y });
+		sprites.at(i)->setPosition({ position.x + i * _halfScaled, position.y});
 	}
 }
 
