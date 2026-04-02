@@ -68,7 +68,7 @@ window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window
     }
 
     // Make 5 enemies and put them in positions that are empty
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 10; i++)
     {
         Enemy enemy(animations.getEntities(), pods, static_cast<Enemy::Type>(rand() % 6), bomber);
         int x, y;
@@ -126,7 +126,7 @@ void Game::update()
 
         if (gameTick % _fps == 0)                           // Display game seconds
             cout << "seconds: " << gameTick / _fps << endl;
-        if (gameTick / _fps >= 100 && !timerExpired)        // Spawn Pontans if past x seconds
+        if (gameTick / _fps >= 200 && !timerExpired)        // Spawn Pontans if past x seconds
             spawnPontans();
 
         bomber.update();

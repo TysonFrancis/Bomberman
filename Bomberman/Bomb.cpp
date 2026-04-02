@@ -156,6 +156,15 @@ std::ostream& operator<<(std::ostream& os, const Bomb& bomb)
 Bomb& Bomb::operator=(const Bomb& other)
 {
 	if (this != &other)
+	{
 		Entity::operator=(other);
+
+		distance = other.distance;
+		remote = other.remote;
+		shrink = other.shrink;
+		now = other.now;
+		willExplode = other.willExplode;
+	}
+
 	return *this;
 }
