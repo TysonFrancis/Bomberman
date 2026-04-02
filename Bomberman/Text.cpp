@@ -17,7 +17,7 @@ Text::Text(string text, sf::Vector2f position, bool isBlack)
 			if (text.at(i) < 48 || text.at(i) > 57)		// and NaN
 				if (text.at(i) != 62)					// and not '>'
 				{
-					text.erase(i--);					// remove it, decrementing i to avoid skipping chars
+					text.erase(i--, 1);					// remove it, decrementing i to avoid skipping chars
 					continue;							// move on to next char
 				}
 

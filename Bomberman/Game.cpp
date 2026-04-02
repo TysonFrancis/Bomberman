@@ -166,17 +166,20 @@ void Game::update()
 
         break;
 
-    case(GameState::Title):
+    case(GameState::Title): break;
     case(GameState::RoundStart):
 
         // Wait for music to finish
         if (audio.getRoundStart().getStatus() == sf::SoundSource::Status::Stopped)
         {
-            // PROBLEM: might cause issues later if other text gets added to the screen before the stage number
-            // CTRL+F and search "PROBLEM" if need to come back to this later
-            //textObjects.pop_back();
+            // Might cause issues later if other text gets added to the screen before the stage number
+            delete textObjects.back();
+            textObjects.pop_back();
+
             state = GameState::Playing;
         }
+
+        break;
 
     case(GameState::GameOver): break;
     }
@@ -213,6 +216,8 @@ void Game::render()
         for (Text* text : textObjects)
             for (sf::Sprite* glyph : text->sprites)
                 window.draw(*glyph);
+
+        break;
 
 	case(GameState::GameOver):      /* Draw game over screen??? */  break;
     }
