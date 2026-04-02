@@ -70,7 +70,7 @@ void Explosion::animate()
 
 void Explosion::die()
 {
-	state = State::Dead;
+	state = State::Dying;
 }
 
 
@@ -147,7 +147,13 @@ std::ostream& operator<<(std::ostream& out, const Explosion& explosion)
 Explosion& Explosion::operator=(const Explosion& other)
 {
 	if (this != &other)
+	{
 		Entity::operator=(other);
+
+		row = other.row;
+		end = other.end;
+		shrink = other.shrink;
+	}
 
 	return *this;
 }

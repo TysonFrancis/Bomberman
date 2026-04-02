@@ -23,6 +23,18 @@ Enemy::Enemy(const sf::Texture& tex, Pod(&pods)[_rows][_cols], Type input, Playe
 	case Type::Pontan:	speed = 2.5f * _speedScale;	eratic = 5;		break;
 	}
 
+	/*switch (type)
+	{
+	case Type::Ballom:	speed = _enemyBaseSpeedScale * 0.8f;	eratic = 11;	break;
+	case Type::Onil:	speed = _enemyBaseSpeedScale;			eratic = 5;		break;
+	case Type::Dahl:	speed = _enemyBaseSpeedScale;			eratic = 5;		break;
+	case Type::Minvo:	speed = _enemyBaseSpeedScale * 1.25f;	eratic = 4;		break;
+	case Type::Doria:	speed = _enemyBaseSpeedScale * 0.5f;	eratic = 11;	break;
+	case Type::Ovape:	speed = _enemyBaseSpeedScale * 0.8f;	eratic = 9;		break;
+	case Type::Pass:	speed = _enemyBaseSpeedScale * 1.25f;	eratic = 3;		break;
+	case Type::Pontan:	speed = _enemyBaseSpeedScale * 1.25f;	eratic = 5;		break;
+	}*/
+
 	setTexture(0, enemyFrameYPos);		// Set texture based on enum Type
 	changeDirection(false);
 }
@@ -330,7 +342,7 @@ bool Enemy::sightObstruction(int checkX, int checkY, bool phase)
 
 std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
 {
-	/*out << "Enemy type: ";
+	out << "Enemy type: ";
 
 	switch (enemy.type)
 	{
@@ -342,9 +354,9 @@ std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
 	case Enemy::Type::Ovape:	out << "Ovape";		break;
 	case Enemy::Type::Pass:		out << "Pass";		break;
 	case Enemy::Type::Pontan:	out << "Pontan";	break;
-	}*/
+	}
 
-	out << "state: ";
+	/*out << "state: ";
 
 	switch (enemy.state)
 	{
@@ -352,7 +364,7 @@ std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
 	case Entity::State::Dead:	out << "dead";		break;
 	case Entity::State::Dying:	out << "dying";		break;
 	case Entity::State::Exit:	out << "exit";		break;
-	}
+	}*/
 
 	out << "\n";
 
@@ -362,6 +374,19 @@ std::ostream& operator<<(std::ostream& out, const Enemy& enemy)
 Enemy& Enemy::operator=(const Enemy& other)
 {
 	if (this != &other)
+	{
 		Entity::operator=(other);
+
+		type = other.type;
+		lastFacing = other.lastFacing;
+
+		moveX = other.moveX;
+		moveY = other.moveY;
+
+		speed = other.speed;
+		eratic = other.eratic;
+
+		enemyFrameYPos = other.enemyFrameYPos;
+	}
 	return *this;
 }

@@ -13,20 +13,24 @@ using std::string;
 
 
 /* Displays text using font textures in the center of the screen.
-Only supports A-Z, 0-9, or '>'. Displays in caps regardless of input.*/
+Only supports a-z, 0-9, or '>'. LOWERCASE ONLY.*/
 class Text
 {
 public:
 	/*
-		@param std::string: the text to display on screen
-		@param int: the color of the text's drop shadow - 0 for black, 1 for gray
-		@param sf::Vector2f: The position the text should appear in - use -1 for center value
+		@param std::string: The text to display on screen
+		@param sf::Vector2f: The position the text should appear in
+		@param int (optional): The text's alignment - -1 for left, 0 for center, 1 for right
+		@param bool (optional): The color of the text's drop shadow - true for black. Defaults false, for gray.
 	*/
-	Text(string, sf::Vector2f, bool = false);
+	Text(string, sf::Vector2f, int = -1, bool = false);
+	Text(string, sf::Vector2f, bool);
 	~Text();
 
 	std::vector<sf::Sprite*> sprites;
 
 private:
+	void construct(string, sf::Vector2f, int, bool);
+
 	sf::Texture texture;
 };

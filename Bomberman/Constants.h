@@ -26,6 +26,7 @@ namespace Constants
 																	// Player
 	static constexpr int _playerDeathY = 32;
 	static constexpr int _playerDeathFrames = 7;
+	static constexpr float _playerSpeed = 4.f;
 	static constexpr int _playerTickSpeed = 5;
 																	// Enemies
 	static constexpr int _enemyDeathX = 96;
@@ -33,6 +34,7 @@ namespace Constants
 	static constexpr int _enemyStartY = 240;
 	static constexpr int _enemyColorDeathX = 112;
 	static constexpr int _enemyColorDeathFrames = 4;
+	static constexpr float _enemyBaseSpeedScale = _playerSpeed * _speedScale;
 	static constexpr int _enemyTickSpeed = 10;
 																	// Explosions
 	static constexpr int _explosionOffset = 80;
