@@ -10,7 +10,7 @@ using std::cout, std::endl;
 Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
 		Entity(tex, pods), bombs(bombs), explosions(explosions),
-		speed(4.f * _speedScale), joyX(0), joyY(0),
+		speed(_playerSpeed * _speedScale), joyX(0), joyY(0),
 		lives(3), blast(2), maxBombs(6), remote(false)
 {
 	setTexture(64, 0);
@@ -246,6 +246,21 @@ std::ostream& operator<<(std::ostream& out, const Player& player)
 Player& Player::operator=(const Player& other)
 {
 	if (this != &other)
+	{
 		Entity::operator=(other);
+
+		speed = other.speed;
+
+		joyX = other.joyX;
+		joyY = other.joyY;
+
+		lives = other.lives;
+
+		blast = other.blast;
+		maxBombs = other.maxBombs;
+		remote = other.remote;
+		wait = other.wait;
+	}
+
 	return *this;
 }
