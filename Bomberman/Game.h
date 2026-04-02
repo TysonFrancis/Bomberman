@@ -12,6 +12,7 @@
 #include "SoftWall.h"
 #include "Explosion.h"
 #include "Constants.h"
+#include "Text.h"
 
 /*
 	Main class handling game logic and display,
@@ -45,7 +46,6 @@ private:
 	void events();
 	void update();
 	void render();
-	void startRound();
 	void closeGame();
 	void spawnPontans();
 
@@ -57,6 +57,8 @@ private:
 	std::vector<Bomb> bombs;
 	std::vector<Explosion> explosions;
 	std::vector<SoftWall> softWalls;
+
+	std::vector<Text*> textObjects;
 
 	Pod pods[Constants::_rows][Constants::_cols];
 

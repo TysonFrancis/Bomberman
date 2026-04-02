@@ -5,9 +5,15 @@
 
 using std::string;
 
+/*
+* Other things to consider adding:
+* - Selectable left/right/center and top/bottom alignment for easier positioning
+* - Optional lifespan argument to automatically remove text later
+*/
+
 
 /* Displays text using font textures in the center of the screen.
-Only supports A-Z. Displays in caps regardless of input.*/
+Only supports A-Z, 0-9, or '>'. Displays in caps regardless of input.*/
 class Text
 {
 public:
@@ -16,10 +22,11 @@ public:
 		@param int: the color of the text's drop shadow - 0 for black, 1 for gray
 		@param sf::Vector2f: The position the text should appear in - use -1 for center value
 	*/
-	Text(string, int, sf::Vector2f);
+	Text(string, sf::Vector2f, bool = false);
 	~Text();
+
+	std::vector<sf::Sprite*> sprites;
 
 private:
 	sf::Texture texture;
-	std::vector<sf::Sprite*> sprites;
 };
