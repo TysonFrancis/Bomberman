@@ -31,7 +31,7 @@ Text::Text(string text, sf::Vector2f position, bool isBlack)
 
 		// set color
 		glyphPosition.y += isBlack * 16;	// more evil bool math >:D
-	
+
 		// create sprite
 		sprites.push_back(new sf::Sprite(texture));												// create the actual sprite
 		sprites.at(sprites.size() - 1)->setTextureRect(sf::IntRect(glyphPosition, { 8, 8 }));	// assign the determined glyph

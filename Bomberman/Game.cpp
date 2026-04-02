@@ -107,9 +107,9 @@ void Game::events()
             closeGame();
 
     // If on title screen and enter is pressed, start game
-    if (state == GameState::Title && isKeyPressed(Scancode::Enter))
+    if (s_gameState == GameState::Title && sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
     {
-        state = GameState::RoundStart;
+        s_gameState = GameState::RoundStart;
         audio.getRoundStart().play(); // Play silly music
         textObjects.push_back(new Text("Stage 1", { 0, 0 }));
     }
@@ -222,7 +222,7 @@ void Game::update()
             delete textObjects.back();
             textObjects.pop_back();
 
-            state = GameState::Playing;
+            s_gameState = GameState::Playing;
         }
 
         break;
