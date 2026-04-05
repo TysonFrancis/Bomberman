@@ -58,9 +58,11 @@ namespace Constants
 																	// Misc
 	static constexpr int _exitX = 176;
 	static constexpr int _exitY = 48;
+
 	static constexpr int _arrowX = 80;
 	static constexpr int _numberY = 248;
 	static constexpr int _letterY = 256;
+
 	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });
-	static constexpr sf::Vector2i _letterTile({ _halfTile, _halfTile });		// Not used currently
+	static constexpr sf::Vector2i _letterTile({ _halfTile, _halfTile });
 };

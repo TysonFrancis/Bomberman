@@ -12,8 +12,6 @@
 	as well as overridden SFML methods for code cleanliness.
 
 	Constructor accepts a texture for the sprite, and a 2D pod array.
-
-	Will eventually extend pure virtual methods to classes??
 */
 
 class Entity : public sf::Drawable

@@ -141,6 +141,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Explosion.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="SoftWall.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Explosion.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="PowerUp.h" />
     <ClInclude Include="SoftWall.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Player.h" />

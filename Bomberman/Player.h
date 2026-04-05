@@ -27,6 +27,18 @@ public:
 	void animate();
 	void die();
 
+	void extraBomb();
+	void extraRange();
+	void giveRemote();
+	void giveSkate();
+	void phaseWalls();
+	void phaseBombs();
+	void shieldFire();
+	void invincible();
+
+	bool hasFireShield() const { return isFireShield; }
+	bool hasInvincible() const { return isInvincible; }
+
 	friend std::ostream& operator<<(std::ostream&, const Player&);
 	Player& operator=(const Player&);
 
@@ -46,4 +58,7 @@ private:
 	int maxBombs;	// Used to determine how many bombs player can have out at once
 	bool remote;	// Used to determine if player has remote control powerup, default false
 	int wait = 0;	// Delay between exploding bombs
+
+	bool isFireShield;
+	bool isInvincible;
 };
