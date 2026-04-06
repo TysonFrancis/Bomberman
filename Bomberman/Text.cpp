@@ -37,7 +37,7 @@ void Text::construct(string text, sf::Vector2f position, int align, bool isBlack
 		else if (text.at(i) > 47 && text.at(i) < 58)			// if number
 			glyphPosition = { (text.at(i) - 48) * _halfTile, _numberY };			// get glyph form corresponding position
 		else if (text.at(i) == 62)								// if '>'
-			glyphPosition = { -arrowX, _numberY };							// get glyph from corresponding position
+			glyphPosition = { _arrowX, _numberY };							// get glyph from corresponding position
 		else													// if space (or anything else somehow)
 			glyphPosition = { 0, 0 };								// put a black squre because skipping
 																	// sprite creation causes too many issues 
