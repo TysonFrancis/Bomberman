@@ -141,10 +141,10 @@ void Game::events(int stage)
         cout << "round start\n";
 
         audio.getRoundStart().play(); // Play silly music
-        if(stage>0)
-            textObjects.push_back(new Text("Stage "+stage, {0, 0}));
+        if (stage > 0)
+            textObjects.push_back(new Text("Stage " + stage, { _windowWidth / 2.f, _windowHeight / 2.f }, 0));
         else
-            textObjects.push_back(new Text("Bonus Stage", { 0, 0 }));
+            textObjects.push_back(new Text("Bonus Stage", { _windowWidth / 2.f, _windowHeight / 2.f }, 0));
     }
 }
 
