@@ -44,12 +44,12 @@ public:
 	inline static int s_enemyCount = 0;
 
 private:
-	void events(int);
+	void events();
 	void update();
 	void render();
 	void closeGame();
 	void spawnPontans();
-	void level(int, int[8][50], int);
+	void level();
 
 	Animations animations;
 
@@ -72,11 +72,15 @@ private:
 
 	sf::RenderWindow window;
 
+	int enemyPresets[8][50] = {};
+	int powerupPresets[50] = {};
+
 	int gameTick;
 	int score;
 	int streak; //Checks if the player has killed enemies in quick sucession
 	int combo;
 	int enemyType;
 
-	bool timerExpired;
+	int stage;
+	bool levelTransition;
 };

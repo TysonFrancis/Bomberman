@@ -12,7 +12,8 @@ Text::Text(string text, sf::Vector2f position, int align, bool isBlack)
 // ..
 Text::Text(string text, sf::Vector2f position, bool isBlack)
 {
-	construct(text, position, isBlack, 0);
+	// Assume this should be 0, isBlack not isBlack, 0 right??
+	construct(text, position, 0, isBlack);
 }
 
 
@@ -27,7 +28,7 @@ void Text::construct(string text, sf::Vector2f position, int align, bool isBlack
 		std::cerr << "Error loading text glyphs from Title.png!";
 
 	// calculate offset for alignment
-	offset = 8 * _scale * text.size() / 2 * align;
+	offset = _halfScaled * text.size() / 2 * align;
 
 	for (int i = 0; i < text.size(); i ++)	// for every character to display
 	{

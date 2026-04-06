@@ -64,6 +64,10 @@ namespace Constants
 	static constexpr int _numberY = 248;
 	static constexpr int _letterY = 256;
 
+	static constexpr int _pontanTimer = _fps * 200;
+
 	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });
 	static constexpr sf::Vector2i _letterTile({ _halfTile, _halfTile });
+
+	static constexpr sf::Vector2f _centerScreen({ _windowWidth / 2.f, _windowHeight / 2.f });
 };
