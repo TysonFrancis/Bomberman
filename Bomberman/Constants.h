@@ -6,6 +6,7 @@ namespace Constants
 	// Array definition
 	static constexpr int _rows = 13;
 	static constexpr int _cols = 31;
+	static constexpr int _softPods = 249;
 
 	// Scaling
 	static constexpr float _scale = 3.f;

@@ -35,6 +35,7 @@ public:
 	void phaseBombs();
 	void shieldFire();
 	void invincible();
+	int getLives() { return lives; };
 
 	bool hasFireShield() const { return isFireShield; }
 	bool hasInvincible() const { return isInvincible; }

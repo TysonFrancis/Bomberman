@@ -24,7 +24,7 @@
 	GameState enum to determine what to update and render.
 */
 
-enum class GameState { Title, RoundStart, Playing, GameOver };
+enum class GameState { Title, RoundStart, Transition, Playing, GameOver };
 
 class Game
 {
@@ -44,11 +44,12 @@ public:
 	inline static int s_enemyCount = 0;
 
 private:
-	void events();
+	void events(int);
 	void update();
 	void render();
 	void closeGame();
 	void spawnPontans();
+	void level(int, int[8][50], int);
 
 	Animations animations;
 

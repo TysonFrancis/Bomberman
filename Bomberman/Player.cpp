@@ -21,8 +21,9 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 void Player::update()
 {
 	// If on exit tile and all enemies are dead, or fully dead end game
-	if (pods[tileY][tileX].isExit && Game::s_enemyCount == 0 ||
-		lives <= 0 && myTick >= _fps)
+	if (pods[tileY][tileX].isExit && Game::s_enemyCount == 0)
+		Game::s_gameState = GameState::Transition;
+	if(lives <= 0 && myTick >= _fps)
 		Game::s_gameState = GameState::GameOver;
 
 	if (state == State::Living)

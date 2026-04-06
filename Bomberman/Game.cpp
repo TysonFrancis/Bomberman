@@ -39,22 +39,25 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
         {
             bool isInnerWall = col % 2 == 0 && row % 2 == 0;
             bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
-            bool isSoft = (rand() % 4 == 0) && (row > 2 || col > 2); // Can't spawn in top 2 x 2 by player
+            //bool isSoft = (rand() % 4 == 0) && (row > 2 || col > 2); // Can't spawn in top 2 x 2 by player
 
             if (isInnerWall || isBorder)
             {
                 pods[row][col].isFilled = true;
                 pods[row][col].isHard = true;
             }
+            /*
             else if (isSoft)
             {
                 pods[row][col].isFilled = true;
                 pods[row][col].isSoft = true;
                 softWalls.push_back(SoftWall(animations.getEntities(), pods, col, row));
             }
+            */
         }
 
 	// Set exit and powerup in random soft wall positions
+    /*
 	int exit = rand() % softWalls.size();                                   // Get random index for exit and powerup in soft wall vector
     int powerUp = 0;
 
@@ -69,6 +72,7 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
         << "Powerup set at: (" << softWalls[powerUp].getX() << ", " << softWalls[powerUp].getY() << ")\n";
 
     // Make more powerups
+    /*
     for (int i = 0; i < 9; i++)
     {
         powerUp = rand() % softWalls.size();
@@ -80,8 +84,9 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
 
 		cout << "Powerup set at: (" << softWalls[powerUp].getX() << ", " << softWalls[powerUp].getY() << ")\n";
     }
-
+    */
     // Make 5 enemies and put them in positions that are empty
+    /*
     for (int i = 0; i < 10; i++)
     {
         Enemy enemy(animations.getEntities(), pods, static_cast<Enemy::Type>(rand() % 6), bomber);
@@ -97,22 +102,31 @@ Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sp
         enemies.push_back(enemy);
         s_enemyCount++;
     }
+    */
 }
 
 // Holds main game loop, all actions passed
 // to supplementary methods for cleanliness
 void Game::run()
 {
+    int enemy[8][50] = {};
+    int powerups[50] = {};
+    int levels = 0;
+    s_gameState = GameState::Title;
     while (window.isOpen())
     {
-        events();
-        update();
-        render();
+        level(levels, enemy, powerups[levels]);
+        s_gameState = GameState::RoundStart;
+        
+        levels++;
+        while(bomber.getLives() <= 0)
+            events(0);
     }
+    
 }
 
 // Handles window events like game starting and closing
-void Game::events()
+void Game::events(int stage)
 {
     // Close game if window is closed, escape key pressed, or on game over screen and enter pressed
     while (const std::optional event = window.pollEvent())
@@ -121,11 +135,16 @@ void Game::events()
             closeGame();
 
     // If on title screen and enter is pressed, start game
-    if (s_gameState == GameState::Title && sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
+    if (s_gameState == GameState::Title && sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)||s_gameState==GameState::RoundStart)
     {
         s_gameState = GameState::RoundStart;
+        cout << "round start\n";
+
         audio.getRoundStart().play(); // Play silly music
-        textObjects.push_back(new Text("Stage 1", { 0, 0 }));
+        if(stage>0)
+            textObjects.push_back(new Text("Stage "+stage, {0, 0}));
+        else
+            textObjects.push_back(new Text("Bonus Stage", { 0, 0 }));
     }
 }
 
@@ -239,6 +258,10 @@ void Game::update()
 
     case(GameState::RoundStart):
 
+        while (audio.getRoundStart().getStatus() == sf::SoundSource::Status::Playing)
+        {
+            render();
+        }
         // Wait for music to finish
         if (audio.getRoundStart().getStatus() == sf::SoundSource::Status::Stopped)
         {
@@ -250,8 +273,11 @@ void Game::update()
                 textObjects.pop_back();
             }
 
+            cout << "playing game\n";
             s_gameState = GameState::Playing;
         }
+        
+        cout << "almost playing game\n";
 
         break;
 
@@ -350,4 +376,76 @@ void Game::spawnPontans()
 
     enemies = std::move(newEnemies);    // Copy over all Pontans back into original enemies vector
     s_enemyCount = enemies.size();      // Re-initialize enemy count
+}
+
+
+void Game::level(int level, int enemyCount[8][50], int power)
+{
+    cout << "level: " << level << "\n";
+    bomber.setPosition(1, 1);
+    //insert pod clearing method
+    //clear other vectors 
+    int walls = level * 2 + 54;
+    int playable = _softPods;
+    for (int row = 0; row < _rows; row++)
+    {
+        for (int col = 0; col < _cols; col++)
+        {
+            if (walls == 0)
+                break;
+            bool isSoft = (rand() % (playable/walls) == 0) && (row > 2 || col > 2); // Can't spawn in top 2 x 2 by player
+            bool isInnerWall = col % 2 == 0 && row % 2 == 0;
+            bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
+            if(!(isInnerWall||isBorder))
+            {
+                if (isSoft)
+                {
+                    pods[row][col].isFilled = true;
+                    pods[row][col].isSoft = true;
+                    softWalls.push_back(SoftWall(animations.getEntities(), pods, col, row));
+                    walls--;
+                }
+                playable--;
+            }
+            
+        }
+    }
+
+    int exit = rand() % softWalls.size();                                   // Get random index for exit and powerup in soft wall vector
+    int powerUp = 0;
+
+    while (powerUp == exit)                                                 // If they are the same, get a new random
+        powerUp = rand() % softWalls.size();                                // index for powerup until they are different
+
+    pods[softWalls[exit].getY()][softWalls[exit].getX()].isExit = true;     // Set selected pod to be exit
+    powerUps.push_back(PowerUp(animations.getMisc(), pods,                  // Make a new powerup of random type at the selected powerup position
+        static_cast<PowerUp::Type>(power), softWalls[powerUp].getX(), softWalls[powerUp].getY()));
+
+    cout << "Exit set at: (" << softWalls[exit].getX() << ", " << softWalls[exit].getY() << ")\n"
+        << "Powerup set at: (" << softWalls[powerUp].getX() << ", " << softWalls[powerUp].getY() << ")\n";
+    for(int k=0;k<8;k++)
+    {
+        for (int i = 0; i < enemyCount[k][level]; i++)
+        {
+            Enemy enemy(animations.getEntities(), pods, Enemy::Type(k), bomber);
+            int x, y;
+
+            do
+            {
+                x = rand() % (_cols - 3) + 3;
+                y = rand() % (_rows - 3) + 3;
+            } while (pods[y][x].isFilled);
+
+            enemy.setPosition(x, y);
+            enemies.push_back(enemy);
+            s_enemyCount++;
+        }
+    }
+
+    while(s_gameState!=GameState::GameOver && s_gameState != GameState::Transition)
+    {
+        events(level + 1);
+        update();
+        render();
+    }
 }
