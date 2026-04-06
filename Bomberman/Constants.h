@@ -15,6 +15,8 @@ namespace Constants
 	static constexpr int _scaledTile = static_cast<int>(_tileSize * _scale);
 	static constexpr int _halfTile = 8;
 	static constexpr int _halfScaled = static_cast<int>(_halfTile * _scale);
+	static constexpr int _quarterTile = 4;
+	static constexpr int _quarterScaled = static_cast<int>(_quarterTile * _scale);
 
 	// Window size
 	static constexpr unsigned int _windowWidth = _cols * _scaledTile;
@@ -56,6 +58,11 @@ namespace Constants
 																	// Misc
 	static constexpr int _exitX = 176;
 	static constexpr int _exitY = 48;
+
+	static constexpr int _arrowX = 80;
+	static constexpr int _numberY = 248;
+	static constexpr int _letterY = 256;
+
 	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });
-	static constexpr sf::Vector2i _letterTile({ _halfTile, _halfTile });		// Not used currently
+	static constexpr sf::Vector2i _letterTile({ _halfTile, _halfTile });
 };

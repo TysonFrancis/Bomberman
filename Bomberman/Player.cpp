@@ -11,7 +11,8 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
 		Entity(tex, pods), bombs(bombs), explosions(explosions),
 		speed(_playerSpeed * _speedScale), joyX(0), joyY(0),
-		lives(3), blast(2), maxBombs(6), remote(false)
+		lives(3), blast(2), maxBombs(6), remote(false),
+		isFireShield(false), isInvincible(false)
 {
 	setTexture(64, 0);
 	setPosition(1, 1);
@@ -128,6 +129,15 @@ void Player::die()
 	myFrame = myTick = 0;
 	tileX = tileY = 1;
 }
+
+void Player::extraBomb()		{ if(maxBombs < 9)	maxBombs++; }
+void Player::extraRange()		{ if(blast < 4)		blast++; }
+void Player::giveRemote()		{ remote = true; }
+void Player::giveSkate()		{ speed *= (1.5f * _speedScale); }
+void Player::phaseWalls()		{ /* Ignore walls */ }
+void Player::phaseBombs()		{ /* Ignore bombs */ }
+void Player::shieldFire()		{ isFireShield = true; }
+void Player::invincible()		{ isInvincible = true; }
 
 
 // *** Private helper methods *** //

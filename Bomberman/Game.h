@@ -13,6 +13,7 @@
 #include "Explosion.h"
 #include "Constants.h"
 #include "Text.h"
+#include "PowerUp.h"
 
 /*
 	Main class handling game logic and display,
@@ -57,6 +58,7 @@ private:
 	std::vector<Bomb> bombs;
 	std::vector<Explosion> explosions;
 	std::vector<SoftWall> softWalls;
+	std::vector<PowerUp> powerUps;
 
 	std::vector<Text*> textObjects;
 
@@ -75,6 +77,5 @@ private:
 	int combo;
 	int enemyType;
 
-	bool isExit;
 	bool timerExpired;
 };

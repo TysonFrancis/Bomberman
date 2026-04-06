@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include "SFML/Graphics.hpp"
+#include "Constants.h"
 
 using std::string;
 

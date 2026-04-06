@@ -1,5 +1,4 @@
 #include "Text.h"
-#include "Constants.h"
 
 using namespace Constants;
 
@@ -34,25 +33,25 @@ void Text::construct(string text, sf::Vector2f position, int align, bool isBlack
 	{
 		// choose glyph
 		if (text.at(i) > 96 && text.at(i) < 123)				// if letter
-			glyphPosition = { (text.at(i) - 97) * 8, 256 };			// get glyph from corresponding position
+			glyphPosition = { (text.at(i) - 97) * _halfTile, _letterY };			// get glyph from corresponding position
 		else if (text.at(i) > 47 && text.at(i) < 58)			// if number
-			glyphPosition = { (text.at(i) - 48) * 8, 248 };			// get glyph form corresponding position
+			glyphPosition = { (text.at(i) - 48) * _halfTile, _numberY };			// get glyph form corresponding position
 		else if (text.at(i) == 62)								// if '>'
-			glyphPosition = { 80, 248 };							// get glyph from corresponding position
+			glyphPosition = { -arrowX, _numberY };							// get glyph from corresponding position
 		else													// if space (or anything else somehow)
 			glyphPosition = { 0, 0 };								// put a black squre because skipping
 																	// sprite creation causes too many issues 
 
 		// set color
-		glyphPosition.y += isBlack * 16;	// more evil bool math >:D
+		glyphPosition.y += isBlack * _tileSize;	// more evil bool math >:D
 
 		// create sprite
-		sprites.push_back(new sf::Sprite(texture));								// create the actual sprite
-		sprites.back()->setTextureRect(sf::IntRect(glyphPosition, {8, 8}));		// assign the determined glyph
-		sprites.back()->setScale({ _scale, _scale });							// scale sprite to match others
+		sprites.push_back(new sf::Sprite(texture));									// create the actual sprite
+		sprites.back()->setTextureRect(sf::IntRect(glyphPosition, _letterTile));	// assign the determined glyph
+		sprites.back()->setScale({ _scale, _scale });								// scale sprite to match others
 
 		// position sprite
-		sprites.at(i)->setPosition({ position.x + i * 8 * _scale + offset, position.y });
+		sprites.at(i)->setPosition({ position.x + i * _halfScaled + offset, position.y});
 	}
 }
 
