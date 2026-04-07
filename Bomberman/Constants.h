@@ -64,6 +64,7 @@ namespace Constants
 	static constexpr int _numberY = 248;
 	static constexpr int _letterY = 256;
 
+	static constexpr int _bonusTimer = _fps * 30;
 	static constexpr int _pontanTimer = _fps * 200;
 
 	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });

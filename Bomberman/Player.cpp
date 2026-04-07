@@ -143,6 +143,9 @@ void Player::phaseBombs()		{ bombPhase = true; }
 void Player::shieldFire()		{ isFireShield = true; }
 void Player::invincible()		{ isInvincible = true; }
 
+int Player::getLives() const	{ return lives; }
+void Player::addLife()			{ lives++; }
+
 
 // *** Private helper methods *** //
 
