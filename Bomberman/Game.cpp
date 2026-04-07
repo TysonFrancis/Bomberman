@@ -11,7 +11,7 @@ bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber entit
 window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
     "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     gameTick(0), score(0), streak(0), combo(0), enemyType(0),   // Set misc values to 0
-	stage(0), levelTransition(false), gameOver(false)
+	stage(0), levelTransition(false), gameOver(false),bonus(false)
 {
     srand((static_cast<unsigned>(time(nullptr))));
 
@@ -93,18 +93,26 @@ void Game::update()
     {
     case(GameState::Playing):
         gameTick++;
-
+        if (gameTick == 30*_fps&&bonus)
+            s_gameState = GameState::Transition;
         if (gameTick == _pontanTimer)        // Spawn Pontans if past 200 seconds
             spawnPontans();
 
         bomber.update();
-
+        if (bonus)
+        {
+            spawnPontans();
+        }
         for (size_t i = 0; i < enemies.size(); i++)
         {
             enemies[i].update();
 
-            if (enemies[i].intersects(bomber))
+            if (enemies[i].intersects(bomber)&&!bonus)
+            {
+                levelTransition = (bomber.getLives() > 1);
                 bomber.die();
+                
+            }
 
             streak -= 1;
             if (enemies[i].getState() == Entity::State::Dead)
@@ -150,8 +158,11 @@ void Game::update()
             explosions[i].update();
 
             if(!bomber.hasFireShield())
-                if (explosions[i].intersects(bomber))
+                if (explosions[i].intersects(bomber)&&!bonus)
+                {
+                    levelTransition = (bomber.getLives() > 1);
                     bomber.die();
+                }
 
             for (Enemy& enemy : enemies)
                 if (explosions[i].intersects(enemy))
@@ -196,7 +207,10 @@ void Game::update()
         if (!levelTransition)       // To prevent restarting audio and text every frame while on round start screen
         {
 			audio.playSound("roundStart");
-            textObjects.emplace_back(new Text("stage " + std::to_string(stage + 1), _centerScreen));
+            if(!bonus)
+                textObjects.emplace_back(new Text("stage " + std::to_string(stage + 1), _centerScreen));
+            else
+                textObjects.emplace_back(new Text("bonus stage", _centerScreen));
 			levelTransition = true;
         }
 
@@ -212,6 +226,7 @@ void Game::update()
 			audio.getMusic("main").setLooping(true);
 			song = "main";
             levelTransition = false;
+            gameTick = 0;
         }
 
         break;
@@ -224,12 +239,24 @@ void Game::update()
             audio.playSound("stageClear");
             textObjects.emplace_back(new Text("stage clear", _centerScreen));
             levelTransition = true;
-            stage++;
-            level();
+            if(!bonus)
+                stage++;
+            bomber.addLife();
+            if (/*stage != 1  &&*/ stage % 5 == 1 && !bonus)
+            {
+                bonus = true;
+                clear();
+            }
+            else
+            {
+                bonus = false;
+            }
         }
 
         if(audio.getStatus("stageClear") == sf::SoundSource::Status::Stopped)
         {
+            if(!bonus)
+                level();
             for (auto* text : textObjects)
                 delete text;
             textObjects.clear();
@@ -332,13 +359,15 @@ void Game::spawnPontans()
 
     std::vector<Enemy> newEnemies;
     newEnemies.reserve(10);
+    if(!bonus)
+    {
+        for (int i = 0; i < copy; i++)      // For how ever many enemies are currently
+        {                                   // alive, replace them with a new Pontan
+            Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
+            enemy.setPosition(enemies[i].getX(), enemies[i].getY());
 
-    for (int i = 0; i < copy; i++)      // For how ever many enemies are currently
-    {                                   // alive, replace them with a new Pontan
-        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
-        enemy.setPosition(enemies[i].getX(), enemies[i].getY());
-
-        newEnemies.emplace_back(enemy);        // Place new enemy in Pontan vector
+            newEnemies.emplace_back(enemy);        // Place new enemy in Pontan vector
+        }
     }
 
     for (int i = 0; i < spawn; i++)     // For how ever many new enemies to make,
@@ -353,10 +382,12 @@ void Game::spawnPontans()
         } while (pods[y][x].isFilled);
 
         enemy.setPosition(x, y);
-        newEnemies.emplace_back(enemy);        // Place new enemy in Pontan vector
+        newEnemies.emplace_back(enemy);
+        if (bonus)
+            enemies.emplace_back(enemy);// Place new enemy in Pontan vector
     }
-
-    enemies = std::move(newEnemies);    // Copy over all Pontans back into original enemies vector
+    if(!bonus)
+        enemies = std::move(newEnemies);    // Copy over all Pontans back into original enemies vector
     s_enemyCount = enemies.size();      // Re-initialize enemy count
 }
 
@@ -380,6 +411,7 @@ void Game::clear()
     softWalls.clear();
     explosions.clear();
     powerUps.clear();
+    gameTick = 0;
 }
 
 

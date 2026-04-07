@@ -36,6 +36,7 @@ public:
 	void shieldFire();
 	void invincible();
 	int getLives() { return lives; };
+	void addLife() { lives++; };
 
 	bool hasFireShield() const { return isFireShield; }
 	bool hasInvincible() const { return isInvincible; }

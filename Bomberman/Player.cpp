@@ -69,6 +69,7 @@ void Player::update()
 			state = State::Living;
 			setTexture(64, 0);
 			setPosition(1, 1);
+			Game::s_gameState = GameState::Transition;
 		}
 	}
 
@@ -129,6 +130,7 @@ void Player::die()
 	state = State::Dying;
 	myFrame = myTick = 0;
 	tileX = tileY = 1;
+	
 }
 
 void Player::extraBomb()		{ if(maxBombs < 9)	maxBombs++; }
