@@ -400,7 +400,7 @@ void Game::level()
 
     for (int k = 0; k < 8; k++)
     {
-        for (int i = 0; i < enemyPresets[k][stage]; i++)
+        for (int i = 0; i < enemyPresets[stage%50][k]; i++)
         {
             Enemy enemy(animations.getEntities(), pods, Enemy::Type(k), bomber);
             int x, y;
