@@ -62,4 +62,6 @@ private:
 
 	bool isFireShield;
 	bool isInvincible;
+	bool wallPhase;
+	bool bombPhase;
 };

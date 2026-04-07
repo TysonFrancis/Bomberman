@@ -149,8 +149,9 @@ void Game::update()
         {
             explosions[i].update();
 
-            if (explosions[i].intersects(bomber))
-                bomber.die();
+            if(!bomber.hasFireShield())
+                if (explosions[i].intersects(bomber))
+                    bomber.die();
 
             for (Enemy& enemy : enemies)
                 if (explosions[i].intersects(enemy))
@@ -371,6 +372,9 @@ void Game::clear()
                 pods[row][col].isBomb = pods[row][col].isExit = pods[row][col].isFilled = pods[row][col].isSoft = false;
         }
     }
+
+    bomber.setPosition(1, 1);
+	bomber.setTexture(64, 0);
     enemies.clear();
     bombs.clear();
     softWalls.clear();
@@ -382,7 +386,6 @@ void Game::clear()
 void Game::level()
 {
     cout << "level: " << stage + 1 << "\n";
-    bomber.setPosition(1, 1);
 
     clear();
 
@@ -413,17 +416,23 @@ void Game::level()
         }
     }
 
+    if(softWalls.size() == 0)
+    {
+        cout << "No soft walls to place exit and powerup on\n";
+        return;
+	}
+
     int exit = rand() % softWalls.size();                                   // Get random index for exit and powerup in soft wall vector
-    int powerUp = 0;
+	int powerUp = rand() % softWalls.size();
 
     while (powerUp == exit)                                                 // If they are the same, get a new random
         powerUp = rand() % softWalls.size();                                // index for powerup until they are different
 
     pods[softWalls[exit].getY()][softWalls[exit].getX()].isExit = true;     // Set selected pod to be exit
     powerUps.emplace_back(PowerUp(animations.getMisc(), pods,                  // Make a new powerup of random type at the selected powerup position
-        static_cast<PowerUp::Type>(rand() % 8), softWalls[powerUp].getX(), softWalls[powerUp].getY()));
+        static_cast<PowerUp::Type>(power), softWalls[powerUp].getX(), softWalls[powerUp].getY()));
 
-    cout << "Exit set at: (" << softWalls[exit].getX() << ", " << softWalls[exit].getY() << ")\n"
+    cout << "Exit set at: (" << softWalls[exit].getX() << ", " << softWalls[exit].getY() << "), "
         << "Powerup set at: (" << softWalls[powerUp].getX() << ", " << softWalls[powerUp].getY() << ")\n";
 
     for (int k = 0; k < 8; k++)

@@ -11,7 +11,7 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
 		Entity(tex, pods), bombs(bombs), explosions(explosions),
 		speed(_playerSpeed * _speedScale), joyX(0), joyY(0),
-		lives(3), blast(2), maxBombs(6), remote(false),
+		lives(3), blast(1), maxBombs(1), remote(false),
 		isFireShield(false), isInvincible(false)
 {
 	setTexture(64, 0);
@@ -135,8 +135,8 @@ void Player::extraBomb()		{ if(maxBombs < 9)	maxBombs++; }
 void Player::extraRange()		{ if(blast < 4)		blast++; }
 void Player::giveRemote()		{ remote = true; }
 void Player::giveSkate()		{ speed *= (1.5f * _speedScale); }
-void Player::phaseWalls()		{ /* Ignore walls */ }
-void Player::phaseBombs()		{ /* Ignore bombs */ }
+void Player::phaseWalls()		{ wallPhase = true; }
+void Player::phaseBombs()		{ bombPhase = true; }
 void Player::shieldFire()		{ isFireShield = true; }
 void Player::invincible()		{ isInvincible = true; }
 
@@ -156,8 +156,8 @@ void Player::moveLogic()
 {
 	int nextX = tileX + joyX;			// Calculate next tile position based on input to avoid 
 	int nextY = tileY + joyY;			// repeated if blocks of y + 1, y - 1, x + 1, x - 1, etc.
-	
-	if (joyX > 0)			//If moving right, only check if collision if person is on the right half of the tile
+
+	/*if (joyX > 0)			//If moving right, only check if collision if person is on the right half of the tile
 	{
 		if (pods[tileY][nextX].isFilled)
 		{
@@ -225,6 +225,105 @@ void Player::moveLogic()
 			else if (joyX <= 0 && tileX > 0 && isObstructed(tileX - 1, nextY))
 				joyX = 1;
 		}
+	}*/
+	
+	if (joyX > 0)			//If moving right, only check if collision if person is on the right half of the tile
+	{
+		if (!pods[tileY][nextX].isFilled)
+		{
+			if (joyY >= 0 && tileY < _rows - 1 && isObstructed(nextX, tileY + 1))
+				joyY = -1;
+			else if (joyY <= 0 && tileY > 0 && isObstructed(nextX, tileY - 1))
+				joyY = 1;
+		}
+		else if (pods[tileY][nextX].isSoft && wallPhase)
+		{
+
+		}
+		else if(pods[tileY][nextX].isBomb && bombPhase)
+		{
+
+		}
+		else
+			if ((tileX * _scaledTile + _halfScaled) <= getSprite().getPosition().x)
+			{
+				joyX = 0;
+			}
+	}
+
+	if (joyX < 0)			//If moving left, only check if collision if person is on the right half of the tile
+	{
+		if(!pods[tileY][nextX].isFilled)
+		{
+			if (joyY >= 0 && tileY < _rows - 1 && isObstructed(nextX, tileY + 1))
+				joyY = -1;
+			else if (joyY <= 0 && tileY > 0 && isObstructed(nextX, tileY - 1))
+				joyY = 1;
+		}
+		else if (pods[tileY][nextX].isSoft && wallPhase)
+		{
+
+		}
+		else if (pods[tileY][nextX].isBomb && bombPhase)
+		{
+
+		}
+		else
+			if ((tileX * _scaledTile + _halfScaled) >= getSprite().getPosition().x)
+			{
+				joyX = 0;
+			}
+	}
+
+	if (joyY > 0)			//If moving down, only check if collision if person is on the lower half of the tile
+	{
+		if (!pods[nextY][tileX].isFilled)
+		{
+			if (joyX >= 0 && tileX < _cols - 1 && isObstructed(tileX + 1, nextY))
+				joyX = -1;
+			else if (joyX <= 0 && tileX > 0 && isObstructed(tileX - 1, nextY))
+				joyX = 1;
+		}
+		else if (pods[nextY][tileX].isSoft && wallPhase)
+		{
+
+		}
+		else if (pods[nextY][tileX].isBomb && bombPhase)
+		{
+
+		}
+		else
+		{
+			if ((tileY * _scaledTile + _halfScaled) <= getSprite().getPosition().y)
+			{
+				joyY = 0;
+			}
+		}
+	}
+	if (joyY < 0)			//If moving up, only check if collision if person is on the upper half of the tile
+	{
+		if(!pods[nextY][tileX].isFilled)
+		{
+			if (joyX >= 0 && tileX < _cols - 1 && isObstructed(tileX + 1, nextY))
+				joyX = -1;
+			else if (joyX <= 0 && tileX > 0 && isObstructed(tileX - 1, nextY))
+				joyX = 1;
+		}
+		else if (pods[nextY][tileX].isSoft && wallPhase)
+		{
+
+		}
+		else if (pods[nextY][tileX].isBomb && bombPhase)
+		{
+
+		}
+		else
+		{
+			if ((tileY * _scaledTile + _halfScaled) >= getSprite().getPosition().y)
+			{
+				joyY = 0;
+			}
+		}
 	}
 
 	move(joyX * speed, joyY * speed);		// Move based on input and speed
@@ -235,9 +334,16 @@ bool Player::isObstructed(int checkX, int checkY)
 	if (checkX < 0 || checkX >= _cols ||		// Out of bounds, treat as solid
 		checkY < 0 || checkY >= _rows)
 		return true;
+
+	const Pod& pod = pods[checkY][checkX];
+
+	if (pod.isBomb && bombPhase)
+		return false;
+	if(pod.isSoft && wallPhase)
+		return false;
 	
 	// return if pod in question is solid and colliding
-	return pods[checkY][checkX].isFilled && intersects(checkX, checkY);
+	return pod.isFilled && intersects(checkX, checkY);
 }
 
 
