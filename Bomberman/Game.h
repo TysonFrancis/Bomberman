@@ -84,4 +84,7 @@ private:
 
 	int stage;
 	bool levelTransition;
+	bool gameOver;
+
+	const char* song;		// To know which song to stop when level change or game over
 };

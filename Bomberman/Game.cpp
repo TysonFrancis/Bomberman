@@ -11,13 +11,14 @@ bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber entit
 window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
     "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     gameTick(0), score(0), streak(0), combo(0), enemyType(0),   // Set misc values to 0
-	stage(0), levelTransition(false)
+	stage(0), levelTransition(false), gameOver(false)
 {
     srand((static_cast<unsigned>(time(nullptr))));
 
     audio.getMusic("title").play();
 	audio.getMusic("title").setVolume(50);
     audio.getMusic("title").setLooping(true);
+	song = "title";
 
     // Set window icon and framerate
     window.setIcon(animations.getIcon());
@@ -201,20 +202,21 @@ void Game::update()
         // Wait until audio finishes
         if (audio.getStatus("roundStart") == sf::SoundSource::Status::Stopped)
         {
-            for (auto* text : textObjects)
+            for (Text* text : textObjects)
                 delete text;
             textObjects.clear();
 
             s_gameState = GameState::Playing;
 			audio.getMusic("main").play();
 			audio.getMusic("main").setLooping(true);
+			song = "main";
             levelTransition = false;
         }
 
         break;
 
     case(GameState::Transition):
-		audio.getMusic("main").stop();
+		audio.getMusic(song).stop();
 
         if (!levelTransition)
         {
@@ -235,6 +237,26 @@ void Game::update()
             levelTransition = false;
 		}
 
+        break;
+
+    case (GameState::GameOver):
+		audio.getMusic(song).stop();
+
+		if (!levelTransition)
+        {
+            audio.playSound("gameOver");
+			textObjects.emplace_back(new Text("game over", _centerScreen));
+			levelTransition = true;
+        }
+
+        if (audio.getStatus("gameOver") == sf::SoundSource::Status::Stopped)
+        {
+            for (Text* text : textObjects)
+                delete text;
+            textObjects.clear();
+
+			gameOver = true;
+        }
         break;
     }
 }
@@ -268,6 +290,13 @@ void Game::render()
 
         break;
 
+    case(GameState::GameOver):
+        if(gameOver)
+        {
+            window.draw(endTitle);
+            break;
+        }
+        [[fallthrough]];
     case(GameState::RoundStart):
 	case(GameState::Transition):
         for (Text* text : textObjects)
@@ -277,7 +306,6 @@ void Game::render()
         break;
 
     case(GameState::Title):     window.draw(title);     break;
-    case(GameState::GameOver):  window.draw(endTitle);  break;
     }
 
     window.display();
@@ -375,7 +403,7 @@ void Game::level()
 
     pods[softWalls[exit].getY()][softWalls[exit].getX()].isExit = true;     // Set selected pod to be exit
     powerUps.emplace_back(PowerUp(animations.getMisc(), pods,                  // Make a new powerup of random type at the selected powerup position
-        static_cast<PowerUp::Type>(power), softWalls[powerUp].getX(), softWalls[powerUp].getY()));
+        static_cast<PowerUp::Type>(rand() % 8), softWalls[powerUp].getX(), softWalls[powerUp].getY()));
 
     cout << "Exit set at: (" << softWalls[exit].getX() << ", " << softWalls[exit].getY() << ")\n"
         << "Powerup set at: (" << softWalls[powerUp].getX() << ", " << softWalls[powerUp].getY() << ")\n";
