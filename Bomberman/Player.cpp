@@ -44,7 +44,7 @@ void Player::update()
 			{
 				pods[tileY][tileX].isFilled = true;
 				pods[tileY][tileX].isBomb = true;
-				bombs.push_back(Bomb(sprite.getTexture(), pods, explosions, remote, blast, tileX, tileY));
+				bombs.emplace_back(Bomb(sprite.getTexture(), pods, explosions, remote, blast, tileX, tileY));
 			}
 
 		//Remote Detonation

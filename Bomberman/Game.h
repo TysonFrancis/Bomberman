@@ -66,6 +66,7 @@ private:
 	Pod pods[Constants::_rows][Constants::_cols];
 
 	Audio audio;
+
 	sf::Sprite title;
 	sf::Sprite endTitle;
 	sf::Sprite background;

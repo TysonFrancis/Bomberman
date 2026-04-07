@@ -86,7 +86,7 @@ void Bomb::explode()
 	pods[tileY][tileX].isFilled = false;
 	pods[tileY][tileX].isBomb = false;
 	myFrame = myTick = 0;
-	explosions.push_back(Explosion(sprite.getTexture(), pods, tileX, tileY, dir, false));
+	explosions.emplace_back(Explosion(sprite.getTexture(), pods, tileX, tileY, dir, false));
 
 	// Need to make better selection than this for direction	- D
 	dir = Facing::Up;
@@ -117,9 +117,9 @@ void Bomb::propogate(int xDir, int yDir)
 		if (!pods[yPos][xPos].isFilled)			// If pod is empty,
 		{
 			if (d == distance)						// If at end of range, spawn end explosion
-				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
+				explosions.emplace_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
 			else									// Else, spawn interior explosion
-				explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
+				explosions.emplace_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
 			/*for (int i = 0; i < explosions.size(); i++)
 			{
 				if(explosions[i].tileX==Xpos)
@@ -139,7 +139,7 @@ void Bomb::propogate(int xDir, int yDir)
 		{
 			pods[yPos][xPos].isFilled = false;
 			pods[yPos][xPos].isBomb = false;
-			explosions.push_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
+			explosions.emplace_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
 		}
 	}
 }
