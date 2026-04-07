@@ -11,8 +11,9 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
 		Entity(tex, pods), bombs(bombs), explosions(explosions),
 		speed(_playerSpeed * _speedScale), joyX(0), joyY(0),
-		lives(3), blast(1), maxBombs(1), remote(false),
-		isFireShield(false), isInvincible(false)
+		lives(3), blast(3), maxBombs(5), remote(false),
+		isFireShield(false), isInvincible(false),
+		wallPhase(false), bombPhase(false)
 {
 	setTexture(64, 0);
 	setPosition(1, 1);

@@ -5,13 +5,13 @@ using namespace Constants;
 
 using std::cout, std::endl;
 
-Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sprites
-background(animations.getBackground()),                     // Load background sprite
-bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber entity
-window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
-    "Bomberman", sf::Style::Titlebar | sf::Style::Close),
-    gameTick(0), score(0), streak(0), combo(0), enemyType(0),   // Set misc values to 0
-	stage(0), levelTransition(false), gameOver(false)
+Game::Game() : title(animations.getTitle()), endTitle(title),               // Load title sprites
+    background(animations.getBackground()),                                 // Load background sprite
+    bomber(animations.getEntities(), pods, bombs, explosions),              // Load bomber entity
+    window(sf::VideoMode({ _windowWidth, _windowHeight }),                  // Create window with title and size
+        "Bomberman", sf::Style::Titlebar | sf::Style::Close),
+    gameTick(0), score(0), streak(0), combo(0), enemyType(0),               // Set misc values to 0
+	stage(0), levelTransition(false), timerExpired(false), gameOver(false)
 {
     srand((static_cast<unsigned>(time(nullptr))));
 
@@ -94,8 +94,11 @@ void Game::update()
     case(GameState::Playing):
         gameTick++;
 
-        if (gameTick == _pontanTimer)        // Spawn Pontans if past 200 seconds
-            spawnPontans();
+        if (gameTick >= _pontanTimer && !timerExpired)        // Spawn Pontans if past 200 seconds
+        {
+			timerExpired = true;
+            spawnEnemies(Enemy::Type::Pontan);
+        }
 
         bomber.update();
 
@@ -161,6 +164,13 @@ void Game::update()
                 if (explosions[i].intersects(bomb) && !bomb.getWillExplode())
                     bomb.delay();       // Explodes in 3 frames
 
+            if(powerUp && powerUp->getSprite().getGlobalBounds().
+                findIntersection(explosions[i].getSprite().getGlobalBounds()))
+            {
+                spawnEnemies(getEnemyType());     // Spawn enemies if powerup is hit by explosion
+				powerUp.reset();                  // Remove powerup if hit by explosion
+            }
+
             if (explosions[i].getState() == Entity::State::Dead)
             {
                 explosions.erase(explosions.begin() + i);
@@ -179,16 +189,13 @@ void Game::update()
             }
         }
 
-        for (size_t i = 0; i < powerUps.size(); i++)
+		if (powerUp && powerUp->getSprite().getGlobalBounds().
+            findIntersection(bomber.getSprite().getGlobalBounds()))
         {
-            if (powerUps[i].intersects(bomber))
-            {
-                powerUps[i].applyEffect(bomber);
-                cout << powerUps[i];
-                powerUps.erase(powerUps.begin() + i);
-                i--;
-            }
-        }
+            powerUp->applyEffect(bomber);
+            cout << *powerUp << "\n";
+			powerUp.reset();
+		}
 
         break;
 
@@ -224,7 +231,7 @@ void Game::update()
             audio.playSound("stageClear");
             textObjects.emplace_back(new Text("stage clear", _centerScreen));
             levelTransition = true;
-            stage++;
+
             level();
         }
 
@@ -258,7 +265,7 @@ void Game::update()
                 delete text;
             textObjects.clear();
 
-			gameOver = true;        // For screen displaye after audio
+			gameOver = true;        // For screen display after audio
         }
         break;
     }
@@ -273,9 +280,9 @@ void Game::render()
     {
     case(GameState::Playing):
         window.draw(background);
-
-        for (PowerUp& powerUp : powerUps)
-            window.draw(powerUp);
+        
+        if(powerUp)
+            window.draw(powerUp->getSprite());
 
         for (SoftWall& wall : softWalls)
             window.draw(wall);
@@ -326,39 +333,61 @@ void Game::closeGame()
 // Called after 200 game seconds have passed on one single level,
 // removes all enemies from the board and replaces them with Pontans,
 // adding or subtracting as needed until there are 10
-void Game::spawnPontans()
+void Game::spawnEnemies(Enemy::Type type)
 {
     int size = enemies.size();          // Number of current enemies
     int copy = std::min(size, 10);      // Number of enemies needed to copy back to vector
     int spawn = 10 - copy;              // Number of new enemies needed to spawn
 
-    std::vector<Enemy> newEnemies;
-    newEnemies.reserve(10);
+	if (timerExpired)                   // If timer expired for Pontans
+    {
+        std::vector<Enemy> newEnemies;
+        newEnemies.reserve(10);
 
-    for (int i = 0; i < copy; i++)      // For how ever many enemies are currently
-    {                                   // alive, replace them with a new Pontan
-        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
-        enemy.setPosition(enemies[i].getX(), enemies[i].getY());
+        for (int i = 0; i < copy; i++)      // For how ever many enemies are currently
+        {                                   // alive, replace them with a new Pontan
+            Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
+            enemy.setPosition(enemies[i].getX(), enemies[i].getY());
 
-        newEnemies.emplace_back(enemy);        // Place new enemy in Pontan vector
+            newEnemies.emplace_back(enemy);     // Place new enemy in Pontan vector
+        }
+
+        for (int i = 0; i < spawn; i++)     // For how ever many new enemies to make,
+        {                                   // place them randomly on the map
+            Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
+            int x, y;
+
+            do
+            {
+                x = rand() % (_cols - 1) + 1;
+                y = rand() % (_rows - 1) + 1;
+            } while (pods[y][x].isFilled);
+
+            enemy.setPosition(x, y);
+            newEnemies.emplace_back(enemy);     // Place new enemy in Pontan vector
+        }
+
+        enemies = std::move(newEnemies);    // Copy over all Pontans back into original enemies vector
     }
 
-    for (int i = 0; i < spawn; i++)     // For how ever many new enemies to make,
-    {                                   // place them randomly on the map
-        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
-        int x, y;
+	else                                // If spawning other enemy type, just add them to the current vector without removing current enemies
+    {
+        for (int i = 0; i < spawn; i++)     // For how ever many new enemies to make,
+        {                                   // place them randomly on the map
+            Enemy enemy(animations.getEntities(), pods, type, bomber);
+            int x, y;
 
-        do
-        {
-            x = rand() % (_cols - 1) + 1;
-            y = rand() % (_rows - 1) + 1;
-        } while (pods[y][x].isFilled);
+            do
+            {
+                x = rand() % (_cols - 1) + 1;
+                y = rand() % (_rows - 1) + 1;
+            } while (pods[y][x].isFilled);
 
-        enemy.setPosition(x, y);
-        newEnemies.emplace_back(enemy);        // Place new enemy in Pontan vector
+            enemy.setPosition(x, y);
+            enemies.emplace_back(enemy);        // Place new enemy in original vector
+        }
     }
 
-    enemies = std::move(newEnemies);    // Copy over all Pontans back into original enemies vector
     s_enemyCount = enemies.size();      // Re-initialize enemy count
 }
 
@@ -381,7 +410,9 @@ void Game::clear()
     bombs.clear();
     softWalls.clear();
     explosions.clear();
-    powerUps.clear();
+
+	timerExpired = false;
+    gameTick = 0;
 }
 
 
@@ -424,18 +455,18 @@ void Game::level()
         return;
 	}
 
-    int exit = rand() % softWalls.size();                                   // Get random index for exit and powerup in soft wall vector
-	int powerUp = rand() % softWalls.size();
+    int exitIndex = rand() % softWalls.size();                                   // Get random index for exit and powerup in soft wall vector
+	int powerUpIndex = rand() % softWalls.size();
 
-    while (powerUp == exit)                                                 // If they are the same, get a new random
-        powerUp = rand() % softWalls.size();                                // index for powerup until they are different
+    while (powerUpIndex == exitIndex)                                                 // If they are the same, get a new random
+        powerUpIndex = rand() % softWalls.size();                                // index for powerup until they are different
 
-    pods[softWalls[exit].getY()][softWalls[exit].getX()].isExit = true;     // Set selected pod to be exit
-    powerUps.emplace_back(PowerUp(animations.getMisc(), pods,                  // Make a new powerup of random type at the selected powerup position
-        static_cast<PowerUp::Type>(power), softWalls[powerUp].getX(), softWalls[powerUp].getY()));
+    pods[softWalls[exitIndex].getY()][softWalls[exitIndex].getX()].isExit = true;     // Set selected pod to be exit
+    powerUp.emplace(PowerUp(animations.getMisc(), pods,                  // Make a new powerup of random type at the selected powerup position
+        static_cast<PowerUp::Type>(power), softWalls[powerUpIndex].getX(), softWalls[powerUpIndex].getY()));
 
-    cout << "Exit set at: (" << softWalls[exit].getX() << ", " << softWalls[exit].getY() << "), "
-        << "Powerup set at: (" << softWalls[powerUp].getX() << ", " << softWalls[powerUp].getY() << ")\n";
+    cout << "Exit set at: (" << softWalls[exitIndex].getX() << ", " << softWalls[exitIndex].getY() << "), "
+        << "Powerup set at: (" << softWalls[powerUpIndex].getX() << ", " << softWalls[powerUpIndex].getY() << ")\n";
 
     for (int k = 0; k < 8; k++)
     {
@@ -454,5 +485,26 @@ void Game::level()
             enemies.emplace_back(enemy);
             s_enemyCount++;
         }
+    }
+}
+
+Enemy::Type Game::getEnemyType() const
+{
+    if(!powerUp)
+    {
+        cout << "No powerup to get enemy type from\n";
+        return Enemy::Type::Ballom;     // Default enemy type if no powerup, should never be used
+	}
+
+    switch (powerUp->getType())
+    {
+    case PowerUp::Type::ExtraBomb:	return Enemy::Type::Ballom;
+    case PowerUp::Type::ExtraRange:	return Enemy::Type::Onil;
+    case PowerUp::Type::Skate:		return Enemy::Type::Dahl;
+    case PowerUp::Type::WallPhase:	return Enemy::Type::Minvo;
+    case PowerUp::Type::Remote:		return Enemy::Type::Doria;
+    case PowerUp::Type::BombPhase:	return Enemy::Type::Ovape;
+    case PowerUp::Type::FireShield:	return Enemy::Type::Pass;
+    case PowerUp::Type::Invincible:	return Enemy::Type::Pontan;
     }
 }

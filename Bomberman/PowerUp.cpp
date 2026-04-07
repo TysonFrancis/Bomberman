@@ -3,10 +3,12 @@
 using namespace Constants;
 
 PowerUp::PowerUp(const sf::Texture& tex, Pod(&pods)[Constants::_rows][Constants::_cols], Type input, int x, int y) :
-	Entity(tex, pods), type(input)
+	sprite(tex), type(input)
 {
-	setTexture(static_cast<int>(type) * _tileSize, 0);
-	setPosition(x, y);
+	sprite.setTextureRect(sf::IntRect({ static_cast<int>(type) * _tileSize, 0 }, _tile));
+	sprite.setOrigin(sf::Vector2f(_halfTile, _halfTile));
+	sprite.setScale(sf::Vector2f(_scale, _scale));
+	sprite.setPosition(sf::Vector2f(x * _scaledTile + _halfScaled, y * _scaledTile + _halfScaled));
 }
 
 void PowerUp::applyEffect(Player& bomber)
@@ -24,6 +26,8 @@ void PowerUp::applyEffect(Player& bomber)
 	}
 }
 
+sf::Sprite& PowerUp::getSprite()		{ return sprite; }
+PowerUp::Type PowerUp::getType() const	{ return type; }
 
 // *** Public debugging method *** //
 
@@ -46,4 +50,15 @@ std::ostream& operator<<(std::ostream& out, const PowerUp& powerUp)
 	out << "\n";
 
 	return out;
+}
+
+PowerUp& PowerUp::operator=(const PowerUp& other)
+{
+	if (this != &other)
+	{
+		sprite = other.sprite;
+		type = other.type;
+	}
+
+	return *this;
 }

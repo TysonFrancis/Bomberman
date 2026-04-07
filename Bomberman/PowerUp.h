@@ -4,7 +4,7 @@
 
 #include "Constants.h"
 
-class PowerUp : public Entity
+class PowerUp
 {
 public:
 	enum class Type { ExtraBomb, ExtraRange, Skate, WallPhase, Remote, BombPhase, FireShield, Invincible };
@@ -13,8 +13,13 @@ public:
 
 	void applyEffect(Player&);
 
+	sf::Sprite& getSprite();
+	Type getType() const;
+
 	friend std::ostream& operator<<(std::ostream&, const PowerUp&);
+	PowerUp& operator=(const PowerUp&);
 
 private:
+	sf::Sprite sprite;
 	Type type;
 };
