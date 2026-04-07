@@ -448,11 +448,12 @@ void Game::clear()
 
     bomber.setPosition(1, 1);
     bomber.setTexture(64, 0);
-
+    s_enemyCount = 0;
     enemies.clear();
     bombs.clear();
     softWalls.clear();
     explosions.clear();
+    powerUp.reset();
     gameTick = 0;
 }
 

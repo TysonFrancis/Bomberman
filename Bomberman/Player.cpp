@@ -11,7 +11,7 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
 		Entity(tex, pods), bombs(bombs), explosions(explosions),
 		speed(_playerSpeed * _speedScale), joyX(0), joyY(0),
-		lives(3), blast(3), maxBombs(5), remote(false),
+		lives(3), blast(3), maxBombs(3), remote(!false),
 		isFireShield(false), isInvincible(false),
 		wallPhase(false), bombPhase(false)
 {
@@ -22,7 +22,7 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 void Player::update()
 {
 	// If on exit tile and all enemies are dead, or fully dead end game
-	if (pods[tileY][tileX].isExit && Game::s_enemyCount == 0)
+	if (pods[tileY][tileX].isExit  && Game::s_enemyCount == 0  )
 		Game::s_gameState = GameState::Transition;
 	if(lives <= 0 && myTick >= _fps)
 		Game::s_gameState = GameState::GameOver;
