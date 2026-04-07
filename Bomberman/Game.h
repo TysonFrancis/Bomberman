@@ -50,6 +50,7 @@ private:
 	void closeGame();
 	void spawnPontans();
 	void level();
+	void clear();
 
 	Animations animations;
 
