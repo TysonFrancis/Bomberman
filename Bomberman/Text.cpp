@@ -47,7 +47,7 @@ void Text::construct(string text, sf::Vector2f position, int align, bool isBlack
 		glyphPosition.y += isBlack * _tileSize;	// more evil bool math >:D
 
 		// create sprite
-		sprites.push_back(new sf::Sprite(texture));									// create the actual sprite
+		sprites.emplace_back(new sf::Sprite(texture));									// create the actual sprite
 		sprites.back()->setTextureRect(sf::IntRect(glyphPosition, _letterTile));	// assign the determined glyph
 		sprites.back()->setScale({ _scale, _scale });								// scale sprite to match others
 
