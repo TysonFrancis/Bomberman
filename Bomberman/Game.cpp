@@ -359,14 +359,32 @@ void Game::spawnPontans()
     s_enemyCount = enemies.size();      // Re-initialize enemy count
 }
 
+void Game::clear()
+{
+    for (int row = 0; row < _rows; row++)
+    {
+        for (int col = 0; col < _cols; col++)
+        {
+            bool isInnerWall = col % 2 == 0 && row % 2 == 0;
+            bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
+            if (!(isInnerWall || isBorder))
+                pods[row][col].isBomb = pods[row][col].isExit = pods[row][col].isFilled = pods[row][col].isSoft = false;
+        }
+    }
+    enemies.clear();
+    bombs.clear();
+    softWalls.clear();
+    explosions.clear();
+    powerUps.clear();
+}
+
 
 void Game::level()
 {
     cout << "level: " << stage + 1 << "\n";
     bomber.setPosition(1, 1);
 
-    //insert pod clearing method
-    //clear other vectors
+    clear();
 
     int walls = stage * 2 + 54;
     int playable = _softPods;
