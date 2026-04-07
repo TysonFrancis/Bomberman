@@ -15,6 +15,7 @@ window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window wit
 {
     srand((static_cast<unsigned>(time(nullptr))));
 
+    // Start title music
     audio.getMusic("title").play();
 	audio.getMusic("title").setVolume(50);
     audio.getMusic("title").setLooping(true);
@@ -44,7 +45,6 @@ window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window wit
         {
             bool isInnerWall = col % 2 == 0 && row % 2 == 0;
             bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
-            //bool isSoft = (rand() % 4 == 0) && (row > 2 || col > 2); // Can't spawn in top 2 x 2 by player
 
             if (isInnerWall || isBorder)
             {
@@ -172,6 +172,13 @@ void Game::update()
                 if (explosions[i].intersects(bomb) && !bomb.getWillExplode())
                     bomb.delay();       // Explodes in 3 frames
 
+            if(powerUp && powerUp->getSprite().getGlobalBounds().
+                findIntersection(explosions[i].getSprite().getGlobalBounds()))
+            {
+                spawnEnemies(getEnemyType());     // Spawn enemies if powerup is hit by explosion
+				powerUp.reset();                  // Remove powerup if hit by explosion
+            }
+
             if (explosions[i].getState() == Entity::State::Dead)
             {
                 explosions.erase(explosions.begin() + i);
@@ -190,16 +197,13 @@ void Game::update()
             }
         }
 
-        for (size_t i = 0; i < powerUps.size(); i++)
+		if (powerUp && powerUp->getSprite().getGlobalBounds().
+            findIntersection(bomber.getSprite().getGlobalBounds()))
         {
-            if (powerUps[i].intersects(bomber))
-            {
-                powerUps[i].applyEffect(bomber);
-                cout << powerUps[i];
-                powerUps.erase(powerUps.begin() + i);
-                i--;
-            }
-        }
+            powerUp->applyEffect(bomber);
+            cout << *powerUp << "\n";
+			powerUp.reset();
+		}
 
         break;
 
@@ -217,7 +221,7 @@ void Game::update()
         // Wait until audio finishes
         if (audio.getStatus("roundStart") == sf::SoundSource::Status::Stopped)
         {
-            for (Text* text : textObjects)
+			for (Text* text : textObjects)      // Clean up text objects after round start audio finishes
                 delete text;
             textObjects.clear();
 
@@ -234,7 +238,7 @@ void Game::update()
     case(GameState::Transition):
 		audio.getMusic(song).stop();
 
-        if (!levelTransition)
+        if (!levelTransition)       // To prevent restarting audio and text every frame while on round start screen
         {
             audio.playSound("stageClear");
             textObjects.emplace_back(new Text("stage clear", _centerScreen));
@@ -253,6 +257,7 @@ void Game::update()
             }
         }
 
+		// Wait until audio finishes
         if(audio.getStatus("stageClear") == sf::SoundSource::Status::Stopped)
         {
             if(!bonus)
@@ -270,20 +275,21 @@ void Game::update()
     case (GameState::GameOver):
 		audio.getMusic(song).stop();
 
-		if (!levelTransition)
+		if (!levelTransition)       // To prevent restarting audio and text every frame while on game over screen
         {
             audio.playSound("gameOver");
 			textObjects.emplace_back(new Text("game over", _centerScreen));
 			levelTransition = true;
         }
 
+		// Wait until audio finishes
         if (audio.getStatus("gameOver") == sf::SoundSource::Status::Stopped)
         {
-            for (Text* text : textObjects)
+			for (Text* text : textObjects)      // Clean up text objects after game over audio finishes
                 delete text;
             textObjects.clear();
 
-			gameOver = true;
+			gameOver = true;        // For screen display after audio
         }
         break;
     }
@@ -298,9 +304,9 @@ void Game::render()
     {
     case(GameState::Playing):
         window.draw(background);
-
-        for (PowerUp& powerUp : powerUps)
-            window.draw(powerUp);
+        
+        if(powerUp)
+            window.draw(powerUp->getSprite());
 
         for (SoftWall& wall : softWalls)
             window.draw(wall);
@@ -351,7 +357,7 @@ void Game::closeGame()
 // Called after 200 game seconds have passed on one single level,
 // removes all enemies from the board and replaces them with Pontans,
 // adding or subtracting as needed until there are 10
-void Game::spawnPontans()
+void Game::spawnEnemies(Enemy::Type type)
 {
     int size = enemies.size();          // Number of current enemies
     int copy = std::min(size, 10);      // Number of enemies needed to copy back to vector
@@ -370,16 +376,16 @@ void Game::spawnPontans()
         }
     }
 
-    for (int i = 0; i < spawn; i++)     // For how ever many new enemies to make,
-    {                                   // place them randomly on the map
-        Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
-        int x, y;
+        for (int i = 0; i < spawn; i++)     // For how ever many new enemies to make,
+        {                                   // place them randomly on the map
+            Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
+            int x, y;
 
-        do
-        {
-            x = rand() % (_cols - 1) + 1;
-            y = rand() % (_rows - 1) + 1;
-        } while (pods[y][x].isFilled);
+            do
+            {
+                x = rand() % (_cols - 1) + 1;
+                y = rand() % (_rows - 1) + 1;
+            } while (pods[y][x].isFilled);
 
         enemy.setPosition(x, y);
         newEnemies.emplace_back(enemy);
@@ -410,7 +416,6 @@ void Game::clear()
     bombs.clear();
     softWalls.clear();
     explosions.clear();
-    powerUps.clear();
     gameTick = 0;
 }
 
@@ -454,18 +459,18 @@ void Game::level()
         return;
 	}
 
-    int exit = rand() % softWalls.size();                                   // Get random index for exit and powerup in soft wall vector
-	int powerUp = rand() % softWalls.size();
+    int exitIndex = rand() % softWalls.size();                                   // Get random index for exit and powerup in soft wall vector
+	int powerUpIndex = rand() % softWalls.size();
 
-    while (powerUp == exit)                                                 // If they are the same, get a new random
-        powerUp = rand() % softWalls.size();                                // index for powerup until they are different
+    while (powerUpIndex == exitIndex)                                                 // If they are the same, get a new random
+        powerUpIndex = rand() % softWalls.size();                                // index for powerup until they are different
 
-    pods[softWalls[exit].getY()][softWalls[exit].getX()].isExit = true;     // Set selected pod to be exit
-    powerUps.emplace_back(PowerUp(animations.getMisc(), pods,                  // Make a new powerup of random type at the selected powerup position
-        static_cast<PowerUp::Type>(power), softWalls[powerUp].getX(), softWalls[powerUp].getY()));
+    pods[softWalls[exitIndex].getY()][softWalls[exitIndex].getX()].isExit = true;     // Set selected pod to be exit
+    powerUp.emplace(PowerUp(animations.getMisc(), pods,                  // Make a new powerup of random type at the selected powerup position
+        static_cast<PowerUp::Type>(power), softWalls[powerUpIndex].getX(), softWalls[powerUpIndex].getY()));
 
-    cout << "Exit set at: (" << softWalls[exit].getX() << ", " << softWalls[exit].getY() << "), "
-        << "Powerup set at: (" << softWalls[powerUp].getX() << ", " << softWalls[powerUp].getY() << ")\n";
+    cout << "Exit set at: (" << softWalls[exitIndex].getX() << ", " << softWalls[exitIndex].getY() << "), "
+        << "Powerup set at: (" << softWalls[powerUpIndex].getX() << ", " << softWalls[powerUpIndex].getY() << ")\n";
 
     for (int k = 0; k < 8; k++)
     {
@@ -484,5 +489,26 @@ void Game::level()
             enemies.emplace_back(enemy);
             s_enemyCount++;
         }
+    }
+}
+
+Enemy::Type Game::getEnemyType() const
+{
+    if(!powerUp)
+    {
+        cout << "No powerup to get enemy type from\n";
+        return Enemy::Type::Ballom;     // Default enemy type if no powerup, should never be used
+	}
+
+    switch (powerUp->getType())
+    {
+    case PowerUp::Type::ExtraBomb:	return Enemy::Type::Ballom;
+    case PowerUp::Type::ExtraRange:	return Enemy::Type::Onil;
+    case PowerUp::Type::Skate:		return Enemy::Type::Dahl;
+    case PowerUp::Type::WallPhase:	return Enemy::Type::Minvo;
+    case PowerUp::Type::Remote:		return Enemy::Type::Doria;
+    case PowerUp::Type::BombPhase:	return Enemy::Type::Ovape;
+    case PowerUp::Type::FireShield:	return Enemy::Type::Pass;
+    case PowerUp::Type::Invincible:	return Enemy::Type::Pontan;
     }
 }
