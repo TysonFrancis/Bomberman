@@ -15,6 +15,7 @@ window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window wit
 {
     srand((static_cast<unsigned>(time(nullptr))));
 
+    // Start title music
     audio.getMusic("title").play();
 	audio.getMusic("title").setVolume(50);
     audio.getMusic("title").setLooping(true);
@@ -44,7 +45,6 @@ window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window wit
         {
             bool isInnerWall = col % 2 == 0 && row % 2 == 0;
             bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
-            //bool isSoft = (rand() % 4 == 0) && (row > 2 || col > 2); // Can't spawn in top 2 x 2 by player
 
             if (isInnerWall || isBorder)
             {
@@ -203,7 +203,7 @@ void Game::update()
         // Wait until audio finishes
         if (audio.getStatus("roundStart") == sf::SoundSource::Status::Stopped)
         {
-            for (Text* text : textObjects)
+			for (Text* text : textObjects)      // Clean up text objects after round start audio finishes
                 delete text;
             textObjects.clear();
 
@@ -219,7 +219,7 @@ void Game::update()
     case(GameState::Transition):
 		audio.getMusic(song).stop();
 
-        if (!levelTransition)
+        if (!levelTransition)       // To prevent restarting audio and text every frame while on round start screen
         {
             audio.playSound("stageClear");
             textObjects.emplace_back(new Text("stage clear", _centerScreen));
@@ -228,9 +228,10 @@ void Game::update()
             level();
         }
 
+		// Wait until audio finishes
         if(audio.getStatus("stageClear") == sf::SoundSource::Status::Stopped)
         {
-            for (auto* text : textObjects)
+			for (auto* text : textObjects)      // Clean up text objects after transition audio finishes
                 delete text;
             textObjects.clear();
 
@@ -243,20 +244,21 @@ void Game::update()
     case (GameState::GameOver):
 		audio.getMusic(song).stop();
 
-		if (!levelTransition)
+		if (!levelTransition)       // To prevent restarting audio and text every frame while on game over screen
         {
             audio.playSound("gameOver");
 			textObjects.emplace_back(new Text("game over", _centerScreen));
 			levelTransition = true;
         }
 
+		// Wait until audio finishes
         if (audio.getStatus("gameOver") == sf::SoundSource::Status::Stopped)
         {
-            for (Text* text : textObjects)
+			for (Text* text : textObjects)      // Clean up text objects after game over audio finishes
                 delete text;
             textObjects.clear();
 
-			gameOver = true;
+			gameOver = true;        // For screen displaye after audio
         }
         break;
     }

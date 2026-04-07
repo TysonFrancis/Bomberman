@@ -75,7 +75,7 @@ private:
 	sf::RenderWindow window;
 
 	int enemyPresets[8][50] = {};
-	int powerupPresets[50] = {};
+	int powerupPresets[50] = {1,0,4,2,0,0,1,4,5,3,0,0,4,5,1,3,0,5,0,4,5,4,0,4,3,7,1,0,4,6,3,0,4,7,5,6,4,1,3,7,4,3,5,4,7,3,5,4,6,7};
 
 	int gameTick;
 	int score;
