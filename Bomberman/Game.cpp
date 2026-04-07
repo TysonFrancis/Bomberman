@@ -11,13 +11,14 @@ bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber entit
 window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
     "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     gameTick(0), score(0), streak(0), combo(0), enemyType(0),   // Set misc values to 0
-	stage(0), levelTransition(false)
+	stage(0), levelTransition(false), gameOver(false)
 {
     srand((static_cast<unsigned>(time(nullptr))));
 
     audio.getMusic("title").play();
 	audio.getMusic("title").setVolume(50);
     audio.getMusic("title").setLooping(true);
+	song = "title";
 
     // Set window icon and framerate
     window.setIcon(animations.getIcon());
@@ -148,8 +149,9 @@ void Game::update()
         {
             explosions[i].update();
 
-            if (explosions[i].intersects(bomber))
-                bomber.die();
+            if(!bomber.hasFireShield())
+                if (explosions[i].intersects(bomber))
+                    bomber.die();
 
             for (Enemy& enemy : enemies)
                 if (explosions[i].intersects(enemy))
@@ -201,20 +203,21 @@ void Game::update()
         // Wait until audio finishes
         if (audio.getStatus("roundStart") == sf::SoundSource::Status::Stopped)
         {
-            for (auto* text : textObjects)
+            for (Text* text : textObjects)
                 delete text;
             textObjects.clear();
 
             s_gameState = GameState::Playing;
 			audio.getMusic("main").play();
 			audio.getMusic("main").setLooping(true);
+			song = "main";
             levelTransition = false;
         }
 
         break;
 
     case(GameState::Transition):
-		audio.getMusic("main").stop();
+		audio.getMusic(song).stop();
 
         if (!levelTransition)
         {
@@ -235,6 +238,26 @@ void Game::update()
             levelTransition = false;
 		}
 
+        break;
+
+    case (GameState::GameOver):
+		audio.getMusic(song).stop();
+
+		if (!levelTransition)
+        {
+            audio.playSound("gameOver");
+			textObjects.emplace_back(new Text("game over", _centerScreen));
+			levelTransition = true;
+        }
+
+        if (audio.getStatus("gameOver") == sf::SoundSource::Status::Stopped)
+        {
+            for (Text* text : textObjects)
+                delete text;
+            textObjects.clear();
+
+			gameOver = true;
+        }
         break;
     }
 }
@@ -268,6 +291,13 @@ void Game::render()
 
         break;
 
+    case(GameState::GameOver):
+        if(gameOver)
+        {
+            window.draw(endTitle);
+            break;
+        }
+        [[fallthrough]];
     case(GameState::RoundStart):
 	case(GameState::Transition):
         for (Text* text : textObjects)
@@ -277,7 +307,6 @@ void Game::render()
         break;
 
     case(GameState::Title):     window.draw(title);     break;
-    case(GameState::GameOver):  window.draw(endTitle);  break;
     }
 
     window.display();
@@ -343,6 +372,9 @@ void Game::clear()
                 pods[row][col].isBomb = pods[row][col].isExit = pods[row][col].isFilled = pods[row][col].isSoft = false;
         }
     }
+
+    bomber.setPosition(1, 1);
+	bomber.setTexture(64, 0);
     enemies.clear();
     bombs.clear();
     softWalls.clear();
@@ -354,7 +386,6 @@ void Game::clear()
 void Game::level()
 {
     cout << "level: " << stage + 1 << "\n";
-    bomber.setPosition(1, 1);
 
     clear();
 
@@ -385,8 +416,14 @@ void Game::level()
         }
     }
 
+    if(softWalls.size() == 0)
+    {
+        cout << "No soft walls to place exit and powerup on\n";
+        return;
+	}
+
     int exit = rand() % softWalls.size();                                   // Get random index for exit and powerup in soft wall vector
-    int powerUp = 0;
+	int powerUp = rand() % softWalls.size();
 
     while (powerUp == exit)                                                 // If they are the same, get a new random
         powerUp = rand() % softWalls.size();                                // index for powerup until they are different
@@ -395,7 +432,7 @@ void Game::level()
     powerUps.emplace_back(PowerUp(animations.getMisc(), pods,                  // Make a new powerup of random type at the selected powerup position
         static_cast<PowerUp::Type>(power), softWalls[powerUp].getX(), softWalls[powerUp].getY()));
 
-    cout << "Exit set at: (" << softWalls[exit].getX() << ", " << softWalls[exit].getY() << ")\n"
+    cout << "Exit set at: (" << softWalls[exit].getX() << ", " << softWalls[exit].getY() << "), "
         << "Powerup set at: (" << softWalls[powerUp].getX() << ", " << softWalls[powerUp].getY() << ")\n";
 
     for (int k = 0; k < 8; k++)
