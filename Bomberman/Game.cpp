@@ -137,8 +137,6 @@ void Game::update()
         // Bomber
         bomber.update();
 
-        
-
         // Enemies
         for (size_t i = 0; i < enemies.size(); i++)
         {
@@ -220,6 +218,10 @@ void Game::update()
                 spawnEnemies(getEnemyType());     // Spawn enemies if powerup is hit by explosion
                 powerUp.reset();                  // Remove powerup if hit by explosion
             }
+
+            // If explosion tile is the exit, spawn enemies
+            if (pods[explosions[i].getY()][explosions[i].getX()].isExit)
+                spawnEnemies(static_cast<Enemy::Type>(stage / 5));
 
 			// Remove explosion if animation is finished
             if (explosions[i].getState() == Entity::State::Dead)

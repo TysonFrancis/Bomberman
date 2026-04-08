@@ -38,7 +38,7 @@ void Player::update()
 
 		// Spawn a bomb
 		if (isKeyPressed(Scancode::Z))
-			if (!pods[tileY][tileX].isFilled && bombs.size() < maxBombs)
+			if (!pods[tileY][tileX].isFilled && bombs.size() < maxBombs && !pods[tileY][tileX].isExit)
 			{
 				pods[tileY][tileX].isFilled = true;
 				pods[tileY][tileX].isBomb = true;
