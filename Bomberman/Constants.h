@@ -30,7 +30,7 @@ namespace Constants
 
 	// Window size
 	static constexpr unsigned int _windowWidth = _cols * _scaledTile;
-	static constexpr unsigned int _windowHeight = _rows * _scaledTile;
+	static constexpr unsigned int _windowHeight = _rows * _scaledTile + 2 * _scaledTile ;
 
 	// Animations
 	static constexpr int _fps = 60;

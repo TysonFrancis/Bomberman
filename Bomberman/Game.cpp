@@ -21,8 +21,13 @@ Game::Game() : background(animations.getBackground()),              // Load back
     levelTransition(false), levelTimerExpired(false),
     gameOver(false), bonus(false)
 {
-    // Seen random number table
+    // Seed random number table
     srand((static_cast<unsigned>(time(nullptr))));
+
+    // Make backdrop for UI display
+    backdrop.setSize(sf::Vector2f(_cols * _scaledTile, 2 * _scaledTile));
+    backdrop.setFillColor(sf::Color(189, 190, 189));
+    backdrop.setPosition(sf::Vector2f(0, _rows * _scaledTile));
 
     // Start title music
     audio.getMusic("title").play();
@@ -382,6 +387,8 @@ void Game::render()
     case(GameState::Playing):
     case(GameState::Death):
         window.draw(background);
+
+        window.draw(backdrop);
 
         if (powerUp)
             window.draw(powerUp->getSprite());
