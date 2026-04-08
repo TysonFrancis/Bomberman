@@ -1,18 +1,27 @@
 #include "Game.h"
+
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+
 #include <iostream>
+#include <cstdlib>      // For srand and rand
+#include <ctime>        // For time
+#include <algorithm>    // For std::min
 
 using namespace Constants;
-
 using std::cout, std::endl;
 
-Game::Game() : title(animations.getTitle()), endTitle(title),   // Load title sprites
-background(animations.getBackground()),                     // Load background sprite
-bomber(animations.getEntities(), pods, bombs, explosions),  // Load bomber entity
-window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window with title and size
-    "Bomberman", sf::Style::Titlebar | sf::Style::Close),
-    gameTick(0), score(0), streak(0), combo(0), enemyType(0),   // Set misc values to 0
-    stage(0), levelTransition(false), gameOver(false), bonus(false)
+Game::Game() : background(animations.getBackground()),              // Load background sprite
+    title(animations.getTitle()), endTitle(animations.getTitle()),  // Load title sprites
+    bomber(animations.getEntities(), pods, bombs, explosions),      // Load bomber entity
+    window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window with title and size
+        "Bomberman", sf::Style::Titlebar | sf::Style::Close),
+    gameState(GameState::Title), gameTick(0), stage(0),             // Set misc values to 0
+    score(0), streak(0), combo(0), enemyType(0),
+    levelTransition(false), levelTimerExpired(false),
+    gameOver(false), bonus(false)
 {
+    // Seen random number table
     srand((static_cast<unsigned>(time(nullptr))));
 
     // Start title music
@@ -53,6 +62,7 @@ window(sf::VideoMode({ _windowWidth, _windowHeight }),      // Create window wit
             }
         }
 
+    // Start level creation
     level();
 }
 
@@ -74,54 +84,71 @@ void Game::events()
     // Close game if window is closed, escape key pressed, or on game over screen and enter pressed
     while (const std::optional event = window.pollEvent())
         if (event->is<sf::Event::Closed>() || sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape) ||
-            s_gameState == GameState::GameOver && sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
+            gameState == GameState::GameOver && sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
             closeGame();
 
     // If on title screen and enter is pressed, start game
-    if (s_gameState == GameState::Title && sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
+    if (gameState == GameState::Title && sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
     {
         audio.getMusic("title").stop();
-        s_gameState = GameState::RoundStart;
+        gameState = GameState::RoundStart;
     }
 
     if (gameTick == _bonusTimer && bonus)                       // End bonus stage after 30 seconds
-        s_gameState = GameState::Transition;
+        gameState = GameState::Transition;
     if (bonus)                                                  // Spawn enemies for bonus stage
     {
         if (stage < 40)                                              // If under 40 increment enemy type
-            spawnEnemies(static_cast<Enemy::Type>(stage / 5));
+            spawnEnemies(static_cast<Enemy::Type>((stage - 5) / 5));
         else                                                        // If 40 or above spawn Pontans
-            spawnEnemies(Enemy::Type::Pontan);
+            spawnEnemies();
     }
-    if (gameTick >= _pontanTimer && !timerExpired)              // Spawn Pontans if past 200 seconds
+    if (gameTick >= _pontanTimer && !levelTimerExpired)         // Spawn Pontans if past 200 seconds
     {
-        timerExpired = true;
-        spawnEnemies(Enemy::Type::Pontan);
+        levelTimerExpired = true;
+        spawnEnemies();
     }
+
+    if (bomber.isDead() && bomber.hasJustDied())            // If bomber just died and is dead,
+    {
+        if (bomber.getLives() > 0)                              // If still has more lives, reset level
+        {
+            gameState = GameState::Death;
+            levelTransition = false;
+        }
+        else                                                    // Else, end game
+            gameState = GameState::GameOver;
+    }
+
+    if (gameState == GameState::Playing &&                  // If bomber is on exit and no enemies, next level
+        bomber.isOnExit() && enemies.size() == 0)
+        gameState = GameState::Transition;
 }
 
 // Sprite updater, calls each sprites update method
 // with current frame and increments frame counter
 void Game::update()
 {
-    switch (s_gameState)
+    switch (gameState)
     {
     case(GameState::Playing):
         gameTick++;
 
-        // Moved enemy spawning items into events method
-
+        // Bomber
         bomber.update();
 
+        
+
+        // Enemies
         for (size_t i = 0; i < enemies.size(); i++)
         {
             enemies[i].update();
 
+            // Kill bomber if intersecting and not a bonus stage
             if (enemies[i].intersects(bomber) && !bonus)
             {
                 levelTransition = (bomber.getLives() > 1);
                 bomber.die();
-
             }
 
             streak -= 1;
@@ -134,7 +161,7 @@ void Game::update()
 
                 enemyType = static_cast<int>(enemies[i].getType());
 
-                switch (enemyType)//Update score when enemy dies
+                switch (enemyType)      // Update score when enemy dies
                 {
                 case 0: case 1: score += (enemyType + 1) * 100 * combo; break;
                 case 2: case 3: score += (enemyType - 1) * 200 * combo; break;
@@ -142,20 +169,21 @@ void Game::update()
                 case 6: case 7: score += (enemyType - 5) * 2000 * combo; break;
                 }
 
-                streak = 20; //Waits 20 frames to check for other deaths
+                streak = 20;            // Waits 20 frames to check for other deaths
 
-                //Display score after death using points
+                                        // Display score after death using points
 
                 enemies.erase(enemies.begin() + i);
-                s_enemyCount--;
                 i--;
             }
         }
 
+        // Bombs
         for (size_t i = 0; i < bombs.size(); i++)
         {
             bombs[i].update();
 
+			// Remove bomb if animation is finished
             if (bombs[i].getState() == Entity::State::Dead)
             {
                 bombs.erase(bombs.begin() + i);
@@ -163,6 +191,7 @@ void Game::update()
             }
         }
 
+        // Explosions
         for (size_t i = 0; i < explosions.size(); i++)
         {
             explosions[i].update();
@@ -183,16 +212,16 @@ void Game::update()
             // If explosion is colliding with bomb, explode bomb after 3 frames
             for (Bomb& bomb : bombs)
                 if (explosions[i].intersects(bomb) && !bomb.getWillExplode())
-                    bomb.delay();       // Explodes in 3 frames
+                    bomb.delay();       // Explodes in 5 frames
 
             // If explosion is colliding with powerup, spawn enemies and remove powerup
-            if (powerUp && powerUp->getSprite().getGlobalBounds().
-                findIntersection(explosions[i].getSprite().getGlobalBounds()))
+            if (powerUp && powerUp->intersects(explosions[i]))
             {
                 spawnEnemies(getEnemyType());     // Spawn enemies if powerup is hit by explosion
                 powerUp.reset();                  // Remove powerup if hit by explosion
             }
 
+			// Remove explosion if animation is finished
             if (explosions[i].getState() == Entity::State::Dead)
             {
                 explosions.erase(explosions.begin() + i);
@@ -200,10 +229,12 @@ void Game::update()
             }
         }
 
+        // Softwalls
         for (size_t i = 0; i < softWalls.size(); i++)
         {
             softWalls[i].update();
 
+			// Remove soft wall if animation is finished
             if (softWalls[i].getState() == Entity::State::Dead)
             {
                 softWalls.erase(softWalls.begin() + i);
@@ -211,8 +242,8 @@ void Game::update()
             }
         }
 
-        if (powerUp && powerUp->getSprite().getGlobalBounds().
-            findIntersection(bomber.getSprite().getGlobalBounds()))
+        // Powerup
+        if (powerUp && powerUp->intersects(bomber))
         {
             powerUp->applyEffect(bomber);
             cout << *powerUp << "\n";
@@ -222,7 +253,11 @@ void Game::update()
         break;
 
     case(GameState::RoundStart):
-        if (!levelTransition)       // To prevent restarting audio and text every frame while on round start screen
+		// Stop music and play round start audio, display current level,
+        // then wait until audio finishes to start level and music
+        audio.getMusic(song).stop();
+
+        if (!levelTransition)
         {
             audio.playSound("roundStart");
 
@@ -241,22 +276,23 @@ void Game::update()
                 delete text;
             textObjects.clear();
 
-            s_gameState = GameState::Playing;
+            gameState = GameState::Playing;
 
             audio.getMusic("main").play();
             audio.getMusic("main").setLooping(true);
             song = "main";
 
             levelTransition = false;
-            gameTick = 0;
         }
 
         break;
 
     case(GameState::Transition):
+		// Stop music and play stage clear audio, display stage clear,
+        // then wait until audio finishes to start next level and music
         audio.getMusic(song).stop();
 
-        if (!levelTransition)       // To prevent restarting audio and text every frame while on round start screen
+        if (!levelTransition)
         {
             audio.playSound("stageClear");
             textObjects.emplace_back(new Text("stage clear", _centerScreen));
@@ -266,7 +302,7 @@ void Game::update()
                 stage++;
             if (bomber.getLives() < 3)
                 bomber.addLife();
-            if (/*stage != 1 && */stage % 5 == 1 && !bonus)
+            if (stage != 1 && stage % 5 == 1 && !bonus)
             {
                 bonus = true;
                 clear();
@@ -285,16 +321,39 @@ void Game::update()
             if (!bonus)
                 level();
 
-            s_gameState = GameState::RoundStart;
+            gameState = GameState::RoundStart;
             levelTransition = false;
         }
 
         break;
 
-    case (GameState::GameOver):
+	case (GameState::Death):
+        // Stop music and play miss audio, display "you died",
+        // then wait until audio finishes to either restart level or show game over screen
         audio.getMusic(song).stop();
 
-        if (!levelTransition)       // To prevent restarting audio and text every frame while on game over screen
+        if (!levelTransition)
+        {
+            audio.playSound("miss");
+            levelTransition = true;
+        }
+
+        // Wait until audio finishes
+        if (audio.getStatus("miss") == sf::SoundSource::Status::Stopped)
+        {
+            level();
+
+            gameState = GameState::RoundStart;
+            levelTransition = false;
+        }
+		break;
+
+    case (GameState::GameOver):
+		// Stop music and play game over audio, display game over,
+		// then wait until audio finishes to show game over screen
+        audio.getMusic(song).stop();
+
+        if (!levelTransition)
         {
             audio.playSound("gameOver");
             textObjects.emplace_back(new Text("game over", _centerScreen));
@@ -319,9 +378,10 @@ void Game::render()
 {
     window.clear();
 
-    switch (s_gameState)
+    switch (gameState)
     {
     case(GameState::Playing):
+    case(GameState::Death):
         window.draw(background);
 
         if (powerUp)
@@ -344,14 +404,14 @@ void Game::render()
         break;
 
     case(GameState::GameOver):
-        if (gameOver)
+		if (gameOver)                       // If game over audio has finished, show game over screen
         {
             window.draw(endTitle);
             break;
         }
         [[fallthrough]];
-    case(GameState::RoundStart):
-    case(GameState::Transition):
+	case(GameState::RoundStart):            // Display text during music transitions
+    case(GameState::Transition):            // for round start, stage clear, and game over
         for (Text* text : textObjects)
             for (sf::Sprite* glyph : text->sprites)
                 window.draw(*glyph);
@@ -371,6 +431,110 @@ void Game::closeGame()
     window.close();
 }
 
+// Called at the start of each level,
+// clears the map and then fills it
+// with soft walls, an exit, a powerup,
+// and enemies based on the current stage
+void Game::level()
+{
+    clear();
+
+    int walls = stage * 2 + 54;
+    int playable = _softPods;
+    int power = powerupPresets[stage];
+
+    for (int row = 0; row < _rows; row++)
+    {
+        if (walls == 0)         // Need to break out of both loops if no more walls
+            break;
+
+        for (int col = 0; col < _cols; col++)
+        {
+            if (walls == 0)         // Break if no more walls
+                break;
+
+            bool isSoft = (rand() % (playable / walls) == 0) && (row > 2 || col > 2); // Can't spawn in top 2 x 2 by player
+            bool isInnerWall = col % 2 == 0 && row % 2 == 0;
+            bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
+
+            if (!(isInnerWall || isBorder))
+            {
+                if (isSoft)
+                {
+                    pods[row][col].isFilled = true;
+                    pods[row][col].isSoft = true;
+                    softWalls.emplace_back(SoftWall(animations.getEntities(), pods, col, row));
+                    walls--;
+                }
+
+                playable--;
+            }
+        }
+    }
+
+	if (softWalls.size() == 0)          // If no soft walls, can't place exit and powerup, so just return to prevent errors
+    {
+        cout << "No soft walls to place exit and powerup on\n";
+        return;
+    }
+
+    int exitIndex = rand() % softWalls.size();          // Get random index for exit and powerup in soft wall vector
+    int powerUpIndex = rand() % softWalls.size();
+
+    while (powerUpIndex == exitIndex)                       // If they are the same, get a new random
+        powerUpIndex = rand() % softWalls.size();           // index for powerup until they are different
+
+    int x = softWalls[exitIndex].getX();                // Get x and y of selected exit wall
+    int y = softWalls[exitIndex].getY();
+    pods[y][x].isExit = true;                               // Set selected pod to be exit
+    cout << "Exit set at: (" << x << ", " << y << "), ";
+
+	x = softWalls[powerUpIndex].getX();                 // Get x and y of selected powerup wall
+	y = softWalls[powerUpIndex].getY();
+    powerUp.emplace(PowerUp(animations.getMisc(),           // Make a new powerup at the selected powerup position
+        static_cast<PowerUp::Type>(power), x, y));
+    cout << "Powerup set at: (" << x << ", " << y << ")\n";
+
+    for (int enemyType = 0; enemyType < 8; enemyType++)                     // Runs the enemy create loop per enemy type,
+        for (int i = 0; i < enemyPresets[stage % 50][enemyType]; i++)           // for how many of each enemy type to spawn
+        {                                                                       // based on the presets for the current stage
+            Enemy enemy(animations.getEntities(), pods, static_cast<Enemy::Type>(enemyType), bomber);
+            int x, y;
+
+            do
+            {
+                x = rand() % (_cols - 3) + 3;
+                y = rand() % (_rows - 3) + 3;
+            } while (pods[y][x].isFilled);
+
+            enemy.setPosition(x, y);
+            enemies.emplace_back(enemy);
+        }
+}
+
+// Called before each level to reset the
+// map, and get rid of last level's data
+void Game::clear()
+{
+    for (int row = 0; row < _rows; row++)   // Reset all pods not walls or borders to empty
+        for (int col = 0; col < _cols; col++)
+        {
+            bool isInnerWall = col % 2 == 0 && row % 2 == 0;
+            bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
+
+            if (!(isInnerWall || isBorder))
+                pods[row][col].isBomb = pods[row][col].isExit = pods[row][col].isFilled = pods[row][col].isSoft = false;
+        }
+
+	bomber.reset();                         // Reset bomber position and status
+	enemies.clear();                        // Clear all containers of various items
+    bombs.clear();
+    softWalls.clear();
+    explosions.clear();
+	powerUp.reset();
+
+	gameTick = 0;                           // Reset misc values for new level
+}
 
 // Called after a powerup or exit is hit, the pontan
 // timer expires, or on bonus stage, spawns enemies of
@@ -381,14 +545,14 @@ void Game::spawnEnemies(Enemy::Type type)
     int copy = std::min(size, 10);      // Number of enemies needed to copy back to vector
     int spawn = 10 - copy;              // Number of new enemies needed to spawn
 
-    if (timerExpired)                   // If timer expired for Pontans
+    if (levelTimerExpired)              // If timer expired for Pontans
     {
         std::vector<Enemy> newEnemies;
         newEnemies.reserve(10);
 
         for (int i = 0; i < copy; i++)      // For how ever many enemies are currently
         {                                   // alive, replace them with a new Pontan
-            Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
+            Enemy enemy(animations.getEntities(), pods, type, bomber);
             enemy.setPosition(enemies[i].getX(), enemies[i].getY());
 
             newEnemies.emplace_back(enemy);     // Place new enemy in Pontan vector
@@ -396,7 +560,7 @@ void Game::spawnEnemies(Enemy::Type type)
 
         for (int i = 0; i < spawn; i++)     // For how ever many new enemies to make,
         {                                   // place them randomly on the map
-            Enemy enemy(animations.getEntities(), pods, Enemy::Type::Pontan, bomber);
+            Enemy enemy(animations.getEntities(), pods, type, bomber);
             int x, y;
 
             do
@@ -429,105 +593,11 @@ void Game::spawnEnemies(Enemy::Type type)
             enemies.emplace_back(enemy);        // Place new enemy in original vector
         }
     }
-
-    s_enemyCount = enemies.size();      // Re-initialize enemy count
 }
 
-void Game::clear()
-{
-    for (int row = 0; row < _rows; row++)
-    {
-        for (int col = 0; col < _cols; col++)
-        {
-            bool isInnerWall = col % 2 == 0 && row % 2 == 0;
-            bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
-            if (!(isInnerWall || isBorder))
-                pods[row][col].isBomb = pods[row][col].isExit = pods[row][col].isFilled = pods[row][col].isSoft = false;
-        }
-    }
-
-    bomber.setPosition(1, 1);
-    bomber.setTexture(64, 0);
-
-    enemies.clear();
-    bombs.clear();
-    softWalls.clear();
-    explosions.clear();
-    gameTick = 0;
-}
-
-void Game::level()
-{
-    cout << "level: " << stage + 1 << "\n";
-
-    clear();
-
-    int walls = stage * 2 + 54;
-    int playable = _softPods;
-    int power = powerupPresets[stage];
-
-    for (int row = 0; row < _rows; row++)
-    {
-        for (int col = 0; col < _cols; col++)
-        {
-            if (walls == 0)
-                break;
-            bool isSoft = (rand() % (playable / walls) == 0) && (row > 2 || col > 2); // Can't spawn in top 2 x 2 by player
-            bool isInnerWall = col % 2 == 0 && row % 2 == 0;
-            bool isBorder = col == 0 || col == _cols - 1 || row == 0 || row == _rows - 1;
-            if (!(isInnerWall || isBorder))
-            {
-                if (isSoft)
-                {
-                    pods[row][col].isFilled = true;
-                    pods[row][col].isSoft = true;
-                    softWalls.emplace_back(SoftWall(animations.getEntities(), pods, col, row));
-                    walls--;
-                }
-                playable--;
-            }
-        }
-    }
-
-    if (softWalls.size() == 0)
-    {
-        cout << "No soft walls to place exit and powerup on\n";
-        return;
-    }
-
-    int exitIndex = rand() % softWalls.size();                                   // Get random index for exit and powerup in soft wall vector
-    int powerUpIndex = rand() % softWalls.size();
-
-    while (powerUpIndex == exitIndex)                                                 // If they are the same, get a new random
-        powerUpIndex = rand() % softWalls.size();                                // index for powerup until they are different
-
-    pods[softWalls[exitIndex].getY()][softWalls[exitIndex].getX()].isExit = true;     // Set selected pod to be exit
-    powerUp.emplace(PowerUp(animations.getMisc(), pods,                  // Make a new powerup of random type at the selected powerup position
-        static_cast<PowerUp::Type>(power), softWalls[powerUpIndex].getX(), softWalls[powerUpIndex].getY()));
-
-    cout << "Exit set at: (" << softWalls[exitIndex].getX() << ", " << softWalls[exitIndex].getY() << "), "
-        << "Powerup set at: (" << softWalls[powerUpIndex].getX() << ", " << softWalls[powerUpIndex].getY() << ")\n";
-
-    for (int k = 0; k < 8; k++)
-    {
-        for (int i = 0; i < enemyPresets[stage % 50][k]; i++)
-        {
-            Enemy enemy(animations.getEntities(), pods, Enemy::Type(k), bomber);
-            int x, y;
-
-            do
-            {
-                x = rand() % (_cols - 3) + 3;
-                y = rand() % (_rows - 3) + 3;
-            } while (pods[y][x].isFilled);
-
-            enemy.setPosition(x, y);
-            enemies.emplace_back(enemy);
-            s_enemyCount++;
-        }
-    }
-}
-
+// Gets the enemy type to spawn based on
+// the current powerup, used for spawning
+// enemies when a powerup is hit by an explosion
 Enemy::Type Game::getEnemyType() const
 {
     if (!powerUp)
@@ -538,13 +608,13 @@ Enemy::Type Game::getEnemyType() const
 
     switch (powerUp->getType())
     {
-    case PowerUp::Type::ExtraBomb:	return Enemy::Type::Ballom;
-    case PowerUp::Type::ExtraRange:	return Enemy::Type::Onil;
-    case PowerUp::Type::Skate:		return Enemy::Type::Dahl;
-    case PowerUp::Type::WallPhase:	return Enemy::Type::Minvo;
-    case PowerUp::Type::Remote:		return Enemy::Type::Doria;
-    case PowerUp::Type::BombPhase:	return Enemy::Type::Ovape;
-    case PowerUp::Type::FireShield:	return Enemy::Type::Pass;
-    case PowerUp::Type::Invincible:	return Enemy::Type::Pontan;
+    case PowerUp::Type::ExtraBomb:  return Enemy::Type::Ballom;
+    case PowerUp::Type::ExtraRange: return Enemy::Type::Onil;
+    case PowerUp::Type::Skate:      return Enemy::Type::Dahl;
+    case PowerUp::Type::WallPhase:  return Enemy::Type::Minvo;
+    case PowerUp::Type::Remote:     return Enemy::Type::Doria;
+    case PowerUp::Type::BombPhase:  return Enemy::Type::Ovape;
+    case PowerUp::Type::FireShield: return Enemy::Type::Pass;
+    case PowerUp::Type::Invincible: return Enemy::Type::Pontan;
     }
 }

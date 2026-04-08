@@ -1,19 +1,22 @@
 #include "Player.h"
-#include "Game.h"
+#include "Bomb.h"
+#include "Explosion.h"
+#include "Pod.h"
 #include <iostream>
 
 using namespace Constants;
 using namespace sf::Keyboard;
-
 using std::cout, std::endl;
 
 Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
 		Entity(tex, pods), bombs(bombs), explosions(explosions),
-		speed(_playerSpeed * _speedScale), joyX(0), joyY(0),
-		lives(3), blast(3), maxBombs(5), remote(false),
+		speed(_playerSpeed * _speedScale),
+		joyX(0), joyY(0), lives(3),
+		blast(3), maxBombs(5), wait(0), remote(false),
 		isFireShield(false), isInvincible(false),
-		wallPhase(false), bombPhase(false)
+		wallPhase(false), bombPhase(false),
+		justDied(false)
 {
 	setTexture(64, 0);
 	setPosition(1, 1);
@@ -21,12 +24,6 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 
 void Player::update()
 {
-	// If on exit tile and all enemies are dead, or fully dead end game
-	if (pods[tileY][tileX].isExit && Game::s_enemyCount == 0)
-		Game::s_gameState = GameState::Transition;
-	if(lives <= 0 && myTick >= _fps)
-		Game::s_gameState = GameState::GameOver;
-
 	if (state == State::Living)
 	{
 		// Update tile position based on current world position
@@ -53,24 +50,8 @@ void Player::update()
 			wait--;
 		if ((isKeyPressed(Scancode::X)) && remote && bombs.size() > 0 && wait == 0)
 		{
-			bombs[0].explode();
+			bombs[0].die();
 			wait = 10;
-		}
-	}
-
-	// Handles respwawning if player dies but has lives left,
-	// otherwise waits for animation to finish and fully die
-	if(state == State::Dead)
-	{
-		if(lives != 0)
-			lives--;
-
-		if(lives > 0)
-		{
-			state = State::Living;
-			setTexture(64, 0);
-			setPosition(1, 1);
-			Game::s_gameState = GameState::Transition;
 		}
 	}
 
@@ -79,16 +60,16 @@ void Player::update()
 
 void Player::animate()
 {
-	myTick++;
+	tick++;
 
-	if (myTick % _playerTickSpeed != 0)
+	if (tick % _playerTickSpeed != 0)			// Leave method if not time to update frame yet
 		return;
 
-	if (state == State::Living)								// Alive animations
+	if (state == State::Living)					// Alive animations
 	{
-		if (joyX != 0 || joyY != 0)				// Only update texture if moving
+		if (joyX != 0 || joyY != 0)					// Only update texture if moving
 		{
-			myFrame = (myFrame + 1) % _moveFrames;		// Loop through frames for walking animation
+			frame = (frame + 1) % _moveFrames;			// Loop through frames for walking animation
 
 			// Texture offsets. Irrelevant to movement or input axes
 			int xOffset = 0, yOffset = 0;
@@ -104,21 +85,21 @@ void Player::animate()
 				yOffset = 16;
 
 			// Apply selected texture
-			setTexture(myFrame * _tileSize + xOffset, yOffset);
+			setTexture(frame * _tileSize + xOffset, yOffset);
 		}
 
 		return;
 	}
 	
-	if (state == State::Dying)				// Death animation
+	if (state == State::Dying)					// Death animation
 	{
-		if (myFrame < _playerDeathFrames)		// Keep incrementing frame until finished with death animation
+		if (frame < _playerDeathFrames)				// Keep incrementing frame until finished with death animation
 		{
-			myFrame++;
-			setTexture(myFrame * _tileSize, _playerDeathY);
+			frame++;
+			setTexture(frame * _tileSize, _playerDeathY);
 		}
 
-		if (myFrame >= _playerDeathFrames)		// Once animation is finished, fully die
+		if (frame >= _playerDeathFrames)		// Once animation is finished, fully die
 			state = State::Dead;
 	}
 }
@@ -129,35 +110,56 @@ void Player::die()
 		return;
 
 	state = State::Dying;
-	myFrame = myTick = 0;
-	tileX = tileY = 1;
-	
+	frame = tick = 0;
+	lives--;
+
+	justDied = true;
 }
 
-void Player::extraBomb()		{ if(maxBombs < 9)	maxBombs++; }
-void Player::extraRange()		{ if(blast < 4)		blast++; }
-void Player::giveRemote()		{ remote = true; }
-void Player::giveSkate()		{ speed *= (1.5f * _speedScale); }
-void Player::phaseWalls()		{ wallPhase = true; }
-void Player::phaseBombs()		{ bombPhase = true; }
-void Player::shieldFire()		{ isFireShield = true; }
-void Player::invincible()		{ isInvincible = true; }
+void Player::reset()
+{
+	state = State::Living;
 
-int Player::getLives() const	{ return lives; }
-void Player::addLife()			{ lives++; }
+	setTexture(64, 0);
+	setPosition(1, 1);
+
+	frame = tick = 0;
+	tileX = tileY = 1;
+	joyX = joyY = 0;
+	justDied = false;
+}
+
+void Player::extraBomb()				{ if(maxBombs < 9)	maxBombs++; }
+void Player::extraRange()				{ if(blast < 4)		blast++; }
+void Player::giveRemote()				{ remote = true; }
+void Player::giveSkate()				{ speed *= (1.5f * _speedScale); }
+void Player::phaseWalls()				{ wallPhase = true; }
+void Player::phaseBombs()				{ bombPhase = true; }
+void Player::shieldFire()				{ isFireShield = true; }
+void Player::invincible()				{ isInvincible = true; }
+
+bool Player::hasFireShield() const		{ return isFireShield; }
+bool Player::hasInvincible() const		{ return isInvincible; }
+
+int Player::getLives() const			{ return lives; }
+void Player::addLife()					{ lives++; }
+
+bool Player::isOnExit() const			{ return pods[tileY][tileX].isExit; }
+bool Player::isDead() const				{ return state == State::Dead; }
+bool Player::hasJustDied()
+{
+	if (justDied)
+	{
+		justDied = false;
+		return true;
+	}
+
+	return false;
+}
 
 
 // *** Private helper methods *** //
 
-// Gets stuck on corners real bad if walking into them,
-// but works decently well otherwise compared to old system
-//
-// This switch is good to separate pod into not rendering textures
-// and messing with tile types and what not... makes bomb and softwall
-// animations exponentially easier but it seems the collision isn't as sound
-// 
-// Also need to work on centering player in square when
-// moving, probably the cause of a lot of the jittering					- Dylan
 void Player::moveLogic()
 {
 	int nextX = tileX + joyX;			// Calculate next tile position based on input to avoid 
@@ -359,7 +361,7 @@ std::ostream& operator<<(std::ostream& out, const Player& player)
 {
 	out /*<< "Position: (" << player.tileX << ", " << player.tileY << ')'
 		<< "\tJoyX: " << player.joyX << "\tJoyY : " << player.joyY*/
-		<< "\tTick: " << player.myTick << "\tFrame: " << player.myFrame
+		<< "\tTick: " << player.tick << "\tFrame: " << player.frame
 		<< "\tLives: " << player.lives;
 	out << "\n";
 

@@ -5,7 +5,7 @@ using namespace Constants;
 Entity::Entity(const sf::Texture& tex, Pod(&pods)[_rows][_cols]) :
 	sprite(tex), pods(pods),
 	state(State::Living), dir(Facing::None),
-	myTick(0), myFrame(0),
+	tick(0), frame(0),
 	tileX(0), tileY(0)
 {
 	setOrigin(_halfTile, _halfTile);
@@ -29,8 +29,9 @@ void Entity::draw(sf::RenderTarget& target,
 
 bool Entity::intersects(const Entity& other) const
 {
-	return this->sprite.getGlobalBounds().findIntersection(other.sprite.getGlobalBounds())
-		&& this->state == State::Living && other.state == State::Living;
+	return this->sprite.getGlobalBounds().findIntersection
+		(other.sprite.getGlobalBounds()).has_value() &&
+		this->state == State::Living && other.state == State::Living;
 }
 
 // Takes in coordinates of the pod to check, and creates an sf::FloatRect
@@ -58,8 +59,8 @@ Entity& Entity::operator=(const Entity& other)
 		state = other.state;
 		dir = other.dir;
 
-		myTick = other.myTick;
-		myFrame = other.myFrame;
+		tick = other.tick;
+		frame = other.frame;
 
 		tileX = other.tileX;
 		tileY = other.tileY;

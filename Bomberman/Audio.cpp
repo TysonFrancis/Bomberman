@@ -1,5 +1,6 @@
 #include "Audio.h"
 #include <iostream>
+#include <stdexcept>
 
 Audio::Audio()
 {
@@ -24,7 +25,7 @@ Audio::Audio()
 	music["specialPowerUp"] = &specialPowerUpMusic;
 	music["ending"] = &endingMusic;
 
-    struct SoundFile { std::string name, path; };           // Struct to hold sound name and path for easier loading
+    struct SoundFile { std::string name, file; };           // Struct to hold sound name and path for easier loading
 
 	SoundFile sounds[] =                                    // List of sound effects to load with name corrosponding to file path
     {
@@ -37,8 +38,8 @@ Audio::Audio()
     for (SoundFile& sound : sounds)                         // For each sound in array
     {
         sf::SoundBuffer buffer;                                 // Make a default buffer
-		if (!buffer.loadFromFile(sound.path))                       // Load sound into buffer
-            std::cerr << "Failed to load \"" << sound.path << "\"!\n";
+		if (!buffer.loadFromFile(sound.file))                       // Load sound into buffer
+            std::cerr << "Failed to load \"" << sound.file << "\"!\n";
 		else                                                        // Add buffer to map with corrosponding name
             buffers[sound.name] = buffer;
     }
@@ -71,6 +72,7 @@ sf::Music& Audio::getMusic(const std::string& name)
 {
 	if (music.find(name) != music.end())                 // Check if the music exists
 		return *music.find(name)->second;							// Return the music
+
 	throw std::runtime_error("Music \"" + name + "\" not found!");			// Throw error if music doesn't exist
 }
 

@@ -1,8 +1,14 @@
 #pragma once
 #include "Entity.h"
 #include "Constants.h"
-#include "Pod.h"
-#include "player.h"
+
+class Player;
+class Pod;
+
+/*
+	Enemy class, represents all enemy types, distiguished by enum Type.
+	Has different movement patterns and speed based on type.
+*/
 
 class Enemy : public Entity
 {

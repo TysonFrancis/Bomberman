@@ -1,23 +1,19 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-
-#include "Pod.h"
 #include "Constants.h"
 
-/*
-	Entity class, parent to Player, Enemy, Bomb, SoftWall, and
-	Explosion, anything that needs applied textures and life states.
-	Holds their sprite, game pod system, position, animation items,
-	and other information. Has getters for neccessary data members,
-	as well as overridden SFML methods for code cleanliness.
+class Pod;
 
-	Constructor accepts a texture for the sprite, and a 2D pod array.
+/*
+	Entity class, parent to Player, Enemy,
+	Bomb, SoftWall, and Explosion, anything
+	that needs applied textures and life states.
 */
 
 class Entity : public sf::Drawable
 {
 public:
-	enum class State { Living, Dying, Dead, Exit };
+	enum class State { Living, Dying, Dead };
 	enum class Facing { Up, Down, Left, Right, None };
 
 	Entity(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols]);
@@ -48,8 +44,8 @@ protected:
 	State state;
 	Facing dir;
 
-	int myTick;
-	int myFrame;
+	int tick;
+	int frame;
 
 	int tileX, tileY;
 };

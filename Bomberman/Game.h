@@ -1,47 +1,33 @@
 #pragma once
 #include <vector>
+#include <optional>
 #include <SFML/Graphics.hpp>
 
 #include "Animations.h"
 #include "Audio.h"
-#include "Entity.h"
-#include "Player.h"
 #include "Bomb.h"
-#include "Enemy.h"
-#include "Pod.h"
-#include "SoftWall.h"
-#include "Explosion.h"
 #include "Constants.h"
-#include "Text.h"
+#include "Enemy.h"
+#include "Explosion.h"
+#include "Player.h"
+#include "Pod.h"
 #include "PowerUp.h"
+#include "SoftWall.h"
+#include "Text.h"
 
 /*
-	Main class handling game logic and display,
-	has all necessary items for sfml viewing and
-	different sprites. Methods to run the game loop,
-	handle events, update sprites, and render the sprites.
-	Destructs game at window close and/or game win or lose.
-	GameState enum to determine what to update and render.
+	Game class, handles all game logic, displaying, and events.
+	Is the base of the game, holding all necessary items for playing.
 */
-
-enum class GameState { Title, RoundStart, Transition, Playing, GameOver };
 
 class Game
 {
 public:
+	enum class GameState { Title, RoundStart, Transition, Death, Playing, GameOver };
+
 	Game();
 
 	void run();
-
-	// For player to be able to access and change
-	// game state if say player dies or finds exit,
-	// also prefixed with s_ to know its static
-	inline static GameState s_gameState = GameState::Title;
-
-	// For player to be able to know when enemy count
-	// reaches 0 without passing vector as parameter,
-	// for checking if can end the level
-	inline static int s_enemyCount = 0;
 
 private:
 	void events();
@@ -49,10 +35,9 @@ private:
 	void render();
 	void closeGame();
 
-	void spawnEnemies(Enemy::Type);
 	void level();
 	void clear();
-
+	void spawnEnemies(Enemy::Type = Enemy::Type::Pontan);
 	Enemy::Type getEnemyType() const;
 
 	Animations animations;
@@ -71,11 +56,27 @@ private:
 
 	Audio audio;
 
+	sf::Sprite background;
 	sf::Sprite title;
 	sf::Sprite endTitle;
-	sf::Sprite background;
 
 	sf::RenderWindow window;
+
+	GameState gameState;
+	int gameTick;
+	int stage;
+
+	int score;
+	int streak;
+	int combo;
+	int enemyType;
+
+	bool levelTransition;
+	bool levelTimerExpired;
+	bool gameOver;
+	bool bonus;
+
+	const char* song;		// To know which song to stop when level change or game over
 
 	// Each number or vector represents the type of powerup
 	// or enemy to spawn for each level, for 50 levels
@@ -105,18 +106,4 @@ private:
 		{0,0,1,1,1,3,3,0}, {0,0,0,1,1,3,5,0}, {0,0,0,1,1,2,5,0}, {0,0,0,1,1,2,6,0}, {0,0,0,0,2,2,5,0},
 		{0,0,0,0,2,2,5,0}, {0,0,0,0,2,2,5,0}, {0,0,0,0,1,2,6,1}, {0,0,0,0,2,1,6,1}, {0,0,0,0,2,1,5,2}
 	};
-
-	int gameTick;
-	int score;
-	int streak; //Checks if the player has killed enemies in quick sucession
-	int combo;
-	int enemyType;
-
-	int stage;
-	bool levelTransition;
-	bool timerExpired;
-	bool gameOver;
-	bool bonus;
-
-	const char* song;		// To know which song to stop when level change or game over
 };

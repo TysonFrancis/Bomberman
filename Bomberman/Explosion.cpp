@@ -1,9 +1,7 @@
 #include "Explosion.h"
-
 #include <iostream>
 
 using namespace Constants;
-
 using std::cout, std::endl;
 
 Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
@@ -18,8 +16,7 @@ Explosion::Explosion(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 
 void Explosion::update()
 {
-	//cout << *this;
-	if (myTick >= _explosionTickSpeed * 6)		// If been living for 7 or more frames
+	if (tick >= _explosionTickSpeed * 6)		// If been living for 7 or more frames
 		die();
 
 	animate();
@@ -27,51 +24,38 @@ void Explosion::update()
 
 void Explosion::animate()
 {
-	myTick++;
+	tick++;
 
-	if (myTick % _explosionTickSpeed != 0)
+	if (tick % _explosionTickSpeed != 0)			// Leave method if not time to update frame yet
 		return;
 
 	if (state == State::Living)
 	{
-		myFrame += shrink ? -1 : 1;
+		frame += shrink ? -1 : 1;
 
-		if (myFrame <= 0)							// If at smallest size, enlarge
-		{
-			//myFrame = 0;
-			shrink = false;
-		}
-
-		else if (myFrame >= _explosionFrames - 1)	// If at largest size, shrink
-		{
-			//myFrame = 3;
-			shrink = true;
-		}
-
-		if (myFrame > 1)				// If frame advances past 1, switch to second row explosions
-			row = 2;
-		if (myFrame < 2 && shrink)		// If frame is less than 2 and it should get smaller, switch to first row
-			row = 1;
-
-		if (myFrame < 0 || myFrame >= _explosionFrames)
-		{
-			//cout << "Explosion frame OOB: " << myFrame << "\n";
+		if (frame < 0 || frame >= _explosionFrames)		// If frame is out of bounds, leave method
 			return;
-		}
+
+		if (frame <= 0)							// If at smallest size, enlarge
+			shrink = false;
+		else if (frame >= _explosionFrames - 1)	// If at largest size, shrink
+			shrink = true;
+
+		if (frame > 1)				// If frame advances past 1, switch to second row explosions
+			row = 2;
+		if (frame < 2 && shrink)		// If frame is less than 2 and it should get smaller, switch to first row
+			row = 1;
 
 		setTexture();
 
 		return;
 	}
 
-	if (myFrame <= 0 && state == State::Dying)
+	if (frame <= 0 && state == State::Dying)
 		state = State::Dead;
 }
 
-void Explosion::die()
-{
-	state = State::Dying;
-}
+void Explosion::die() { state = State::Dying; }
 
 
 // *** Private helper method *** //
@@ -82,12 +66,12 @@ void Explosion::setTexture()
 	int leftX, rightX, baseX, upY, downY, baseY;
 
 	// Base location setup
-	baseX = myFrame * _explosionOffset + _explosionStartX;
+	baseX = frame * _explosionOffset + _explosionStartX;
 	baseY = _explosionStartY;
 
 	if (row >= 2)					// If on row two,
 	{									// offset the frame count by 2 for BaseX + move down baseY
-		baseX = (myFrame - 2) * _explosionOffset + _explosionStartX;
+		baseX = (frame - 2) * _explosionOffset + _explosionStartX;
 		baseY += _explosionOffset;
 	}
 
@@ -113,9 +97,6 @@ void Explosion::setTexture()
 	case Facing::Right:	Entity::setTexture(rightX, baseY);	break;
 	case Facing::None:	Entity::setTexture(baseX,  baseY);	break;
 	}
-
-	/*if(dir == Facing::None)
-		cout << "\tbaseX: " << baseX << "\tbaseY: " << baseY << "\t";*/
 }
 
 
@@ -126,7 +107,7 @@ std::ostream& operator<<(std::ostream& out, const Explosion& explosion)
 	if(explosion.dir == Entity::Facing::None)
 	{
 		out << "Position: (" << explosion.tileX << ", " << explosion.tileY << ")\t"
-			<< "frame: " << explosion.myFrame << "\trow: " << explosion.row
+			<< "frame: " << explosion.frame << "\trow: " << explosion.row
 			<< "\tshrink: " << std::boolalpha << explosion.shrink;
 			/* << "\tend: " << (explosion.end ? "true" : "false")
 			<< "\tstate: ";

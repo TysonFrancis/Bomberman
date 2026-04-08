@@ -1,6 +1,15 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+/*
+	Constants namespace to hold all repeated values
+	for the game, such as window size, animation speeds,
+	and other values that are used in multiple places.
+
+	This is to avoid magic numbers and make it
+	easier to change values in one place if needed.
+*/
+
 namespace Constants
 {
 	// Array definition
@@ -37,7 +46,6 @@ namespace Constants
 	static constexpr int _enemyStartY = 240;
 	static constexpr int _enemyColorDeathX = 112;
 	static constexpr int _enemyColorDeathFrames = 4;
-	static constexpr float _enemyBaseSpeedScale = _playerSpeed * _speedScale;
 	static constexpr int _enemyTickSpeed = 10;
 																	// Explosions
 	static constexpr int _explosionOffset = 80;
@@ -50,6 +58,7 @@ namespace Constants
 	static constexpr int _bombY = 48;
 	static constexpr int _bombTickSpeed = 15;
 	static constexpr int _bombFrames = 3;
+	static constexpr int _bombDelay = 5;
 	static constexpr float _bombTimer = 2.5f;
 																	// SoftWalls
 	static constexpr int _softWallX = 64;
@@ -57,17 +66,17 @@ namespace Constants
 	static constexpr int _softWallDeathFrames = 6;
 	static constexpr int _wallTickSpeed = 6;
 																	// Misc
-	static constexpr int _exitX = 176;
+	static constexpr int _exitX = 176;										// Exit
 	static constexpr int _exitY = 48;
 
-	static constexpr int _arrowX = 80;
+	static constexpr int _arrowX = 80;										// Letters
 	static constexpr int _numberY = 248;
 	static constexpr int _letterY = 256;
 
-	static constexpr int _bonusTimer = _fps * 30;
+	static constexpr int _bonusTimer = _fps * 30;							// Timers
 	static constexpr int _pontanTimer = _fps * 200;
 
-	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });
+	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });			// Size vectors
 	static constexpr sf::Vector2i _letterTile({ _halfTile, _halfTile });
 
 	static constexpr sf::Vector2f _centerScreen({ _windowWidth / 2.f, _windowHeight / 2.f });

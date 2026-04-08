@@ -1,20 +1,15 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-
 #include "Entity.h"
-#include "Pod.h"
-#include "Bomb.h"
-#include "Explosion.h"
 #include "Constants.h"
 
-/*
-	Player class that extends entity and its protected
-	member variables, with added player specific ones.
-	Representing the bomber and its movement,
-	collision, and other neccessary items.
+class Bomb;
+class Explosion;
+class Pod;
 
-	Constructor takes in a texture and 2D pod array to
-	pass to entity, as well as Bomb and Explosion vectors.
+/*
+	Player class, represents moveable character
+	controlled by person, can place bombs, use
+	powerups and is killed by enemies and explosions.
 */
 
 class Player : public Entity
@@ -27,6 +22,8 @@ public:
 	void animate();
 	void die();
 
+	void reset();
+
 	void extraBomb();
 	void extraRange();
 	void giveRemote();
@@ -36,11 +33,15 @@ public:
 	void shieldFire();
 	void invincible();
 
+	bool hasFireShield() const;
+	bool hasInvincible() const;
+
 	int getLives() const;
 	void addLife();
 
-	bool hasFireShield() const { return isFireShield; }
-	bool hasInvincible() const { return isInvincible; }
+	bool isOnExit() const;
+	bool isDead() const;
+	bool hasJustDied();
 
 	friend std::ostream& operator<<(std::ostream&, const Player&);
 	Player& operator=(const Player&);
@@ -59,11 +60,13 @@ private:
 
 	int blast;		// Used to determine blast radius of bombs
 	int maxBombs;	// Used to determine how many bombs player can have out at once
+	int wait;		// Delay between exploding bombs
 	bool remote;	// Used to determine if player has remote control powerup, default false
-	int wait = 0;	// Delay between exploding bombs
 
 	bool isFireShield;
 	bool isInvincible;
 	bool wallPhase;
 	bool bombPhase;
+
+	bool justDied;		// Used to determine if player just died, for checking if can respawn or should fully die
 };

@@ -1,6 +1,11 @@
 #pragma once
 #include <iosfwd> // To allow for friend ostream operator<< without including iostream in this header
 
+/*
+	Pod class, holds information about each tile
+	in the game, used primarily for collision checks.
+*/
+
 class Pod
 {
 public:

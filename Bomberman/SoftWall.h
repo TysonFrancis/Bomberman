@@ -1,9 +1,14 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-
 #include "Entity.h"
-#include "Pod.h"
 #include "Constants.h"
+
+class Pod;
+
+/*
+	SoftWall class, represents
+	the destructable walls in game,
+	and break when hit by an explosion.
+*/
 
 class SoftWall : public Entity
 {

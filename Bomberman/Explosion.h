@@ -1,9 +1,14 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-
 #include "Entity.h"
-#include "Pod.h"
 #include "Constants.h"
+
+class Pod;
+
+/*
+	Explosion class, handles explosion animation and logic.
+	Created when a bomb explodes, has a short lifespan and then dies.
+	Can damage player and enemies, and destroy soft walls.
+*/
 
 class Explosion : public Entity
 {

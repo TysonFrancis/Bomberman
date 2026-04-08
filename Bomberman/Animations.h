@@ -2,9 +2,10 @@
 #include <SFML/Graphics.hpp>
 
 /*
-	Texture and image handler class, loads in all items and sets
-	them in appropriate containers. Has getter methods for each
-	separate spritesheet as well as game console icon.
+	Animations class, used to load in all textures
+	and images for the game, and access them.
+
+	Spritesheet positioning below:
 
 	Entity frames are 16 x 16 unless otherwise noted:
 

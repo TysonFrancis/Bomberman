@@ -1,8 +1,9 @@
 #include "Enemy.h"
+#include "Player.h"
+#include "Pod.h"
 #include <iostream>
 
 using namespace Constants;
-
 using std::cout, std::endl;
 
 Enemy::Enemy(const sf::Texture& tex, Pod(&pods)[_rows][_cols], Type input, Player(&play)) :
@@ -23,18 +24,6 @@ Enemy::Enemy(const sf::Texture& tex, Pod(&pods)[_rows][_cols], Type input, Playe
 	case Type::Pontan:	speed = 2.5f * _speedScale;	eratic = 5;		break;
 	}
 
-	/*switch (type)
-	{
-	case Type::Ballom:	speed = _enemyBaseSpeedScale * 0.8f;	eratic = 11;	break;
-	case Type::Onil:	speed = _enemyBaseSpeedScale;			eratic = 5;		break;
-	case Type::Dahl:	speed = _enemyBaseSpeedScale;			eratic = 5;		break;
-	case Type::Minvo:	speed = _enemyBaseSpeedScale * 1.25f;	eratic = 4;		break;
-	case Type::Doria:	speed = _enemyBaseSpeedScale * 0.5f;	eratic = 11;	break;
-	case Type::Ovape:	speed = _enemyBaseSpeedScale * 0.8f;	eratic = 9;		break;
-	case Type::Pass:	speed = _enemyBaseSpeedScale * 1.25f;	eratic = 3;		break;
-	case Type::Pontan:	speed = _enemyBaseSpeedScale * 1.25f;	eratic = 5;		break;
-	}*/
-
 	setTexture(0, enemyFrameYPos);		// Set texture based on enum Type
 	changeDirection(false);
 }
@@ -53,14 +42,14 @@ void Enemy::update()
 
 		switch (type)
 		{
-		case Type::Ballom:  randomMove(false);					break;  // Ballom, random movement
-		case Type::Onil:    chasePlayer(false, true, false);	break;  // Onil,   chases player if seen on y axis
-		case Type::Dahl:    chasePlayer(true, false, false);	break;  // Dahl,   chases player if seen on X axis
-		case Type::Minvo:   chasePlayer(true, true, false);		break;  // Minvo,  chases player if seen on either axis
-		case Type::Doria:   chasePlayer(true, true, true);		break;  // Doria,  chases, avoids bombs, moves through soft blocks
-		case Type::Ovape:   randomMove(true);					break;  // Ovape,  random movement, moves through soft blocks
-		case Type::Pass:    chasePlayer(true, true, true);		break;	// Pass,   always chases if encountered, changes direction at most junctions
-		case Type::Pontan:	chasePlayer(true, true, true);		break;  // Pontan, alwyays chases, moves through soft blocks
+		case Type::Ballom:  randomMove(false);					break;  // Ballom,	random movement
+		case Type::Onil:    chasePlayer(false, true, false);	break;  // Onil,	chases player if seen on y axis
+		case Type::Dahl:    chasePlayer(true, false, false);	break;  // Dahl,	chases player if seen on X axis
+		case Type::Minvo:   chasePlayer(true, true, false);		break;  // Minvo,	chases player if seen on either axis
+		case Type::Doria:   chasePlayer(true, true, true);		break;  // Doria,	chases, avoids bombs, moves through soft blocks
+		case Type::Ovape:   randomMove(true);					break;  // Ovape,	random movement, moves through soft blocks
+		case Type::Pass:    chasePlayer(true, true, true);		break;	// Pass,	always chases if encountered, changes direction at most junctions
+		case Type::Pontan:	chasePlayer(true, true, true);		break;  // Pontan,	alwyays chases, moves through soft blocks
 		}
 	}
 
@@ -69,9 +58,9 @@ void Enemy::update()
 
 void Enemy::animate()
 {
-	myTick++;
+	tick++;
 
-	if (myTick % _enemyTickSpeed != 0)
+	if (tick % _enemyTickSpeed != 0)
 		return;
 
 	if (dir == Facing::Left || dir == Facing::Right)
@@ -83,31 +72,31 @@ void Enemy::animate()
 	{
 		if(type == Type::Pontan)					// Pontan has 4 walk frames and doesn't care about
 		{											// last direction facing, logic has to be separate
-			myFrame = (myFrame + 1) % (_moveFrames + 1);
+			frame = (frame + 1) % (_moveFrames + 1);
 
-			setTexture(myFrame * _tileSize, enemyFrameYPos);
+			setTexture(frame * _tileSize, enemyFrameYPos);
 			return;
 		}
 
-		myFrame = (myFrame + 1) % _moveFrames;		// Loop through frames for walking animation
+		frame = (frame + 1) % _moveFrames;		// Loop through frames for walking animation
 
 		if (facing == Facing::Left)
-			setTexture(myFrame * _tileSize + _enemyLeftX, enemyFrameYPos);
+			setTexture(frame * _tileSize + _enemyLeftX, enemyFrameYPos);
 		else
-			setTexture(myFrame * _tileSize, enemyFrameYPos);
+			setTexture(frame * _tileSize, enemyFrameYPos);
 
 		return;
 	}
 
 	if (state == State::Dying)				// If dying,
 	{
-		if (myTick < _fps)						// Don't continue with death animation until after 1 second
+		if (tick < _fps)						// Don't continue with death animation until after 1 second
 			return;
 
-		if (myFrame < _enemyColorDeathFrames)	// Keep incrementing frame until finished with death animation
-			myFrame++;
+		if (frame < _enemyColorDeathFrames)		// Keep incrementing frame until finished with death animation
+			frame++;
 
-		if (myFrame >= _enemyColorDeathFrames)	// Once animation is finished, fully die
+		if (frame >= _enemyColorDeathFrames)	// Once animation is finished, fully die
 			state = State::Dead;
 
 		int deathRow = _enemyStartY;				// Deafault to pink death row
@@ -116,7 +105,7 @@ void Enemy::animate()
 		else if (type == Type::Dahl || type == Type::Ovape)
 			deathRow += 32;							// Set to purple death row
 
-		setTexture(myFrame * _tileSize + _enemyColorDeathX, deathRow);
+		setTexture(frame * _tileSize + _enemyColorDeathX, deathRow);
 	}
 }
 
@@ -126,7 +115,7 @@ void Enemy::die()
 		return;
 
 	state = State::Dying;
-	myFrame = myTick = 0;
+	frame = tick = 0;
 	setTexture(_enemyDeathX, enemyFrameYPos);
 }
 

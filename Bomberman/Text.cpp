@@ -1,7 +1,8 @@
 #include "Text.h"
+#include <iostream>
 
 using namespace Constants;
-
+using std::string;
 
 // Overload shenanigans
 Text::Text(string text, sf::Vector2f position, int align, bool isBlack)

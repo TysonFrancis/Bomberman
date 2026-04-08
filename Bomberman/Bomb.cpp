@@ -1,17 +1,17 @@
 #include "Bomb.h"
-
+#include "Explosion.h"
+#include "Pod.h"
 #include <iostream>
 
 using namespace Constants;
-
 using std::cout, std::endl;
 
 Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 	std::vector<Explosion>& explosions, bool timer, int d, int x, int y) :
-		Entity(tex, pods), explosions(explosions),
-		remote(timer), distance(d), shrink(false), now(0)
+		Entity(tex, pods), explosions(explosions), distance(d),
+		remote(timer), shrink(false), now(0), willExplode(false)
 {
-	myFrame = 2;
+	frame = 2;
 
 	setTexture(32, 48);
 	setPosition(x, y);
@@ -19,90 +19,67 @@ Bomb::Bomb(const sf::Texture& tex, Pod(&pods)[_rows][_cols],
 
 void Bomb::update()
 {
-	if (myTick >= _fps * _bombTimer && !remote)	// If 2.5 seconds and no remote explode
-		explode();
-	if (willExplode && now + 5 <= myTick)
-		explode();
+	if (tick >= _fps * _bombTimer && !remote)	// If 2.5 seconds and no remote explode
+		die();
+	if (willExplode && now + _bombDelay <= tick)
+		die();
 
 	animate();
 }
 
 void Bomb::animate()
 {
-	myTick++;
+	tick++;
 
-	if (myTick % _bombTickSpeed != 0)
+	if (tick % _bombTickSpeed != 0)
 		return;
 
 	if (state == State::Living)					// Alive animations
 	{
-		myFrame += shrink ? 1 : -1;
+		frame += shrink ? 1 : -1;
 
-		if (myFrame <= 0)							// If at largest size, shrink
-		{
-			//myFrame = 0;
-			shrink = true;
-		}
-		else if (myFrame >= _bombFrames - 1)		// If at smallest size, enlarge
-		{
-			//myFrame = _bombFrames - 1;
-			shrink = false;
-		}
-
-		if (myFrame < 0 || myFrame >= _bombFrames)
-		{
-			//cout << "Bomb frame OOB: " << myFrame << "\n";
+		if (frame < 0 || frame >= _bombFrames)	// If frame out of bounds leave method
 			return;
-		}
 
-		setTexture(myFrame * _tileSize, _bombY);
+		if (frame <= 0)							// If at largest size, shrink
+			shrink = true;
+		else if (frame >= _bombFrames - 1)		// If at smallest size, enlarge
+			shrink = false;
+
+		setTexture(frame * _tileSize, _bombY);
 
 		return;
 	}
 
 	// Death animation
-	if (myFrame <= _bombFrames)						// Keep incrementing frame until finished with death animation
+	if (frame <= _bombFrames)						// Keep incrementing frame until finished with death animation
 	{
-		myFrame++;
-		setTexture(myFrame * _tileSize, _bombY);
+		frame++;
+		setTexture(frame * _tileSize, _bombY);
 	}
 }
 
-void Bomb::delay()
-{
-	willExplode = true;
-	now = myTick;
-}
-
-bool Bomb::getWillExplode()
-{
-	return willExplode;
-}
-
-
-void Bomb::explode()
+void Bomb::die()
 {
 	state = State::Dead;
 	pods[tileY][tileX].isFilled = false;
 	pods[tileY][tileX].isBomb = false;
-	myFrame = myTick = 0;
+	frame = tick = 0;
 	explosions.emplace_back(Explosion(sprite.getTexture(), pods, tileX, tileY, dir, false));
 
-	// Need to make better selection than this for direction	- D
-	dir = Facing::Up;
-	propogate(0, -1);		// Checks up
-	dir = Facing::Down;
-	propogate(0, 1);		// Checks down
-	dir = Facing::Left;
-	propogate(-1, 0);		// Checks left
-	dir = Facing::Right;
-	propogate(1, 0);		// Checks right
+	propogate(0, -1, Facing::Up);		// Checks up
+	propogate(0, 1, Facing::Down);		// Checks down
+	propogate(-1, 0, Facing::Left);		// Checks left
+	propogate(1, 0, Facing::Right);		// Checks right
 }
+
+void Bomb::delay()					{ willExplode = true; now = tick; }
+bool Bomb::getWillExplode() const	{ return willExplode; }
 
 
 // *** Private helper method *** //
 
-void Bomb::propogate(int xDir, int yDir)
+void Bomb::propogate(int xDir, int yDir, Facing dir)
 {
 	for (int d = 1; d <= distance; d++)
 	{
@@ -120,10 +97,6 @@ void Bomb::propogate(int xDir, int yDir)
 				explosions.emplace_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
 			else									// Else, spawn interior explosion
 				explosions.emplace_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
-			/*for (int i = 0; i < explosions.size(); i++)
-			{
-				if(explosions[i].tileX==Xpos)
-			}*/
 			continue;								// Skip to next iteration
 		}
 
@@ -150,7 +123,7 @@ void Bomb::propogate(int xDir, int yDir)
 std::ostream& operator<<(std::ostream& os, const Bomb& bomb)
 {
 	return os << "Position: (" << bomb.tileX << ", " << bomb.tileY << ")\t"
-		<< "frame: " << bomb.myFrame << "\n";
+		<< "frame: " << bomb.frame << "\n";
 }
 
 Bomb& Bomb::operator=(const Bomb& other)

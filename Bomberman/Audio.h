@@ -1,8 +1,14 @@
+#pragma once
 #include <SFML/Audio.hpp>
 #include <unordered_map>
 #include <string>
 #include <vector>
-#pragma once
+
+/*
+	Game audio class, holds all music
+	and sound effects for the game,
+	and has methods to play them.
+*/
 
 class Audio
 {

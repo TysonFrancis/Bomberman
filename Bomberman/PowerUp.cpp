@@ -1,8 +1,9 @@
 #include "PowerUp.h"
+#include "Player.h"
 
 using namespace Constants;
 
-PowerUp::PowerUp(const sf::Texture& tex, Pod(&pods)[Constants::_rows][Constants::_cols], Type input, int x, int y) :
+PowerUp::PowerUp(const sf::Texture& tex, Type input, int x, int y) :
 	sprite(tex), type(input)
 {
 	sprite.setTextureRect(sf::IntRect({ static_cast<int>(type) * _tileSize, 0 }, _tile));
@@ -26,10 +27,16 @@ void PowerUp::applyEffect(Player& bomber)
 	}
 }
 
+bool PowerUp::intersects(const Entity& entity) const
+{
+	return sprite.getGlobalBounds().findIntersection(entity.getSprite().getGlobalBounds()).has_value();
+}
+
 sf::Sprite& PowerUp::getSprite()		{ return sprite; }
 PowerUp::Type PowerUp::getType() const	{ return type; }
 
-// *** Public debugging method *** //
+
+// *** Public debugging methods *** //
 
 std::ostream& operator<<(std::ostream& out, const PowerUp& powerUp)
 {

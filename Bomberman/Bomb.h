@@ -1,10 +1,15 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-
 #include "Entity.h"
-#include "Pod.h"
-#include "Explosion.h"
 #include "Constants.h"
+
+class Explosion;
+class Pod;
+
+/*
+	Bomb class, handles bombanimation and explosion propogation.
+	Created when player spawns a bomb,
+	has a short lifespan and then explodes.
+*/
 
 class Bomb : public Entity
 {
@@ -14,22 +19,21 @@ public:
 
 	void update();
 	void animate();
-	void explode();
-	void delay();
+	void die();
 
-	bool getWillExplode();
+	void delay();
+	bool getWillExplode() const;
 
 	friend std::ostream& operator<<(std::ostream&, const Bomb&);
 	Bomb& operator=(const Bomb&);
 private:
-	void propogate(int, int);
+	void propogate(int, int, Facing);
 
 	std::vector<Explosion>& explosions;
 
 	int distance;
-	bool remote; // Checks if player has remote power up
+	bool remote;		// Checks if player has remote power up
 	bool shrink;
-	int now; // Used to delay explosion 
-
-	bool willExplode = false; //Used to delay explosion 
+	int now;			// Used to delay explosion 
+	bool willExplode;
 };
