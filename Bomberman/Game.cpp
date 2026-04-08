@@ -147,10 +147,7 @@ void Game::update()
 
             // Kill bomber if intersecting and not a bonus stage
             if (enemies[i].intersects(bomber) && !bonus)
-            {
-                levelTransition = (bomber.getLives() > 1);
                 bomber.die();
-            }
 
             streak -= 1;
             if (enemies[i].getState() == Entity::State::Dead)
@@ -200,10 +197,7 @@ void Game::update()
             // If bomber doesn't have fire shield and is colliding with explosion, die
             if (!bomber.hasFireShield())
                 if (explosions[i].intersects(bomber) && !bonus)
-                {
-                    levelTransition = (bomber.getLives() > 1);
                     bomber.die();
-                }
 
             // If explosion is colliding with enemy, kill enemy
             for (Enemy& enemy : enemies)
@@ -307,7 +301,7 @@ void Game::update()
                 stage++;
             if (bomber.getLives() < 3)
                 bomber.addLife();
-            if (stage != 1 && stage % 5 == 1 && !bonus)
+            if (stage != 1 && stage % 5 == 0 && !bonus)
             {
                 bonus = true;
                 clear();
@@ -446,7 +440,6 @@ void Game::level()
 
     int walls = stage * 2 + 54;
     int playable = _softPods;
-    int power = powerupPresets[stage];
 
     for (int row = 0; row < _rows; row++)
     {
@@ -497,7 +490,7 @@ void Game::level()
 	x = softWalls[powerUpIndex].getX();                 // Get x and y of selected powerup wall
 	y = softWalls[powerUpIndex].getY();
     powerUp.emplace(PowerUp(animations.getMisc(),           // Make a new powerup at the selected powerup position
-        static_cast<PowerUp::Type>(power), x, y));
+        static_cast<PowerUp::Type>(powerupPresets[stage]), x, y));
     cout << "Powerup set at: (" << x << ", " << y << ")\n";
 
     for (int enemyType = 0; enemyType < 8; enemyType++)                     // Runs the enemy create loop per enemy type,
