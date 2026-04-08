@@ -98,7 +98,7 @@ void Game::events()
         gameState = GameState::Transition;
     if (bonus)                                                  // Spawn enemies for bonus stage
     {
-        if (stage < 40)                                              // If under 40 increment enemy type
+        if (stage < 40)                                             // If under 40 increment enemy type
             spawnEnemies(static_cast<Enemy::Type>((stage - 5) / 5));
         else                                                        // If 40 or above spawn Pontans
             spawnEnemies();
@@ -117,7 +117,10 @@ void Game::events()
             levelTransition = false;
         }
         else                                                    // Else, end game
+        {
             gameState = GameState::GameOver;
+            levelTransition = false;
+        }
     }
 
     if (gameState == GameState::Playing &&                  // If bomber is on exit and no enemies, next level
@@ -221,7 +224,7 @@ void Game::update()
 
             // If explosion tile is the exit, spawn enemies
             if (pods[explosions[i].getY()][explosions[i].getX()].isExit)
-                spawnEnemies(static_cast<Enemy::Type>(stage / 5));
+                spawnEnemies(static_cast<Enemy::Type>(powerupPresets[stage]));
 
 			// Remove explosion if animation is finished
             if (explosions[i].getState() == Entity::State::Dead)
