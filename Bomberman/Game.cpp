@@ -16,6 +16,8 @@ Game::Game() : background(animations.getBackground()),              // Load back
     bomber(animations.getEntities(), pods, bombs, explosions),      // Load bomber entity
     window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
+    world(window.getDefaultView()), UI(window.getDefaultView()),    // Set view blocks
+    panel(animations.getMisc()),                                    // Load information panel
     gameState(GameState::Title), gameTick(0), stage(0),             // Set misc values to 0
     score(0), streak(0), combo(0), enemyType(0),
     levelTransition(false), levelTimerExpired(false),
@@ -24,10 +26,8 @@ Game::Game() : background(animations.getBackground()),              // Load back
     // Seed random number table
     srand((static_cast<unsigned>(time(nullptr))));
 
-    // Make backdrop for UI display
-    backdrop.setSize(sf::Vector2f(_cols * _scaledTile, 2 * _scaledTile));
-    backdrop.setFillColor(sf::Color(189, 190, 189));
-    backdrop.setPosition(sf::Vector2f(0, _rows * _scaledTile));
+    // Move the world view down 2 tiles
+    world.move(sf::Vector2f(0, -2 * _scaledTile));
 
     // Start title music
     audio.getMusic("title").play();
@@ -250,6 +250,7 @@ void Game::update()
         if (powerUp && powerUp->intersects(bomber))
         {
             powerUp->applyEffect(bomber);
+            panel.updatePowerUp(powerUp->getType());
             cout << *powerUp << "\n";
             powerUp.reset();
         }
@@ -386,9 +387,9 @@ void Game::render()
     {
     case(GameState::Playing):
     case(GameState::Death):
-        window.draw(background);
+        window.setView(world);
 
-        window.draw(backdrop);
+        window.draw(background);
 
         if (powerUp)
             window.draw(powerUp->getSprite());
@@ -406,6 +407,10 @@ void Game::render()
 
         for (Enemy& enemy : enemies)
             window.draw(enemy);
+
+        window.setView(UI);
+
+        window.draw(panel);
 
         break;
 

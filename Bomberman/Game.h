@@ -9,6 +9,7 @@
 #include "Constants.h"
 #include "Enemy.h"
 #include "Explosion.h"
+#include "InfoPanel.h"
 #include "Player.h"
 #include "Pod.h"
 #include "PowerUp.h"
@@ -61,9 +62,8 @@ private:
 	sf::Sprite endTitle;
 
 	sf::RenderWindow window;
-	sf::RectangleShape backdrop;
-
-	// Make display items grayscale i.e. (125, 125, 125)
+	sf::View world, UI;
+	InfoPanel panel;
 
 	GameState gameState;
 	int gameTick;
