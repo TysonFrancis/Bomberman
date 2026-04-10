@@ -28,10 +28,13 @@ public:
 	Text(std::string, sf::Vector2f, bool);
 	~Text();
 
+	void edit(Text&, const std::string&, bool = false);
+
 	std::vector<sf::Sprite*> sprites;
 
 private:
 	void construct(std::string, sf::Vector2f, int, bool);
 
 	sf::Texture texture;
+	sf::Vector2f position;
 };

@@ -1,4 +1,5 @@
 #include "InfoPanel.h"
+#include "Game.h"
 
 using namespace Constants;
 
@@ -19,6 +20,20 @@ InfoPanel::InfoPanel(const sf::Texture& tex)
         sprite.setScale(sf::Vector2f(_scale, _scale));
         sprite.setPosition(sf::Vector2f(_windowWidth * 0.6f + i * _scaledTile, _halfScaled));
     }
+
+    texts.emplace_back(new Text("time " + std::to_string(Game::s_gameSeconds), sf::Vector2f(_windowWidth * 0.15f, _halfScaled), true));
+    texts.emplace_back(new Text("score " + std::to_string(0), sf::Vector2f(_windowWidth * 0.35f, _halfScaled), true));
+}
+
+InfoPanel::~InfoPanel()
+{
+    for (Text* text : texts)      // Clean up text objects after game is finished
+        delete text;
+}
+
+void InfoPanel::update()
+{
+    texts[0]->edit(*texts[0], std::to_string(Game::s_gameSeconds), true);
 }
 
 // Make powerup true color when collected
@@ -32,5 +47,7 @@ void InfoPanel::draw(sf::RenderTarget& target, sf::RenderStates states) const
     for (auto& sprite : powerUps)       // Draw powerups on top
         target.draw(sprite);
 
-                                        // Draw other info items
+    for (Text* text : texts)
+        for (sf::Sprite* glyph : text->sprites)
+            target.draw(*glyph);
 }

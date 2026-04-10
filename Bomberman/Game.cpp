@@ -142,6 +142,9 @@ void Game::update()
     case(GameState::Playing):
         gameTick++;
 
+        if(gameTick % _fps == 0)
+            s_gameSeconds--;
+        cout << s_gameSeconds << "\n";
         // Bomber
         bomber.update();
 
@@ -254,6 +257,8 @@ void Game::update()
             cout << *powerUp << "\n";
             powerUp.reset();
         }
+
+        panel.update();
 
         break;
 
@@ -544,6 +549,7 @@ void Game::clear()
 	powerUp.reset();
 
 	gameTick = 0;                           // Reset misc values for new level
+    levelTimerExpired = false;
 }
 
 // Called after a powerup or exit is hit, the pontan
