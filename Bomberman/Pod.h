@@ -9,10 +9,10 @@
 class Pod
 {
 public:
-	Pod() : isFilled(false), isHard(false),
+	Pod() : isFilled(false), isHard(false), isDying(false),
 		isSoft(false), isBomb(false), isExit(false) {}
 
-	bool isFilled, isHard, isSoft, isBomb, isExit;
+	bool isFilled, isHard, isSoft, isBomb, isExit, isDying;
 
 	friend std::ostream& operator<<(std::ostream&, const Pod&);
 };

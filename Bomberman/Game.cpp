@@ -239,6 +239,15 @@ void Game::update()
         // Softwalls
         for (size_t i = 0; i < softWalls.size(); i++)
         {
+            if (pods[softWalls[i].getY()][softWalls[i].getX()].isDying)
+            {
+                pods[softWalls[i].getY()][softWalls[i].getX()].isDying = false;
+                pods[softWalls[i].getY()][softWalls[i].getX()].isSoft = false;
+                pods[softWalls[i].getY()][softWalls[i].getX()].isFilled = false;
+                if (softWalls[i].isOnSameTile(bomber))
+                    bomber.die();
+            }
+
             softWalls[i].update();
 
 			// Remove soft wall if animation is finished

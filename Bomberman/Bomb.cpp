@@ -102,8 +102,7 @@ void Bomb::propogate(int xDir, int yDir, Facing dir)
 
 		else if (pods[yPos][xPos].isSoft)			// If a soft wall is in the way,
 		{
-			pods[yPos][xPos].isFilled = false;
-			pods[yPos][xPos].isSoft = false;
+			pods[yPos][xPos].isDying = true;
 			break;								// Since loop continues if empty, if it reaches this point, it
 												// means it's a soft wall that was just destroyed, so exit loop
 		}
