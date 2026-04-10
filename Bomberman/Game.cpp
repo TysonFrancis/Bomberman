@@ -154,7 +154,7 @@ void Game::update()
             enemies[i].update();
 
             // Kill bomber if intersecting and not a bonus stage
-            if (enemies[i].getX()==bomber.getX()&&enemies[i].getY()==bomber.getY() && !bonus)
+            if (enemies[i].isOnSameTile(bomber) && !bonus)
                 bomber.die();
 
             streak -= 1;
@@ -204,12 +204,12 @@ void Game::update()
 
             // If bomber doesn't have fire shield and is colliding with explosion, die
             if (!bomber.hasFireShield())
-                if (explosions[i].getX() == bomber.getX() && explosions[i].getY() == bomber.getY() && !bonus)
+                if (explosions[i].isOnSameTile(bomber) && !bonus)
                     bomber.die();
 
             // If explosion is colliding with enemy, kill enemy
             for (Enemy& enemy : enemies)
-                if (explosions[i].getX() == bomber.getX() && explosions[i].getY() == bomber.getY())
+                if (explosions[i].isOnSameTile(bomber) == bomber.getY())
                     enemy.die();
 
             // If explosion is colliding with bomb, explode bomb after 3 frames

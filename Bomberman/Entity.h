@@ -31,6 +31,7 @@ public:
 	void setTexture(int, int);
 	void draw(sf::RenderTarget&, sf::RenderStates) const override;
 
+	bool isOnSameTile(const Entity&) const;
 	bool intersects(const Entity&) const;
 	bool intersects(int, int) const;
 

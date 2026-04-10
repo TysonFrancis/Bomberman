@@ -27,6 +27,11 @@ void Entity::setTexture(int x, int y)				{ sprite.setTextureRect(sf::IntRect(sf:
 void Entity::draw(sf::RenderTarget& target,
 				sf::RenderStates states) const		{ target.draw(sprite, states); }
 
+bool Entity::isOnSameTile(const Entity& other) const
+{
+	return this->getX() == other.getX() && this->getY() == other.getY();
+}
+
 bool Entity::intersects(const Entity& other) const
 {
 	return this->sprite.getGlobalBounds().findIntersection
