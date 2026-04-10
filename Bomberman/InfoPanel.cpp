@@ -1,6 +1,6 @@
 #include "InfoPanel.h"
 #include "Game.h"
-
+#include <format>
 using namespace Constants;
 
 InfoPanel::InfoPanel(const sf::Texture& tex)
@@ -33,7 +33,17 @@ InfoPanel::~InfoPanel()
 
 void InfoPanel::update()
 {
-    texts[0]->edit(*texts[0], std::to_string(Game::s_gameSeconds), true);
+    double num = Game::s_gameSeconds * 10 + 1;
+    if (num > 1)
+    {
+        num /= 10000;
+        std::string bingo = std::to_string(num);
+        bingo.erase(0, 2);
+        bingo.erase(3);
+        texts[0]->edit(*texts[0], bingo, true);
+    }
+    else
+        texts[0]->edit(*texts[0], "000", true);
 }
 
 // Make powerup true color when collected
