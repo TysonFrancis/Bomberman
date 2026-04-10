@@ -30,7 +30,7 @@ public:
 
 	void run();
 
-	inline static int s_gameSeconds = 105;
+	inline static int s_gameSeconds = Constants::_pontanTimer/Constants::_fps;
 
 private:
 	void events();

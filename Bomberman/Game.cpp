@@ -209,7 +209,7 @@ void Game::update()
 
             // If explosion is colliding with enemy, kill enemy
             for (Enemy& enemy : enemies)
-                if (explosions[i].isOnSameTile(bomber) == bomber.getY())
+                if (explosions[i].isOnSameTile(enemy))
                     enemy.die();
 
             // If explosion is colliding with bomb, explode bomb after 3 frames
@@ -548,6 +548,7 @@ void Game::clear()
     explosions.clear();
 	powerUp.reset();
 
+    s_gameSeconds = _pontanTimer/_fps;
 	gameTick = 0;                           // Reset misc values for new level
     levelTimerExpired = false;
 }
