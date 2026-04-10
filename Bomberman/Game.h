@@ -61,6 +61,9 @@ private:
 	sf::Sprite endTitle;
 
 	sf::RenderWindow window;
+	sf::RectangleShape backdrop;
+
+	// Make display items grayscale i.e. (125, 125, 125)
 
 	GameState gameState;
 	int gameTick;

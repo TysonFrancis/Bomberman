@@ -21,8 +21,13 @@ Game::Game() : background(animations.getBackground()),              // Load back
     levelTransition(false), levelTimerExpired(false),
     gameOver(false), bonus(false)
 {
-    // Seen random number table
+    // Seed random number table
     srand((static_cast<unsigned>(time(nullptr))));
+
+    // Make backdrop for UI display
+    backdrop.setSize(sf::Vector2f(_cols * _scaledTile, 2 * _scaledTile));
+    backdrop.setFillColor(sf::Color(189, 190, 189));
+    backdrop.setPosition(sf::Vector2f(0, _rows * _scaledTile));
 
     // Start title music
     audio.getMusic("title").play();
@@ -98,7 +103,7 @@ void Game::events()
         gameState = GameState::Transition;
     if (bonus)                                                  // Spawn enemies for bonus stage
     {
-        if (stage < 40)                                              // If under 40 increment enemy type
+        if (stage < 40)                                             // If under 40 increment enemy type
             spawnEnemies(static_cast<Enemy::Type>((stage - 5) / 5));
         else                                                        // If 40 or above spawn Pontans
             spawnEnemies();
@@ -117,7 +122,10 @@ void Game::events()
             levelTransition = false;
         }
         else                                                    // Else, end game
+        {
             gameState = GameState::GameOver;
+            levelTransition = false;
+        }
     }
 
     if (gameState == GameState::Playing &&                  // If bomber is on exit and no enemies, next level
@@ -144,10 +152,7 @@ void Game::update()
 
             // Kill bomber if intersecting and not a bonus stage
             if (enemies[i].intersects(bomber) && !bonus)
-            {
-                levelTransition = (bomber.getLives() > 1);
                 bomber.die();
-            }
 
             streak -= 1;
             if (enemies[i].getState() == Entity::State::Dead)
@@ -197,10 +202,7 @@ void Game::update()
             // If bomber doesn't have fire shield and is colliding with explosion, die
             if (!bomber.hasFireShield())
                 if (explosions[i].intersects(bomber) && !bonus)
-                {
-                    levelTransition = (bomber.getLives() > 1);
                     bomber.die();
-                }
 
             // If explosion is colliding with enemy, kill enemy
             for (Enemy& enemy : enemies)
@@ -221,7 +223,7 @@ void Game::update()
 
             // If explosion tile is the exit, spawn enemies
             if (pods[explosions[i].getY()][explosions[i].getX()].isExit)
-                spawnEnemies(static_cast<Enemy::Type>(stage / 5));
+                spawnEnemies(static_cast<Enemy::Type>(powerupPresets[stage]));
 
 			// Remove explosion if animation is finished
             if (explosions[i].getState() == Entity::State::Dead)
@@ -304,7 +306,7 @@ void Game::update()
                 stage++;
             if (bomber.getLives() < 3)
                 bomber.addLife();
-            if (stage != 1 && stage % 5 == 1 && !bonus)
+            if (stage != 1 && stage % 5 == 0 && !bonus)
             {
                 bonus = true;
                 clear();
@@ -386,6 +388,8 @@ void Game::render()
     case(GameState::Death):
         window.draw(background);
 
+        window.draw(backdrop);
+
         if (powerUp)
             window.draw(powerUp->getSprite());
 
@@ -443,7 +447,6 @@ void Game::level()
 
     int walls = stage * 2 + 54;
     int playable = _softPods;
-    int power = powerupPresets[stage];
 
     for (int row = 0; row < _rows; row++)
     {
@@ -494,7 +497,7 @@ void Game::level()
 	x = softWalls[powerUpIndex].getX();                 // Get x and y of selected powerup wall
 	y = softWalls[powerUpIndex].getY();
     powerUp.emplace(PowerUp(animations.getMisc(),           // Make a new powerup at the selected powerup position
-        static_cast<PowerUp::Type>(power), x, y));
+        static_cast<PowerUp::Type>(powerupPresets[stage]), x, y));
     cout << "Powerup set at: (" << x << ", " << y << ")\n";
 
     for (int enemyType = 0; enemyType < 8; enemyType++)                     // Runs the enemy create loop per enemy type,
