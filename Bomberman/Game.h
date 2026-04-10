@@ -30,6 +30,8 @@ public:
 
 	void run();
 
+	inline static int s_gameSeconds = 105;
+
 private:
 	void events();
 	void update();
