@@ -166,15 +166,16 @@ void Game::update()
 
                 switch (enemyType)      // Update score when enemy dies
                 {
-                case 0: case 1: score += (enemyType + 1) * 100 * combo; break;
-                case 2: case 3: score += (enemyType - 1) * 200 * combo; break;
-                case 4: case 5: score += (enemyType - 3) * 1000 * combo; break;
-                case 6: case 7: score += (enemyType - 5) * 2000 * combo; break;
+                case 0: case 1: point = (enemyType + 1) * 100 * combo; break;
+                case 2: case 3: point = (enemyType - 1) * 200 * combo; break;
+                case 4: case 5: point = (enemyType - 3) * 1000 * combo; break;
+                case 6: case 7: point = (enemyType - 5) * 2000 * combo; break;
                 }
-
+                
+                score += point;
                 streak = 20;            // Waits 20 frames to check for other deaths
 
-                                        // Display score after death using points
+                points.push_back(Points(animations.getEntities(), pods, point, enemies[i].getX(), enemies[i].getY()));                      // Display score after death using points
 
                 enemies.erase(enemies.begin() + i);
                 i--;
@@ -242,6 +243,18 @@ void Game::update()
             if (softWalls[i].getState() == Entity::State::Dead)
             {
                 softWalls.erase(softWalls.begin() + i);
+                i--;
+            }
+        }
+
+        //Points
+        for (size_t i = 0; i < points.size(); i++)
+        {
+            points[i].update();
+
+            if (points[i].getState() == Entity::State::Dead)
+            {
+                points.erase(points.begin() + i);
                 i--;
             }
         }
@@ -406,6 +419,9 @@ void Game::render()
 
         for (Enemy& enemy : enemies)
             window.draw(enemy);
+
+        for (Points& point : points)
+            window.draw(point);
 
         break;
 

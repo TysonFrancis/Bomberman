@@ -11,6 +11,7 @@
 #include "Explosion.h"
 #include "Player.h"
 #include "Pod.h"
+#include "Points.h"
 #include "PowerUp.h"
 #include "SoftWall.h"
 #include "Text.h"
@@ -48,6 +49,7 @@ private:
 	std::vector<Bomb> bombs;
 	std::vector<Explosion> explosions;
 	std::vector<SoftWall> softWalls;
+	std::vector<Points> points;
 	std::optional<PowerUp> powerUp;
 
 	std::vector<Text*> textObjects;
@@ -73,6 +75,7 @@ private:
 	int streak;
 	int combo;
 	int enemyType;
+	int point;
 
 	bool levelTransition;
 	bool levelTimerExpired;

@@ -26,6 +26,9 @@ public:
 	friend std::ostream& operator<<(std::ostream&, const Enemy&);
 	Enemy& operator=(const Enemy&);
 
+	int getX() { return tileX; }
+	int getY() { return tileY; }
+
 private:
 	void randomMove(bool);
 	void chasePlayer(bool, bool, bool);
