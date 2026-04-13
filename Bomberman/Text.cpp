@@ -17,11 +17,51 @@ Text::Text(string text, sf::Vector2f position, bool isBlack)
 	construct(text, position, 0, isBlack);
 }
 
-
-// Actual construct code
-void Text::construct(string text, sf::Vector2f position, int align, bool isBlack)
+void Text::edit(Text& input, const std::string& text, bool isBlack)
 {
 	sf::Vector2i glyphPosition;
+	//int offset;
+
+	// load texture from file
+	if (!texture.loadFromFile("Textures/Title.png"))
+		std::cerr << "Error loading text glyphs from Title.png!";
+
+	// calculate offset for alignment
+	//offset = _halfScaled * text.size() / 2 * align;
+
+	for (int i = 0; i < text.size(); i++)	// for every character to display
+	{
+		// choose glyph
+		if (text.at(i) > 96 && text.at(i) < 123)				// if letter
+			glyphPosition = { (text.at(i) - 97) * _halfTile, _letterY };			// get glyph from corresponding position
+		else if (text.at(i) > 47 && text.at(i) < 58)			// if number
+			glyphPosition = { (text.at(i) - 48) * _halfTile, _numberY };			// get glyph form corresponding position
+		else if (text.at(i) == 62)								// if '>'
+			glyphPosition = { _arrowX, _numberY };							// get glyph from corresponding position
+		else													// if space (or anything else somehow)
+			glyphPosition = { 0, 0 };								// put a black squre because skipping
+
+		// sprite creation causes too many issues 
+
+		// set color
+		glyphPosition.y += isBlack * _tileSize;	// more evil bool math >:D
+
+		// create sprite
+		int index = sprites.size() - text.size() + i;
+		
+		sprites[index]->setTextureRect({ glyphPosition, _letterTile });
+
+		// position sprite
+		sprites.at(i)->setPosition({ position.x + i * _halfScaled, position.y });
+	}
+}
+
+
+// Actual construct code
+void Text::construct(string text, sf::Vector2f pos, int align, bool isBlack)
+{
+	sf::Vector2i glyphPosition;
+	position = pos;
 	int offset;
 
 	// load texture from file

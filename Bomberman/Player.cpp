@@ -15,7 +15,7 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 		joyX(0), joyY(0), lives(3),
 		blast(3), maxBombs(3), wait(0), remote(false),
 		isFireShield(false), isInvincible(false),
-		wallPhase(false), bombPhase(false),
+		wallPhase(true), bombPhase(false),
 		justDied(false)
 {
 	setTexture(64, 0);

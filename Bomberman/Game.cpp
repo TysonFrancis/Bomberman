@@ -16,6 +16,8 @@ Game::Game() : background(animations.getBackground()),              // Load back
     bomber(animations.getEntities(), pods, bombs, explosions),      // Load bomber entity
     window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
+    world(window.getDefaultView()), UI(window.getDefaultView()),    // Set view blocks
+    panel(animations.getMisc()),                                    // Load information panel
     gameState(GameState::Title), gameTick(0), stage(0),             // Set misc values to 0
     score(0), streak(0), combo(0), enemyType(0),
     levelTransition(false), levelTimerExpired(false),
@@ -24,10 +26,8 @@ Game::Game() : background(animations.getBackground()),              // Load back
     // Seed random number table
     srand((static_cast<unsigned>(time(nullptr))));
 
-    // Make backdrop for UI display
-    backdrop.setSize(sf::Vector2f(_cols * _scaledTile, 2 * _scaledTile));
-    backdrop.setFillColor(sf::Color(189, 190, 189));
-    backdrop.setPosition(sf::Vector2f(0, _rows * _scaledTile));
+    // Move the world view down 2 tiles
+    world.move(sf::Vector2f(0, -2 * _scaledTile));
 
     // Start title music
     audio.getMusic("title").play();
@@ -142,6 +142,9 @@ void Game::update()
     case(GameState::Playing):
         gameTick++;
 
+        if(gameTick % _fps == 0)
+            s_gameSeconds--;
+        cout << s_gameSeconds << "\n";
         // Bomber
         bomber.update();
 
@@ -151,7 +154,7 @@ void Game::update()
             enemies[i].update();
 
             // Kill bomber if intersecting and not a bonus stage
-            if (enemies[i].intersects(bomber) && !bonus)
+            if (enemies[i].isOnSameTile(bomber) && !bonus)
                 bomber.die();
 
             streak -= 1;
@@ -202,12 +205,12 @@ void Game::update()
 
             // If bomber doesn't have fire shield and is colliding with explosion, die
             if (!bomber.hasFireShield())
-                if (explosions[i].intersects(bomber) && !bonus)
+                if (explosions[i].isOnSameTile(bomber) && !bonus)
                     bomber.die();
 
             // If explosion is colliding with enemy, kill enemy
             for (Enemy& enemy : enemies)
-                if (explosions[i].intersects(enemy))
+                if (explosions[i].isOnSameTile(enemy))
                     enemy.die();
 
             // If explosion is colliding with bomb, explode bomb after 3 frames
@@ -237,6 +240,15 @@ void Game::update()
         // Softwalls
         for (size_t i = 0; i < softWalls.size(); i++)
         {
+            if (pods[softWalls[i].getY()][softWalls[i].getX()].isDying)
+            {
+                pods[softWalls[i].getY()][softWalls[i].getX()].isDying = false;
+                pods[softWalls[i].getY()][softWalls[i].getX()].isSoft = false;
+                pods[softWalls[i].getY()][softWalls[i].getX()].isFilled = false;
+                if (softWalls[i].isOnSameTile(bomber))
+                    bomber.die();
+            }
+
             softWalls[i].update();
 
 			// Remove soft wall if animation is finished
@@ -263,9 +275,12 @@ void Game::update()
         if (powerUp && powerUp->intersects(bomber))
         {
             powerUp->applyEffect(bomber);
+            panel.updatePowerUp(powerUp->getType());
             cout << *powerUp << "\n";
             powerUp.reset();
         }
+
+        panel.update();
 
         break;
 
@@ -399,9 +414,9 @@ void Game::render()
     {
     case(GameState::Playing):
     case(GameState::Death):
-        window.draw(background);
+        window.setView(world);
 
-        window.draw(backdrop);
+        window.draw(background);
 
         if (powerUp)
             window.draw(powerUp->getSprite());
@@ -419,6 +434,10 @@ void Game::render()
 
         for (Enemy& enemy : enemies)
             window.draw(enemy);
+
+        window.setView(UI);
+
+        window.draw(panel);
 
         for (Points& point : points)
             window.draw(point);
@@ -554,7 +573,9 @@ void Game::clear()
     explosions.clear();
 	powerUp.reset();
 
+    s_gameSeconds = _pontanTimer/_fps;
 	gameTick = 0;                           // Reset misc values for new level
+    levelTimerExpired = false;
 }
 
 // Called after a powerup or exit is hit, the pontan
