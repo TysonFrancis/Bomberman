@@ -34,7 +34,8 @@ public:
 	void invincible();
 
 	bool hasFireShield() const;
-	bool hasInvincible() const;
+	bool hasInvinciblity() const;
+	void removeInvincibility();
 
 	int getLives() const;
 	void addLife();

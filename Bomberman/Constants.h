@@ -1,5 +1,5 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+#include <SFML/System/Vector2.hpp>
 
 /*
 	Constants namespace to hold all repeated values
@@ -74,7 +74,17 @@ namespace Constants
 	static constexpr int _letterY = 256;
 
 	static constexpr int _bonusTimer = _fps * 30;							// Timers
+	static constexpr int _invincibilityTimer = _fps * 30;
 	static constexpr int _pontanTimer = _fps * 200;
+
+	static constexpr int _slowBlinkSpeed = _invincibilityTimer - 6 * _fps;	// Blinker controls
+	static constexpr int _slowBlinkInterval = 20;
+	static constexpr int _mediumBlinkSpeed = _invincibilityTimer - 3 * _fps;
+	static constexpr int _mediumBlinkInterval = 10;
+	static constexpr int _fastBlinkSpeed = _invincibilityTimer - static_cast<int>(1.5 * _fps);
+	static constexpr int _fastBlinkInterval = 4;
+
+	static constexpr sf::Vector2i _spaceCharacter({ 88, 248 });				// Position vector
 
 	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });			// Size vectors
 	static constexpr sf::Vector2i _letterTile({ _halfTile, _halfTile });

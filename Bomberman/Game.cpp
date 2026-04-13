@@ -17,9 +17,11 @@ Game::Game() : background(animations.getBackground()),              // Load back
     window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     world(window.getDefaultView()), UI(window.getDefaultView()),    // Set view blocks
-    panel(animations.getMisc()),                                    // Load information panel
-    gameState(GameState::Title), gameTick(0), stage(0),             // Set misc values to 0
-    score(0), streak(0), combo(0), enemyType(0),
+    panel(animations.getMisc(), animations.getEntities(),           // Load information panel
+        animations.getTitle()),
+    gameState(GameState::Title), gameTick(0), stage(0),             // Set misc values to defaults
+    invincibilePlayerTicks(0), active(false),
+    streak(0), combo(0), enemyType(0),
     levelTransition(false), levelTimerExpired(false),
     gameOver(false), bonus(false)
 {
@@ -98,39 +100,6 @@ void Game::events()
         audio.getMusic("title").stop();
         gameState = GameState::RoundStart;
     }
-
-    if (gameTick == _bonusTimer && bonus)                       // End bonus stage after 30 seconds
-        gameState = GameState::Transition;
-    if (bonus)                                                  // Spawn enemies for bonus stage
-    {
-        if (stage < 40)                                             // If under 40 increment enemy type
-            spawnEnemies(static_cast<Enemy::Type>((stage - 5) / 5));
-        else                                                        // If 40 or above spawn Pontans
-            spawnEnemies();
-    }
-    if (gameTick >= _pontanTimer && !levelTimerExpired)         // Spawn Pontans if past 200 seconds
-    {
-        levelTimerExpired = true;
-        spawnEnemies();
-    }
-
-    if (bomber.isDead() && bomber.hasJustDied())            // If bomber just died and is dead,
-    {
-        if (bomber.getLives() > 0)                              // If still has more lives, reset level
-        {
-            gameState = GameState::Death;
-            levelTransition = false;
-        }
-        else                                                    // Else, end game
-        {
-            gameState = GameState::GameOver;
-            levelTransition = false;
-        }
-    }
-
-    if (gameState == GameState::Playing &&                  // If bomber is on exit and no enemies, next level
-        bomber.isOnExit() && enemies.size() == 0)
-        gameState = GameState::Transition;
 }
 
 // Sprite updater, calls each sprites update method
@@ -140,13 +109,50 @@ void Game::update()
     switch (gameState)
     {
     case(GameState::Playing):
-        gameTick++;
+        gameTick++;                                             // *** Timing *** //
 
-        if(gameTick % _fps == 0)
+        // Decrement game seconds on second mark
+        if (gameTick % _fps == 0)
             s_gameSeconds--;
-        cout << s_gameSeconds << "\n";
-        // Bomber
-        bomber.update();
+
+        // If bomber just died and is dead                      // *** State changes *** //
+        if (bomber.isDead() && bomber.hasJustDied())
+        {
+            if (bomber.getLives() > 0)              // If still has more lives, reset level
+            {
+                gameState = GameState::Death;
+                levelTransition = false;
+            }
+
+            else                                    // Else, end game
+            {
+                gameState = GameState::GameOver;
+                levelTransition = false;
+            }
+        }
+
+        // If bomber is on exit and no enemies, or bonus stage ended, next level
+        if ((bomber.isOnExit() && enemies.size() == 0)
+            || (gameTick >= _bonusTimer && bonus))
+            gameState = GameState::Transition;
+
+        // Spawn enemies for bonus stage                        // *** Enemy spawning *** //
+        if (bonus)
+        {
+            if (stage < 40)                                             // If under 40 increment enemy type
+                spawnEnemies(static_cast<Enemy::Type>((stage - 5) / 5));
+            else                                                        // If 40 or above spawn Pontans
+                spawnEnemies();
+        }
+
+        // Spawn Pontans if timer expired
+        if (gameTick >= _pontanTimer && !levelTimerExpired)
+        {
+            levelTimerExpired = true;
+            spawnEnemies();
+        }
+
+        bomber.update();                                        // *** Entity updates *** //
 
         // Enemies
         for (size_t i = 0; i < enemies.size(); i++)
@@ -154,7 +160,9 @@ void Game::update()
             enemies[i].update();
 
             // Kill bomber if intersecting and not a bonus stage
-            if (enemies[i].isOnSameTile(bomber) && !bonus)
+            if (enemies[i].getState() == Entity::State::Living &&   // Might make it to easy
+                enemies[i].isOnSameTile(bomber) &&
+                !bomber.hasInvinciblity())
                 bomber.die();
 
             streak -= 1;
@@ -169,15 +177,13 @@ void Game::update()
 
                 switch (enemyType)      // Update score when enemy dies
                 {
-                case 0: case 1: score += (enemyType + 1) * 100 * combo; break;
-                case 2: case 3: score += (enemyType - 1) * 200 * combo; break;
-                case 4: case 5: score += (enemyType - 3) * 1000 * combo; break;
-                case 6: case 7: score += (enemyType - 5) * 2000 * combo; break;
+                case 0: case 1: s_gameScore += (enemyType + 1) * 100 * combo;   break;
+                case 2: case 3: s_gameScore += (enemyType - 1) * 200 * combo;   break;
+                case 4: case 5: s_gameScore += (enemyType - 3) * 1000 * combo;  break;
+                case 6: case 7: s_gameScore += (enemyType - 5) * 2000 * combo;  break;
                 }
 
                 streak = 20;            // Waits 20 frames to check for other deaths
-
-                                        // Display score after death using points
 
                 enemies.erase(enemies.begin() + i);
                 i--;
@@ -203,9 +209,34 @@ void Game::update()
             explosions[i].update();
 
             // If bomber doesn't have fire shield and is colliding with explosion, die
-            if (!bomber.hasFireShield())
-                if (explosions[i].isOnSameTile(bomber) && !bonus)
+            if (!(bomber.hasFireShield() || bomber.hasInvinciblity())
+                && explosions[i].isOnSameTile(bomber))
                     bomber.die();
+
+            /*
+                if has shield || fire resit
+                    do nojthing
+                if doesnt have fire shield but does shield
+                    do nothing
+                if fire but no shield
+                    do nothing
+                if no fire && no shield
+                    die
+                     
+                    (invincible || resist)
+                    || (invincible && !resist || invincible && resist) 
+                    || (!invincible && resist || invincible && resist)
+                        return
+                    !invincible && !resist && !(invincible && resist)
+                        die
+            
+                    invincible && resist && 
+
+                    !(invincible || resist) -> true true true false
+            
+            
+            */
+
 
             // If explosion is colliding with enemy, kill enemy
             for (Enemy& enemy : enemies)
@@ -267,6 +298,35 @@ void Game::update()
             powerUp.reset();
         }
 
+        // Invincibility display                                // *** UI updates *** //
+        if (bomber.hasInvinciblity())                           // If bomber is invincible
+        {
+            if (invincibilePlayerTicks >= _invincibilityTimer)      // If the timer runs out, remove powerup and reset icon
+            {
+                active = false;
+                invincibilePlayerTicks = 0;
+                bomber.removeInvincibility();
+                panel.updatePowerUp(PowerUp::Type::Invincible, active);
+            }
+
+            int interval = 0;                                       // Default interval tick
+
+            if (invincibilePlayerTicks >= _fastBlinkSpeed)          // Set blink timing based on how much time is left
+                interval = _fastBlinkInterval;
+            else if (invincibilePlayerTicks >= _mediumBlinkSpeed)
+                interval = _mediumBlinkInterval;
+            else if (invincibilePlayerTicks >= _slowBlinkSpeed)
+                interval = _slowBlinkInterval;
+
+            if (interval > 0 && invincibilePlayerTicks % interval == 0)     // If on interval timing
+            {
+                panel.updatePowerUp(PowerUp::Type::Invincible, active);         // Blink the powerup display
+                active = !active;                                               // Swap the sign to opposite
+            }
+
+            invincibilePlayerTicks++;
+        }
+
         panel.update();
 
         break;
@@ -280,10 +340,10 @@ void Game::update()
         {
             audio.playSound("roundStart");
 
-            if (!bonus)
-                textObjects.emplace_back(new Text("stage " + std::to_string(stage + 1), _centerScreen));
+            if (bonus)
+                textObjects.emplace_back("bonus stage", _centerScreen);
             else
-                textObjects.emplace_back(new Text("bonus stage", _centerScreen));
+                textObjects.emplace_back("stage " + std::to_string(stage + 1), _centerScreen);
 
             levelTransition = true;
         }
@@ -291,8 +351,6 @@ void Game::update()
         // Wait until audio finishes
         if (audio.getStatus("roundStart") == sf::SoundSource::Status::Stopped)
         {
-            for (Text* text : textObjects)      // Clean up text objects after round start audio finishes
-                delete text;
             textObjects.clear();
 
             gameState = GameState::Playing;
@@ -300,6 +358,12 @@ void Game::update()
             audio.getMusic("main").play();
             audio.getMusic("main").setLooping(true);
             song = "main";
+
+            if (bonus)
+            {
+                bomber.invincible();
+                panel.updatePowerUp(PowerUp::Type::Invincible);
+            }
 
             levelTransition = false;
         }
@@ -314,14 +378,17 @@ void Game::update()
         if (!levelTransition)
         {
             audio.playSound("stageClear");
-            textObjects.emplace_back(new Text("stage clear", _centerScreen));
+            textObjects.emplace_back("stage clear", _centerScreen);
             levelTransition = true;
 
             if (!bonus)
                 stage++;
             if (bomber.getLives() < 3)
+            {
                 bomber.addLife();
-            if (stage != 1 && stage % 5 == 0 && !bonus)
+                panel.updateLives(true);
+            }
+            if (stage != 1 && stage % 5 == 1 && !bonus)
             {
                 bonus = true;
                 clear();
@@ -333,8 +400,6 @@ void Game::update()
         // Wait until audio finishes
         if (audio.getStatus("stageClear") == sf::SoundSource::Status::Stopped)
         {
-            for (auto* text : textObjects)
-                delete text;
             textObjects.clear();
 
             if (!bonus)
@@ -355,6 +420,7 @@ void Game::update()
         {
             audio.playSound("miss");
             levelTransition = true;
+            panel.updateLives();
         }
 
         // Wait until audio finishes
@@ -375,15 +441,13 @@ void Game::update()
         if (!levelTransition)
         {
             audio.playSound("gameOver");
-            textObjects.emplace_back(new Text("game over", _centerScreen));
+            textObjects.emplace_back("game over", _centerScreen);
             levelTransition = true;
         }
 
         // Wait until audio finishes
         if (audio.getStatus("gameOver") == sf::SoundSource::Status::Stopped)
         {
-            for (Text* text : textObjects)      // Clean up text objects after game over audio finishes
-                delete text;
             textObjects.clear();
 
             gameOver = true;        // For screen display after audio
@@ -437,9 +501,9 @@ void Game::render()
         [[fallthrough]];
 	case(GameState::RoundStart):            // Display text during music transitions
     case(GameState::Transition):            // for round start, stage clear, and game over
-        for (Text* text : textObjects)
-            for (sf::Sprite* glyph : text->sprites)
-                window.draw(*glyph);
+        for (Text& text : textObjects)
+            for (sf::Sprite& glyph : text.sprites)
+                window.draw(glyph);
 
         break;
 
@@ -487,7 +551,7 @@ void Game::level()
                 {
                     pods[row][col].isFilled = true;
                     pods[row][col].isSoft = true;
-                    softWalls.emplace_back(SoftWall(animations.getEntities(), pods, col, row));
+                    softWalls.emplace_back(animations.getEntities(), pods, col, row);
                     walls--;
                 }
 
@@ -557,9 +621,15 @@ void Game::clear()
     explosions.clear();
 	powerUp.reset();
 
-    s_gameSeconds = _pontanTimer/_fps;
-	gameTick = 0;                           // Reset misc values for new level
+    if(bonus)                               // Reset misc values for new level
+        s_gameSeconds = _bonusTimer / _fps;
+    else
+        s_gameSeconds = _pontanTimer / _fps;
+
+	gameTick = 0;
+    invincibilePlayerTicks = 0;
     levelTimerExpired = false;
+    active = false;
 }
 
 // Called after a powerup or exit is hit, the pontan

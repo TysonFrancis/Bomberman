@@ -24,17 +24,18 @@ public:
 		@param int (optional): The text's alignment - -1 for left, 0 for center, 1 for right
 		@param bool (optional): The color of the text's drop shadow - true for black. Defaults false, for gray.
 	*/
-	Text(std::string, sf::Vector2f, int = -1, bool = false);
-	Text(std::string, sf::Vector2f, bool);
-	~Text();
+	Text(std::string, sf::Vector2f, int = 0, bool = false);
 
-	void edit(Text&, const std::string&, bool = false);
+	static void setTexture(const sf::Texture&);		// To not reload texture for every text object
 
-	std::vector<sf::Sprite*> sprites;
+	void edit(const std::string&, bool = false);
+
+	std::vector<sf::Sprite> sprites;
 
 private:
-	void construct(std::string, sf::Vector2f, int, bool);
+	void construct(std::string, bool);
 
-	sf::Texture texture;
+	const static sf::Texture* texture;				// To not reload texture for every text object
 	sf::Vector2f position;
+	int align;
 };

@@ -30,7 +30,9 @@ public:
 
 	void run();
 
-	inline static int s_gameSeconds = Constants::_pontanTimer/Constants::_fps;
+	// Public static variables for infoPanel display
+	inline static int s_gameSeconds = Constants::_pontanTimer / Constants::_fps;
+	inline static int s_gameScore = 0;
 
 private:
 	void events();
@@ -53,7 +55,7 @@ private:
 	std::vector<SoftWall> softWalls;
 	std::optional<PowerUp> powerUp;
 
-	std::vector<Text*> textObjects;
+	std::vector<Text> textObjects;
 
 	Pod pods[Constants::_rows][Constants::_cols];
 
@@ -71,7 +73,9 @@ private:
 	int gameTick;
 	int stage;
 
-	int score;
+	int invincibilePlayerTicks;
+	bool active;
+
 	int streak;
 	int combo;
 	int enemyType;
@@ -98,6 +102,7 @@ private:
 		4,3,5,4,7,
 		3,5,4,6,7
 	};
+
 	int enemyPresets[50][8] =
 	{
 		{6,0,0,0,0,0,0,0}, {3,3,0,0,0,0,0,0}, {2,2,2,0,0,0,0,0}, {1,1,2,2,0,0,0,0}, {0,4,3,0,0,0,0,0},
