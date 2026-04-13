@@ -171,19 +171,23 @@ void Game::update()
                 //Check for combo kills
                 if (streak > 0)
                     combo += 1;
-                else combo = 1;
+                else
+                    combo = 1;
 
                 enemyType = static_cast<int>(enemies[i].getType());
 
                 switch (enemyType)      // Update score when enemy dies
                 {
-                case 0: case 1: s_gameScore += (enemyType + 1) * 100 * combo;   break;
-                case 2: case 3: s_gameScore += (enemyType - 1) * 200 * combo;   break;
-                case 4: case 5: s_gameScore += (enemyType - 3) * 1000 * combo;  break;
-                case 6: case 7: s_gameScore += (enemyType - 5) * 2000 * combo;  break;
+                case 0: case 1: point = (enemyType + 1) * 100 * combo; break;
+                case 2: case 3: point = (enemyType - 1) * 200 * combo; break;
+                case 4: case 5: point = (enemyType - 3) * 1000 * combo; break;
+                case 6: case 7: point = (enemyType - 5) * 2000 * combo; break;
                 }
-
+                
+                s_gameScore += point;
                 streak = 20;            // Waits 20 frames to check for other deaths
+
+                points.push_back(Points(animations.getEntities(), pods, point, enemies[i].getX(), enemies[i].getY()));
 
                 enemies.erase(enemies.begin() + i);
                 i--;
@@ -212,31 +216,6 @@ void Game::update()
             if (!(bomber.hasFireShield() || bomber.hasInvinciblity())
                 && explosions[i].isOnSameTile(bomber))
                     bomber.die();
-
-            /*
-                if has shield || fire resit
-                    do nojthing
-                if doesnt have fire shield but does shield
-                    do nothing
-                if fire but no shield
-                    do nothing
-                if no fire && no shield
-                    die
-                     
-                    (invincible || resist)
-                    || (invincible && !resist || invincible && resist) 
-                    || (!invincible && resist || invincible && resist)
-                        return
-                    !invincible && !resist && !(invincible && resist)
-                        die
-            
-                    invincible && resist && 
-
-                    !(invincible || resist) -> true true true false
-            
-            
-            */
-
 
             // If explosion is colliding with enemy, kill enemy
             for (Enemy& enemy : enemies)
@@ -270,11 +249,14 @@ void Game::update()
         // Softwalls
         for (size_t i = 0; i < softWalls.size(); i++)
         {
-            if (pods[softWalls[i].getY()][softWalls[i].getX()].isDying)
+            Pod& pod = pods[softWalls[i].getY()][softWalls[i].getX()];
+
+            if (pod.isDying)
             {
-                pods[softWalls[i].getY()][softWalls[i].getX()].isDying = false;
-                pods[softWalls[i].getY()][softWalls[i].getX()].isSoft = false;
-                pods[softWalls[i].getY()][softWalls[i].getX()].isFilled = false;
+                pod.isDying = false;
+                pod.isSoft = false;
+                pod.isFilled = false;
+
                 if (softWalls[i].isOnSameTile(bomber))
                     bomber.die();
             }
@@ -285,6 +267,18 @@ void Game::update()
             if (softWalls[i].getState() == Entity::State::Dead)
             {
                 softWalls.erase(softWalls.begin() + i);
+                i--;
+            }
+        }
+
+        // Points
+        for (size_t i = 0; i < points.size(); i++)
+        {
+            points[i].update();
+
+            if (points[i].getState() == Entity::State::Dead)
+            {
+                points.erase(points.begin() + i);
                 i--;
             }
         }
@@ -489,6 +483,9 @@ void Game::render()
         window.setView(UI);
 
         window.draw(panel);
+
+        for (Points& point : points)
+            window.draw(point);
 
         break;
 
