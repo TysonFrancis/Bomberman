@@ -349,14 +349,21 @@ void Game::update()
 
             gameState = GameState::Playing;
 
-            audio.getMusic("main").play();
-            audio.getMusic("main").setLooping(true);
-            song = "main";
-
             if (bonus)
             {
+                audio.getMusic("bonusStage").play();
+                audio.getMusic("bonusStage").setLooping(true);
+                song = "bonusStage";
+
                 bomber.invincible();
                 panel.updatePowerUp(PowerUp::Type::Invincible);
+            }
+
+            else
+            {
+                audio.getMusic("main").play();
+                audio.getMusic("main").setLooping(true);
+                song = "main";
             }
 
             levelTransition = false;
@@ -628,6 +635,9 @@ void Game::clear()
     invincibilePlayerTicks = 0;
     levelTimerExpired = false;
     active = false;
+
+    bomber.removeInvincibility();           // Make sure invincibility is gone after bonus stage
+    panel.updatePowerUp(PowerUp::Type::Invincible, active);
 }
 
 // Called after a powerup or exit is hit, the pontan
