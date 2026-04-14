@@ -18,7 +18,7 @@ Game::Game() : background(animations.getBackground()),              // Load back
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     world(window.getDefaultView()), UI(window.getDefaultView()),    // Set view blocks
     panel(animations.getMisc(), animations.getEntities(),           // Load information panel
-        animations.getTitle()),
+        animations.getTitle(), bomber),
     gameState(GameState::Title), gameTick(0), stage(0),             // Set misc values to defaults
     invincibilePlayerTicks(0), active(false),
     streak(0), combo(0), enemyType(0),
@@ -44,7 +44,7 @@ Game::Game() : background(animations.getBackground()),              // Load back
     // Set title sprite on right texture, scale to fit and position in middle of window
     title.setTextureRect(sf::IntRect({ 0, 0 }, { 256, 240 }));
     title.setOrigin({ 128.f, 120.f });
-    title.setScale({ _scale * 0.875f, _scale * 0.875f });        // Best ratio fit for title screen
+    title.setScale({ _scale, _scale });
     title.setPosition(_centerScreen);
 
     // Set to other title screen with same everything else as title

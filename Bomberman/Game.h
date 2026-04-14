@@ -32,7 +32,7 @@ public:
 	void run();
 
 	// Public static variables for infoPanel display
-	inline static int s_gameSeconds = Constants::_pontanTimer / Constants::_fps;
+	inline static int s_gameSeconds = 0;
 	inline static int s_gameScore = 0;
 
 private:
