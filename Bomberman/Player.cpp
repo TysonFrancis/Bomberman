@@ -130,10 +130,13 @@ void Player::reset()
 	isInvincible = false;
 }
 
-void Player::extraBomb()				{ if(maxBombs < 9)	maxBombs++; }
-void Player::extraRange()				{ if(blast < 4)		blast++; }
+void Player::extraBomb()				{ if(maxBombs < 9)
+											maxBombs++; }
+void Player::extraRange()				{ if(blast < 4)
+											blast++; }
 void Player::giveRemote()				{ remote = true; }
-void Player::giveSkate()				{ speed *= (1.5f * _speedScale); }
+void Player::giveSkate()				{ if (speed < _playerSpeed * _speedScale * 1.5f)
+											speed *= (1.5f * _speedScale); }
 void Player::phaseWalls()				{ wallPhase = true; }
 void Player::phaseBombs()				{ bombPhase = true; }
 void Player::shieldFire()				{ isFireShield = true; }

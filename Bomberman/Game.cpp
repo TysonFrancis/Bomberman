@@ -382,7 +382,7 @@ void Game::update()
                 bomber.addLife();
                 panel.updateLives(true);
             }
-            if (stage != 1 && stage % 5 == 1 && !bonus)
+            if (stage != 1 && stage % 5 == 0 && !bonus)
             {
                 bonus = true;
                 clear();
@@ -480,12 +480,12 @@ void Game::render()
         for (Enemy& enemy : enemies)
             window.draw(enemy);
 
+        for (Points& point : points)
+            window.draw(point);
+
         window.setView(UI);
 
         window.draw(panel);
-
-        for (Points& point : points)
-            window.draw(point);
 
         break;
 
@@ -616,6 +616,7 @@ void Game::clear()
     bombs.clear();
     softWalls.clear();
     explosions.clear();
+    points.clear();
 	powerUp.reset();
 
     if(bonus)                               // Reset misc values for new level
