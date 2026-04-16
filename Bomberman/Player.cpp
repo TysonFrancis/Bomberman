@@ -3,6 +3,7 @@
 #include "Explosion.h"
 #include "Pod.h"
 #include <iostream>
+#include <cmath>
 
 using namespace Constants;
 using namespace sf::Keyboard;
@@ -31,8 +32,11 @@ void Player::update()
 		tileY = static_cast<int>((sprite.getPosition().y) / _scaledTile);
 
 		// Determine total direction held
-		joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
-		joyY = isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up);
+		/*joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
+		joyY = isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up);*/
+
+		joyX = std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X));
+		joyY = std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y));
 
 		moveLogic();
 
