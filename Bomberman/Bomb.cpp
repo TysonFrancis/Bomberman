@@ -86,12 +86,14 @@ void Bomb::propogate(int xDir, int yDir, Facing dir)
 		int xPos = tileX + xDir * d;			// Resized postion to check based on direction and distance
 		int yPos = tileY + yDir * d;
 
+		Pod& pod = pods[yPos][xPos];
+
 		if (xPos < 0 || xPos >= _cols ||
 			yPos < 0 || yPos >= _rows ||
-			pods[yPos][xPos].isHard)			// If out of bounds or hard wall, stop checking in that direction, exit loop
+			pod.isHard)			// If out of bounds or hard wall, stop checking in that direction, exit loop
 			break;
 
-		if (!pods[yPos][xPos].isFilled)			// If pod is empty,
+		if (!pod.isFilled && !pod.isExit)			// If pod is empty,
 		{
 			if (d == distance)						// If at end of range, spawn end explosion
 				explosions.emplace_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
@@ -100,17 +102,22 @@ void Bomb::propogate(int xDir, int yDir, Facing dir)
 			continue;								// Skip to next iteration
 		}
 
-		else if (pods[yPos][xPos].isSoft)			// If a soft wall is in the way,
+		else if (pod.isSoft)			// If a soft wall, make dying, break direction
 		{
-			pods[yPos][xPos].isDying = true;
-			break;								// Since loop continues if empty, if it reaches this point, it
-												// means it's a soft wall that was just destroyed, so exit loop
+			pod.isDying = true;
+			break;
+		}
+
+		else if (pod.isExit)			// If exit, explode on it with end explosion, break direction
+		{
+			explosions.emplace_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
+			break;
 		}
 		
-		else if (pods[yPos][xPos].isBomb)
+		else if (pod.isBomb)			// If bomb, blow it up and continute checking if more things exist
 		{
-			pods[yPos][xPos].isFilled = false;
-			pods[yPos][xPos].isBomb = false;
+			pod.isFilled = false;
+			pod.isBomb = false;
 			explosions.emplace_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
 		}
 	}

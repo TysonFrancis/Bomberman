@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <fstream>
 #include <optional>
 #include <SFML/Graphics.hpp>
 
@@ -32,7 +33,7 @@ public:
 	void run();
 
 	// Public static variables for infoPanel display
-	inline static int s_gameSeconds = Constants::_pontanTimer / Constants::_fps;
+	inline static int s_gameSeconds = 0;
 	inline static int s_gameScore = 0;
 
 private:
@@ -62,6 +63,8 @@ private:
 	Pod pods[Constants::_rows][Constants::_cols];
 
 	Audio audio;
+
+	std::fstream highscore;
 
 	sf::Sprite background;
 	sf::Sprite title;

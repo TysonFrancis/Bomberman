@@ -1,12 +1,13 @@
 #include "InfoPanel.h"
+#include "Player.h"
 #include "Game.h"
 #include <format>
 #include <iostream>
 
 using namespace Constants;
 
-InfoPanel::InfoPanel(const sf::Texture& miscTex, const sf::Texture& playTex, const sf::Texture& titleTex) :
-    lifeTex(playTex)
+InfoPanel::InfoPanel(const sf::Texture& miscTex, const sf::Texture& playTex,
+    const sf::Texture& titleTex, const Player& player) : lifeTex(playTex)
 {
     // Make sure text texture is set
     Text::setTexture(titleTex);
@@ -47,14 +48,14 @@ InfoPanel::InfoPanel(const sf::Texture& miscTex, const sf::Texture& playTex, con
 // Update game seconds and score
 void InfoPanel::update()
 {
-    double num = Game::s_gameSeconds * 10 + 1;
+    double num = Game::s_gameSeconds;
     if (num > 1)
     {
-        num /= 10000;
-        std::string bingo = std::to_string(num);
-        bingo.erase(0, 2);
-        bingo.erase(3);
-        texts[0].edit("time " + bingo, true);
+        num /= 1000;
+        std::string time = std::to_string(num);
+        time.erase(0, 2);
+        time.erase(3);
+        texts[0].edit("time " + time, true);
     }
     else
         texts[0].edit("time 000", true);

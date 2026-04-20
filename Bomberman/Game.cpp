@@ -4,6 +4,7 @@
 #include <SFML/Window.hpp>
 
 #include <iostream>
+#include <fstream>      // For highscores
 #include <cstdlib>      // For srand and rand
 #include <ctime>        // For time
 #include <algorithm>    // For std::min
@@ -18,7 +19,7 @@ Game::Game() : background(animations.getBackground()),              // Load back
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     world(window.getDefaultView()), UI(window.getDefaultView()),    // Set view blocks
     panel(animations.getMisc(), animations.getEntities(),           // Load information panel
-        animations.getTitle()),
+        animations.getTitle(), bomber),
     gameState(GameState::Title), gameTick(0), stage(0),             // Set misc values to defaults
     invincibilePlayerTicks(0), active(false),
     streak(0), combo(0), enemyType(0),
@@ -44,7 +45,7 @@ Game::Game() : background(animations.getBackground()),              // Load back
     // Set title sprite on right texture, scale to fit and position in middle of window
     title.setTextureRect(sf::IntRect({ 0, 0 }, { 256, 240 }));
     title.setOrigin({ 128.f, 120.f });
-    title.setScale({ _scale * 0.875f, _scale * 0.875f });        // Best ratio fit for title screen
+    title.setScale({ _scale, _scale });
     title.setPosition(_centerScreen);
 
     // Set to other title screen with same everything else as title
@@ -98,6 +99,7 @@ void Game::events()
     if (gameState == GameState::Title && sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
     {
         audio.getMusic("title").stop();
+        textObjects.clear();
         gameState = GameState::RoundStart;
     }
 }
@@ -106,6 +108,9 @@ void Game::events()
 // with current frame and increments frame counter
 void Game::update()
 {
+    std::fstream highscoreFile;
+    static int highscore;
+
     switch (gameState)
     {
     case(GameState::Playing):
@@ -349,14 +354,21 @@ void Game::update()
 
             gameState = GameState::Playing;
 
-            audio.getMusic("main").play();
-            audio.getMusic("main").setLooping(true);
-            song = "main";
-
             if (bonus)
             {
+                audio.getMusic("bonusStage").play();
+                audio.getMusic("bonusStage").setLooping(true);
+                song = "bonusStage";
+
                 bomber.invincible();
                 panel.updatePowerUp(PowerUp::Type::Invincible);
+            }
+
+            else
+            {
+                audio.getMusic("main").play();
+                audio.getMusic("main").setLooping(true);
+                song = "main";
             }
 
             levelTransition = false;
@@ -382,7 +394,7 @@ void Game::update()
                 bomber.addLife();
                 panel.updateLives(true);
             }
-            if (stage != 1 && stage % 5 == 1 && !bonus)
+            if (stage != 1 && stage % 5 == 0 && !bonus)
             {
                 bonus = true;
                 clear();
@@ -428,12 +440,29 @@ void Game::update()
 		break;
 
     case (GameState::GameOver):
-		// Stop music and play game over audio, display game over,
-		// then wait until audio finishes to show game over screen
+        /* Stop music and play game over audio, display game over,
+        then wait until audio finishes to show game over screen.
+        Also save highscore and display on game over screen. */
+
         audio.getMusic(song).stop();
 
         if (!levelTransition)
         {
+            highscoreFile.open("highscore.txt", std::ios::in);
+            if (!highscoreFile.is_open())
+                std::cerr << "Error opneing file highscore.txt!";
+            highscoreFile >> highscore;
+            highscoreFile.close();
+
+            if (highscore < s_gameScore)
+            {
+                highscore = s_gameScore;
+
+                highscoreFile.open("highscore.txt", std::ios::out);
+                highscoreFile << s_gameScore;
+                highscoreFile.close();
+            }
+
             audio.playSound("gameOver");
             textObjects.emplace_back("game over", _centerScreen);
             levelTransition = true;
@@ -443,9 +472,33 @@ void Game::update()
         if (audio.getStatus("gameOver") == sf::SoundSource::Status::Stopped)
         {
             textObjects.clear();
+            if (highscore > 999999999)
+                textObjects.emplace_back("999999999", _highscoreGameoverPosition, 1);
+            else
+                textObjects.emplace_back(std::to_string(highscore), _highscoreGameoverPosition, 1);
 
             gameOver = true;        // For screen display after audio
         }
+        break;
+    case (GameState::Title):
+        static bool done = false;
+
+        if (!done)
+        {
+            highscoreFile.open("highscore.txt", std::ios::in);
+            if (!highscoreFile.is_open())
+                std::cerr << "Error opneing file highscore.txt!";
+            highscoreFile >> highscore;
+            highscoreFile.close();
+
+            if (highscore > 999999999)
+                textObjects.emplace_back("999999999", _highscoreTitlePosition, 1);
+            else
+                textObjects.emplace_back(std::to_string(highscore), _highscoreTitlePosition, 1);
+
+            done = true;
+        }
+
         break;
     }
 }
@@ -480,12 +533,12 @@ void Game::render()
         for (Enemy& enemy : enemies)
             window.draw(enemy);
 
+        for (Points& point : points)
+            window.draw(point);
+
         window.setView(UI);
 
         window.draw(panel);
-
-        for (Points& point : points)
-            window.draw(point);
 
         break;
 
@@ -493,6 +546,9 @@ void Game::render()
 		if (gameOver)                       // If game over audio has finished, show game over screen
         {
             window.draw(endTitle);
+            for (Text& text : textObjects)
+                for (sf::Sprite& glyph : text.sprites)
+                    window.draw(glyph);
             break;
         }
         [[fallthrough]];
@@ -504,7 +560,13 @@ void Game::render()
 
         break;
 
-    case(GameState::Title):     window.draw(title);     break;
+    case(GameState::Title):
+        window.draw(title);
+        for (Text& text : textObjects)
+            for (sf::Sprite& glyph : text.sprites)
+                window.draw(glyph);
+        
+        break;
     }
 
     window.display();
@@ -616,6 +678,7 @@ void Game::clear()
     bombs.clear();
     softWalls.clear();
     explosions.clear();
+    points.clear();
 	powerUp.reset();
 
     if(bonus)                               // Reset misc values for new level
@@ -627,6 +690,9 @@ void Game::clear()
     invincibilePlayerTicks = 0;
     levelTimerExpired = false;
     active = false;
+
+    bomber.removeInvincibility();           // Make sure invincibility is gone after bonus stage
+    panel.updatePowerUp(PowerUp::Type::Invincible, active);
 }
 
 // Called after a powerup or exit is hit, the pontan

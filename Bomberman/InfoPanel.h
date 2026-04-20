@@ -6,10 +6,12 @@
 #include "Text.h"
 #include "Constants.h"
 
+class Player;
+
 class InfoPanel : public sf::Drawable
 {
 public:
-	InfoPanel(const sf::Texture&, const sf::Texture&, const sf::Texture&);
+	InfoPanel(const sf::Texture&, const sf::Texture&, const sf::Texture&, const Player&);
 
 	void update();
 	void updateLives(bool = false);
