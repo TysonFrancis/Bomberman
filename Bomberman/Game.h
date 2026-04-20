@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <fstream>
 #include <optional>
 #include <SFML/Graphics.hpp>
 
@@ -64,6 +65,8 @@ private:
 	Pod pods[Constants::_rows][Constants::_cols];
 
 	Audio audio;
+
+	std::fstream highscore;
 
 	sf::Sprite background;
 	sf::Sprite title;

@@ -32,6 +32,10 @@ namespace Constants
 	static constexpr unsigned int _windowWidth = _cols * _scaledTile;
 	static constexpr unsigned int _windowHeight = _rows * _scaledTile + 2 * _scaledTile ;
 
+	// Highscore positions
+	static constexpr sf::Vector2f _highscoreTitlePosition({ 912, 504 });
+	static constexpr sf::Vector2f _highscoreGameoverPosition({ 888, 624 });
+
 	// Animations
 	static constexpr int _fps = 60;
 	static constexpr int _moveFrames = 3;

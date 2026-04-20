@@ -4,6 +4,7 @@
 #include <SFML/Window.hpp>
 
 #include <iostream>
+#include <fstream>      // For highscores
 #include <cstdlib>      // For srand and rand
 #include <ctime>        // For time
 #include <algorithm>    // For std::min
@@ -113,6 +114,7 @@ void Game::events()
         !enterPressed)
     {
         audio.getMusic(song).stop();
+        textObjects.clear();
         gameState = GameState::RoundStart;
     }
 }
@@ -121,6 +123,9 @@ void Game::events()
 // with current frame and increments frame counter
 void Game::update()
 {
+    std::fstream highscoreFile;
+    static int highscore;
+
     switch (gameState)
     {
     case(GameState::Playing):
@@ -398,7 +403,7 @@ void Game::update()
             levelTransition = true;
 
             if (!bonus)
-                stage++;
+                stage=(stage+1)%50;
             if (bomber.getLives() < 3)
             {
                 bomber.addLife();
@@ -450,12 +455,29 @@ void Game::update()
 		break;
 
     case (GameState::GameOver):
-		// Stop music and play game over audio, display game over,
-		// then wait until audio finishes to show game over screen
+        /* Stop music and play game over audio, display game over,
+        then wait until audio finishes to show game over screen.
+        Also save highscore and display on game over screen. */
+
         audio.getMusic(song).stop();
 
         if (!levelTransition)
         {
+            highscoreFile.open("highscore.txt", std::ios::in);
+            if (!highscoreFile.is_open())
+                std::cerr << "Error opneing file highscore.txt!";
+            highscoreFile >> highscore;
+            highscoreFile.close();
+
+            if (highscore < s_gameScore)
+            {
+                highscore = s_gameScore;
+
+                highscoreFile.open("highscore.txt", std::ios::out);
+                highscoreFile << s_gameScore;
+                highscoreFile.close();
+            }
+
             audio.playSound("gameOver");
             textObjects.emplace_back("game over", _centerScreen);
             levelTransition = true;
@@ -465,9 +487,33 @@ void Game::update()
         if (audio.getStatus("gameOver") == sf::SoundSource::Status::Stopped)
         {
             textObjects.clear();
+            if (highscore > 999'999'999)
+                textObjects.emplace_back("999999999", _highscoreGameoverPosition, 1);
+            else
+                textObjects.emplace_back(std::to_string(highscore), _highscoreGameoverPosition, 1);
 
             gameOver = true;        // For screen display after audio
         }
+        break;
+    case (GameState::Title):
+        static bool done = false;
+
+        if (!done)
+        {
+            highscoreFile.open("highscore.txt", std::ios::in);
+            if (!highscoreFile.is_open())
+                std::cerr << "Error opneing file highscore.txt!";
+            highscoreFile >> highscore;
+            highscoreFile.close();
+
+            if (highscore > 999'999'999)
+                textObjects.emplace_back("999999999", _highscoreTitlePosition, 1);
+            else
+                textObjects.emplace_back(std::to_string(highscore), _highscoreTitlePosition, 1);
+
+            done = true;
+        }
+
         break;
     }
 }
@@ -515,6 +561,9 @@ void Game::render()
 		if (gameOver)                       // If game over audio has finished, show game over screen
         {
             window.draw(endTitle);
+            for (Text& text : textObjects)
+                for (sf::Sprite& glyph : text.sprites)
+                    window.draw(glyph);
             break;
         }
         [[fallthrough]];
@@ -526,7 +575,13 @@ void Game::render()
 
         break;
 
-    case(GameState::Title):     window.draw(title);     break;
+    case(GameState::Title):
+        window.draw(title);
+        for (Text& text : textObjects)
+            for (sf::Sprite& glyph : text.sprites)
+                window.draw(glyph);
+        
+        break;
     }
 
     window.display();
@@ -603,7 +658,7 @@ void Game::level()
     cout << "Powerup set at: (" << x << ", " << y << ")\n";
 
     for (int enemyType = 0; enemyType < 8; enemyType++)                     // Runs the enemy create loop per enemy type,
-        for (int i = 0; i < enemyPresets[stage % 50][enemyType]; i++)           // for how many of each enemy type to spawn
+        for (int i = 0; i < enemyPresets[stage][enemyType]; i++)           // for how many of each enemy type to spawn
         {                                                                       // based on the presets for the current stage
             Enemy enemy(animations.getEntities(), pods, static_cast<Enemy::Type>(enemyType), bomber);
             int x, y;
@@ -678,6 +733,8 @@ void Game::reset()
     levelTransition = false;
     gameOver = false;
     bonus = false;
+
+    s_gameScore = 0;
 
     level();
 }
