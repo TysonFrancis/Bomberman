@@ -32,11 +32,8 @@ void Player::update()
 		tileY = static_cast<int>((sprite.getPosition().y) / _scaledTile);
 
 		// Determine total direction held
-		/*joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
-		joyY = isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up);*/
-
-		joyX = std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X));
-		joyY = std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y));
+		joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
+		joyY = isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up);
 
 		moveLogic();
 
@@ -132,6 +129,21 @@ void Player::reset()
 	joyX = joyY = 0;
 	justDied = false;
 	isInvincible = false;
+}
+
+void Player::gameReset()
+{
+	reset();
+
+	speed = _playerSpeed;
+	lives = 3;
+	blast = 1;
+	maxBombs = 1;
+	wait = 0;
+	remote = false;
+	isFireShield = false;
+	wallPhase = false;
+	bombPhase = false;
 }
 
 void Player::extraBomb()				{ if(maxBombs < 10)

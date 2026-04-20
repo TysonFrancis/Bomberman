@@ -43,6 +43,8 @@ private:
 
 	void level();
 	void clear();
+	void reset();
+
 	void spawnEnemies(Enemy::Type = Enemy::Type::Pontan);
 	Enemy::Type getEnemyType() const;
 
@@ -76,7 +78,7 @@ private:
 	int stage;
 
 	int invincibilePlayerTicks;
-	bool active;
+	bool isInvincibleLit;
 
 	int streak;
 	int combo;
@@ -85,6 +87,7 @@ private:
 
 	bool levelTransition;
 	bool levelTimerExpired;
+	bool enterPressed;
 	bool gameOver;
 	bool bonus;
 

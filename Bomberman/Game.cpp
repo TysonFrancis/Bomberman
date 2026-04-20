@@ -20,10 +20,10 @@ Game::Game() : background(animations.getBackground()),              // Load back
     panel(animations.getMisc(), animations.getEntities(),           // Load information panel
         animations.getTitle(), bomber),
     gameState(GameState::Title), gameTick(0), stage(0),             // Set misc values to defaults
-    invincibilePlayerTicks(0), active(false),
+    invincibilePlayerTicks(0), isInvincibleLit(false),
     streak(0), combo(0), enemyType(0),
     levelTransition(false), levelTimerExpired(false),
-    gameOver(false), bonus(false)
+    enterPressed(false), gameOver(false), bonus(false)
 {
     // Seed random number table
     srand((static_cast<unsigned>(time(nullptr))));
@@ -69,10 +69,7 @@ Game::Game() : background(animations.getBackground()),              // Load back
             }
         }
 
-    // Start level creation
     level();
-
-    cout << "button count for joy 0: " << sf::Joystick::getButtonCount(0);
 }
 
 // Holds main game loop, all actions passed
@@ -84,10 +81,6 @@ void Game::run()
         events();
         update();
         render();
-
-        for(int i = 0; i < 32; i++)
-            if (sf::Joystick::isButtonPressed(0, i))
-                cout << "button " << i << " pressed\n";
     }
 }
 
@@ -96,14 +89,30 @@ void Game::events()
 {
     // Close game if window is closed, escape key pressed, or on game over screen and enter pressed
     while (const std::optional event = window.pollEvent())
-        if (event->is<sf::Event::Closed>() || sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape) ||
-            gameState == GameState::GameOver && sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
+    {
+        if (event->is<sf::Event::Closed>() ||
+            sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape))
             closeGame();
 
+        if (gameState == GameState::GameOver &&
+            sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
+        {
+            enterPressed = true;
+            reset();
+        }
+
+        // Check if enter key is released
+        if (auto* key = event->getIf<sf::Event::KeyReleased>())
+            if (key->scancode == sf::Keyboard::Scan::Enter)
+                enterPressed = false;
+    }
+
     // If on title screen and enter is pressed, start game
-    if (gameState == GameState::Title && sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
+    if (gameState == GameState::Title &&
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter) &&
+        !enterPressed)
     {
-        audio.getMusic("title").stop();
+        audio.getMusic(song).stop();
         gameState = GameState::RoundStart;
     }
 }
@@ -303,10 +312,10 @@ void Game::update()
         {
             if (invincibilePlayerTicks >= _invincibilityTimer)      // If the timer runs out, remove powerup and reset icon
             {
-                active = false;
+                isInvincibleLit = false;
                 invincibilePlayerTicks = 0;
                 bomber.removeInvincibility();
-                panel.updatePowerUp(PowerUp::Type::Invincible, active);
+                panel.updatePowerUp(PowerUp::Type::Invincible, isInvincibleLit);
             }
 
             int interval = 0;                                       // Default interval tick
@@ -318,10 +327,10 @@ void Game::update()
             else if (invincibilePlayerTicks >= _slowBlinkSpeed)
                 interval = _slowBlinkInterval;
 
-            if (interval > 0 && invincibilePlayerTicks % interval == 0)     // If on interval timing
+            if (interval > 0 && invincibilePlayerTicks % interval == 0)         // If on interval timing
             {
-                panel.updatePowerUp(PowerUp::Type::Invincible, active);         // Blink the powerup display
-                active = !active;                                               // Swap the sign to opposite
+                panel.updatePowerUp(PowerUp::Type::Invincible, isInvincibleLit);    // Blink the powerup display
+                isInvincibleLit = !isInvincibleLit;                                 // Swap the sign to opposite
             }
 
             invincibilePlayerTicks++;
@@ -632,18 +641,45 @@ void Game::clear()
     points.clear();
 	powerUp.reset();
 
-    if(bonus)                               // Reset misc values for new level
+    if (bonus)                               // Reset misc values for new level
         s_gameSeconds = _bonusTimer / _fps;
     else
         s_gameSeconds = _pontanTimer / _fps;
 
 	gameTick = 0;
     invincibilePlayerTicks = 0;
+    isInvincibleLit = false;
     levelTimerExpired = false;
-    active = false;
 
     bomber.removeInvincibility();           // Make sure invincibility is gone after bonus stage
-    panel.updatePowerUp(PowerUp::Type::Invincible, active);
+    panel.updatePowerUp(PowerUp::Type::Invincible, isInvincibleLit);
+}
+
+// Called when game over and continuing,
+// reset specific game-wide variables,
+// then call level to start game again
+void Game::reset()
+{
+    bomber.gameReset();
+
+    audio.getMusic("title").play();
+    audio.getMusic("title").setVolume(50);
+    audio.getMusic("title").setLooping(true);
+    song = "title";
+
+    gameState = GameState::Title;
+    cout << "titlkle: " << static_cast<int>(gameState) << "\n";
+    stage = 0;
+
+    streak = 0;
+    combo = 0;
+    enemyType = 0;
+
+    levelTransition = false;
+    gameOver = false;
+    bonus = false;
+
+    level();
 }
 
 // Called after a powerup or exit is hit, the pontan
