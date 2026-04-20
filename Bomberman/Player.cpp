@@ -32,14 +32,17 @@ void Player::update()
 		tileY = static_cast<int>((sprite.getPosition().y) / _scaledTile);
 
 		// Determine total direction held
-		/*joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
-		joyY = isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up);*/
+		joyX = 0;
+		joyY = 0;
 
-		joyX = std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X));
-		joyY = std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y));
+		joyX += (isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left));
+		joyY += (isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up));
+
+		joyX += (std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X)));
+		joyY += (std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y)));
 
 		moveLogic();
-
+		 
 		// Spawn a bomb
 		if (isKeyPressed(Scancode::Z))
 			if (!pods[tileY][tileX].isFilled && bombs.size() < maxBombs && !pods[tileY][tileX].isExit)
