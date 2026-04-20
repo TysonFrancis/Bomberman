@@ -3,6 +3,7 @@
 #include "Explosion.h"
 #include "Pod.h"
 #include <iostream>
+#include <cmath>
 
 using namespace Constants;
 using namespace sf::Keyboard;
@@ -12,7 +13,7 @@ Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
 		Entity(tex, pods), bombs(bombs), explosions(explosions),
 		speed(_playerSpeed * _speedScale),
-		joyX(0), joyY(0), lives(0), //SET THIS BACK
+		joyX(0), joyY(0), lives(3),
 		blast(1), maxBombs(1), wait(0), remote(false),
 		isFireShield(false), isInvincible(false),
 		wallPhase(false), bombPhase(false),
@@ -31,8 +32,11 @@ void Player::update()
 		tileY = static_cast<int>((sprite.getPosition().y) / _scaledTile);
 
 		// Determine total direction held
-		joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
-		joyY = isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up);
+		/*joyX = isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left);
+		joyY = isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up);*/
+
+		joyX = std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X));
+		joyY = std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y));
 
 		moveLogic();
 
@@ -41,6 +45,7 @@ void Player::update()
 			if (!pods[tileY][tileX].isFilled && bombs.size() < maxBombs && !pods[tileY][tileX].isExit)
 			{
 				pods[tileY][tileX].isFilled = true;
+				pods[tileY][tileX].isHard = true;
 				pods[tileY][tileX].isBomb = true;
 				bombs.emplace_back(sprite.getTexture(), pods, explosions, remote, blast, tileX, tileY);
 			}

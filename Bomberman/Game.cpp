@@ -72,6 +72,8 @@ Game::Game() : background(animations.getBackground()),              // Load back
 
     // Start level creation
     level();
+
+    cout << "button count for joy 0: " << sf::Joystick::getButtonCount(0);
 }
 
 // Holds main game loop, all actions passed
@@ -83,6 +85,10 @@ void Game::run()
         events();
         update();
         render();
+
+        for(int i = 0; i < 32; i++)
+            if (sf::Joystick::isButtonPressed(0, i))
+                cout << "button " << i << " pressed\n";
     }
 }
 
@@ -388,7 +394,7 @@ void Game::update()
             levelTransition = true;
 
             if (!bonus)
-                stage++;
+                stage=(stage+1)%50;
             if (bomber.getLives() < 3)
             {
                 bomber.addLife();
@@ -643,7 +649,7 @@ void Game::level()
     cout << "Powerup set at: (" << x << ", " << y << ")\n";
 
     for (int enemyType = 0; enemyType < 8; enemyType++)                     // Runs the enemy create loop per enemy type,
-        for (int i = 0; i < enemyPresets[stage % 50][enemyType]; i++)           // for how many of each enemy type to spawn
+        for (int i = 0; i < enemyPresets[stage][enemyType]; i++)           // for how many of each enemy type to spawn
         {                                                                       // based on the presets for the current stage
             Enemy enemy(animations.getEntities(), pods, static_cast<Enemy::Type>(enemyType), bomber);
             int x, y;
