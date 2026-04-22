@@ -64,6 +64,7 @@ void Bomb::die()
 	state = State::Dead;
 	pods[tileY][tileX].isFilled = false;
 	pods[tileY][tileX].isBomb = false;
+	pods[tileY][tileX].isHard = false;
 	frame = tick = 0;
 	explosions.emplace_back(Explosion(sprite.getTexture(), pods, tileX, tileY, dir, false));
 
@@ -89,8 +90,7 @@ void Bomb::propogate(int xDir, int yDir, Facing dir)
 		Pod& pod = pods[yPos][xPos];
 
 		if (xPos < 0 || xPos >= _cols ||
-			yPos < 0 || yPos >= _rows ||
-			pod.isHard)			// If out of bounds or hard wall, stop checking in that direction, exit loop
+			yPos < 0 || yPos >= _rows )			// If out of bounds, stop checking in that direction, exit loop
 			break;
 
 		if (!pod.isFilled && !pod.isExit)			// If pod is empty,
@@ -113,13 +113,16 @@ void Bomb::propogate(int xDir, int yDir, Facing dir)
 			explosions.emplace_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, true));
 			break;
 		}
-		
+
 		else if (pod.isBomb)			// If bomb, blow it up and continute checking if more things exist
 		{
 			pod.isFilled = false;
 			pod.isBomb = false;
+			pod.isHard = false;
 			explosions.emplace_back(Explosion(sprite.getTexture(), pods, xPos, yPos, dir, false));
 		}
+		else if (pod.isHard)			//Check if it is hard wall after checking if its a bomb
+			break;
 	}
 }
 
