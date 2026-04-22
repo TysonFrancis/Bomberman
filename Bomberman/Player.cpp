@@ -195,20 +195,12 @@ void Player::moveLogic()
 	
 	if (joyX > 0)			//If moving right, only check if collision if person is on the right half of the tile
 	{
-		if (!pods[tileY][nextX].isFilled)
+		if (!pods[tileY][nextX].isFilled||(pods[tileY][nextX].isBomb && bombPhase)||(pods[tileY][nextX].isSoft && wallPhase))
 		{
 			if (joyY >= 0 && tileY < _rows - 1 && isObstructed(nextX, tileY + 1))
 				joyY = -1;
 			else if (joyY <= 0 && tileY > 0 && isObstructed(nextX, tileY - 1))
 				joyY = 1;
-		}
-		else if (pods[tileY][nextX].isSoft && wallPhase)
-		{
-
-		}
-		else if(pods[tileY][nextX].isBomb && bombPhase)
-		{
-
 		}
 		else
 			if ((tileX * _scaledTile + _halfScaled) <= getSprite().getPosition().x)
@@ -217,20 +209,12 @@ void Player::moveLogic()
 
 	if (joyX < 0)			//If moving left, only check if collision if person is on the right half of the tile
 	{
-		if(!pods[tileY][nextX].isFilled)
+		if(!pods[tileY][nextX].isFilled || (pods[tileY][nextX].isBomb && bombPhase) || (pods[tileY][nextX].isSoft && wallPhase))
 		{
 			if (joyY >= 0 && tileY < _rows - 1 && isObstructed(nextX, tileY + 1))
 				joyY = -1;
 			else if (joyY <= 0 && tileY > 0 && isObstructed(nextX, tileY - 1))
 				joyY = 1;
-		}
-		else if (pods[tileY][nextX].isSoft && wallPhase)
-		{
-
-		}
-		else if (pods[tileY][nextX].isBomb && bombPhase)
-		{
-
 		}
 		else
 			if ((tileX * _scaledTile + _halfScaled) >= getSprite().getPosition().x)
@@ -239,20 +223,12 @@ void Player::moveLogic()
 
 	if (joyY > 0)			//If moving down, only check if collision if person is on the lower half of the tile
 	{
-		if (!pods[nextY][tileX].isFilled)
+		if (!pods[nextY][tileX].isFilled||(pods[nextY][tileX].isBomb && bombPhase)||(pods[nextY][tileX].isSoft && wallPhase))
 		{
 			if (joyX >= 0 && tileX < _cols - 1 && isObstructed(tileX + 1, nextY))
 				joyX = -1;
 			else if (joyX <= 0 && tileX > 0 && isObstructed(tileX - 1, nextY))
 				joyX = 1;
-		}
-		else if (pods[nextY][tileX].isSoft && wallPhase)
-		{
-
-		}
-		else if (pods[nextY][tileX].isBomb && bombPhase)
-		{
-
 		}
 		else
 			if ((tileY * _scaledTile + _halfScaled) <= getSprite().getPosition().y)
@@ -260,20 +236,12 @@ void Player::moveLogic()
 	}
 	if (joyY < 0)			//If moving up, only check if collision if person is on the upper half of the tile
 	{
-		if(!pods[nextY][tileX].isFilled)
+		if(!pods[nextY][tileX].isFilled || (pods[nextY][tileX].isBomb && bombPhase) || (pods[nextY][tileX].isSoft && wallPhase))
 		{
 			if (joyX >= 0 && tileX < _cols - 1 && isObstructed(tileX + 1, nextY))
 				joyX = -1;
 			else if (joyX <= 0 && tileX > 0 && isObstructed(tileX - 1, nextY))
 				joyX = 1;
-		}
-		else if (pods[nextY][tileX].isSoft && wallPhase)
-		{
-
-		}
-		else if (pods[nextY][tileX].isBomb && bombPhase)
-		{
-
 		}
 		else
 			if ((tileY * _scaledTile + _halfScaled) >= getSprite().getPosition().y)
