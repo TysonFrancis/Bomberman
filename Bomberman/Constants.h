@@ -30,11 +30,7 @@ namespace Constants
 
 	// Window size
 	static constexpr unsigned int _windowWidth = _cols * _scaledTile;
-	static constexpr unsigned int _windowHeight = _rows * _scaledTile + 2 * _scaledTile ;
-
-	// Highscore positions
-	static constexpr sf::Vector2f _highscoreTitlePosition({ 912, 504 });
-	static constexpr sf::Vector2f _highscoreGameoverPosition({ 888, 624 });
+	static constexpr unsigned int _windowHeight = _rows * _scaledTile + 2 * _scaledTile;
 
 	// Animations
 	static constexpr int _fps = 60;
@@ -88,7 +84,10 @@ namespace Constants
 	static constexpr int _fastBlinkSpeed = _invincibilityTimer - static_cast<int>(1.5 * _fps);
 	static constexpr int _fastBlinkInterval = 4;
 
-	static constexpr sf::Vector2i _spaceCharacter({ 88, 248 });				// Position vector
+	static constexpr sf::Vector2i _spaceCharacter({ 88, 248 });				// Position vectors
+
+	static constexpr sf::Vector2f _highscoreTitlePosition({ 912, 504 });
+	static constexpr sf::Vector2f _highscoreGameoverPosition({ 888, 624 });
 
 	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });			// Size vectors
 	static constexpr sf::Vector2i _letterTile({ _halfTile, _halfTile });

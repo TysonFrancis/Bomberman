@@ -46,6 +46,15 @@ private:
 	void clear();
 	void reset();
 
+	void timingAndStateChanges();
+	void updateEntities();
+	void updateUI();
+	void startRoundLogic();
+	void transitionLogic();
+	void deathLogic();
+	void titleLogic();
+	void gameOverLogic();
+
 	void spawnEnemies(Enemy::Type = Enemy::Type::Pontan);
 	Enemy::Type getEnemyType() const;
 
@@ -90,8 +99,13 @@ private:
 
 	bool levelTransition;
 	bool levelTimerExpired;
+
 	bool enterPressed;
+	bool displayScore;
+	std::fstream highscoreFile;
+
 	bool gameOver;
+
 	bool bonus;
 
 	const char* song;		// To know which song to stop when level change or game over
