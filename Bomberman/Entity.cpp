@@ -20,8 +20,10 @@ int Entity::getY() const							{ return tileY; }
 
 void Entity::move(float x, float y)					{ sprite.move(sf::Vector2f(x, y)); }
 void Entity::setScale(float x, float y)				{ sprite.setScale(sf::Vector2f(x, y)); }
-void Entity::setPosition(int x, int y)				{ sprite.setPosition(sf::Vector2f(x * _scaledTile + _halfScaled, y * _scaledTile + _halfScaled));
-														tileX = x; tileY = y; }
+void Entity::setPosition(int x, int y)				{ sprite.setPosition(sf::Vector2f
+														(static_cast<float>(x * _scaledTile + _halfScaled),
+														 static_cast<float>(y * _scaledTile + _halfScaled)));
+														 tileX = x; tileY = y; }
 void Entity::setOrigin(float x, float y)			{ sprite.setOrigin(sf::Vector2f(x, y)); }
 void Entity::setTexture(int x, int y)				{ sprite.setTextureRect(sf::IntRect(sf::Vector2i(x, y), _tile)); }
 void Entity::draw(sf::RenderTarget& target,
@@ -46,10 +48,14 @@ bool Entity::intersects(const Entity& other) const
 // I have to create the rectangle to make the comparison myself.
 bool Entity::intersects(int x, int y) const
 {
-	return this->getSprite().getGlobalBounds().					// At position
-		findIntersection(sf::FloatRect							// (tileX * game tile scale,
-		(sf::Vector2f(x * _scaledTile, y * _scaledTile),		// tileY * game tile scale),
-		 sf::Vector2f(_scaledTile, _scaledTile))).has_value();	// with size of game tile scale
+	return this->getSprite().getGlobalBounds().findIntersection
+		(sf::FloatRect
+		(sf::Vector2f											// At position
+			(static_cast<float>(x * _scaledTile),				// (tileX * game tile scale,
+			 static_cast<float>(y * _scaledTile)),				// tileY * game tile scale),
+		sf::Vector2f
+			(static_cast<float>(_scaledTile),					// with size of game tile scale
+			 static_cast<float>(_scaledTile)))).has_value();
 }
 
 

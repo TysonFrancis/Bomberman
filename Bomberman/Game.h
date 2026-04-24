@@ -31,10 +31,10 @@ public:
 	Game();
 
 	void run();
-
-	// Public static variables for infoPanel display
-	inline static int s_gameSeconds = 0;
-	inline static int s_gameScore = 0;
+	
+	// Getters for static ints
+	static int getSeconds();
+	static int getScore();
 
 private:								// *** Main methods *** //
 	void events();
@@ -59,15 +59,19 @@ private:								// *** Main methods *** //
 	void spawnEnemies(Enemy::Type = Enemy::Type::Pontan);
 	Enemy::Type getEnemyType() const;
 
+
+	inline static int s_gameSeconds = 0;
+	inline static int s_gameScore = 0;
+
 	Animations animations;
 
 	Player bomber;
 	std::vector<Enemy> enemies;
-
 	std::vector<Bomb> bombs;
 	std::vector<Explosion> explosions;
 	std::vector<SoftWall> softWalls;
 	std::vector<Points> points;
+
 	std::optional<PowerUp> powerUp;
 
 	std::vector<Text> textObjects;
