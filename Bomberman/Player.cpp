@@ -169,7 +169,7 @@ bool Player::hasFireShield() const		{ return isFireShield; }
 bool Player::hasInvinciblity() const	{ return isInvincible; }
 void Player::removeInvincibility()		{ isInvincible = false; }
 
-int Player::getLives() const			{ return lives; }
+int  Player::getLives() const			{ return lives; }
 void Player::addLife()					{ lives++; }
 
 bool Player::isOnExit() const			{ return pods[tileY][tileX].isExit; }

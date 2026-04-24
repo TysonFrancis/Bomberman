@@ -742,7 +742,7 @@ void Game::gameOverLogic()
 
     if (!levelTransition)
     {
-        highscoreFile.open("highscore.txt", std::ios::in);
+        highscoreFile.open("Savedata/highscore.txt", std::ios::in);
         if (!highscoreFile.is_open())
             std::cerr << "Error opneing file highscore.txt!";
 
@@ -753,7 +753,7 @@ void Game::gameOverLogic()
         {
             highscore = s_gameScore;
 
-            highscoreFile.open("highscore.txt", std::ios::out);
+            highscoreFile.open("Savedata/highscore.txt", std::ios::out);
             if (!highscoreFile.is_open())
                 std::cerr << "Error opneing file highscore.txt!";
 
