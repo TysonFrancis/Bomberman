@@ -11,13 +11,13 @@ using std::cout, std::endl;
 
 Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
-		Entity(tex, pods), bombs(bombs), explosions(explosions),
-		speed(_playerSpeed * _speedScale),
-		joyX(0), joyY(0), lives(3),
-		blast(1), maxBombs(1), wait(0), remote(false),
-		isFireShield(false), isInvincible(false),
-		wallPhase(false), bombPhase(false),
-		justDied(false)
+	Entity(tex, pods), bombs(bombs), explosions(explosions),
+	speed(_playerSpeed * _speedScale),
+	joyX(0), joyY(0), lives(3),
+	blast(1), maxBombs(1), wait(0), remote(false),
+	isFireShield(false), isInvincible(false),
+	wallPhase(false), bombPhase(false),
+	justDied(false)
 {
 	setTexture(64, 0);
 	setPosition(1, 1);
@@ -38,11 +38,11 @@ void Player::update()
 		joyX += (isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left));
 		joyY += (isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up));
 
-		joyX += (std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X)));
-		joyY += (std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y)));
+		joyX += std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X));
+		joyY += std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y));
 
 		moveLogic();
-		 
+
 		// Spawn a bomb
 		if (isKeyPressed(Scancode::Z))
 			if (!pods[tileY][tileX].isFilled && bombs.size() < maxBombs && !pods[tileY][tileX].isExit)
@@ -98,7 +98,7 @@ void Player::animate()
 
 		return;
 	}
-	
+
 	if (state == State::Dying)					// Death animation
 	{
 		if (frame < _playerDeathFrames)				// Keep incrementing frame until finished with death animation
@@ -153,9 +153,9 @@ void Player::gameReset()
 	bombPhase = false;
 }
 
-void Player::extraBomb()				{ if(maxBombs < 10)
+void Player::extraBomb()				{ if (maxBombs < 10)
 											maxBombs++; }
-void Player::extraRange()				{ if(blast < 10)
+void Player::extraRange()				{ if (blast < 10)
 											blast++; }
 void Player::giveRemote()				{ remote = true; }
 void Player::giveSkate()				{ if (speed < _playerSpeed * _speedScale * 1.5f)
@@ -190,12 +190,15 @@ bool Player::hasJustDied()
 
 void Player::moveLogic()
 {
-	int nextX = tileX + joyX;			// Calculate next tile position based on input to avoid 
-	int nextY = tileY + joyY;			// repeated if blocks of y + 1, y - 1, x + 1, x - 1, etc.
-	
+	int nextX = tileX + joyX;					// Calculate next tile position based on input to avoid 
+	int nextY = tileY + joyY;						// repeated if blocks of y + 1, y - 1, x + 1, x - 1, etc.
+
+	const Pod& podX = pods[tileY][nextX];		// Make pod references for less written code
+	const Pod& podY = pods[nextY][tileX];
+
 	if (joyX > 0)			//If moving right, only check if collision if person is on the right half of the tile
 	{
-		if (!pods[tileY][nextX].isFilled||(pods[tileY][nextX].isBomb && bombPhase)||(pods[tileY][nextX].isSoft && wallPhase))
+		if (!podX.isFilled || (podX.isBomb && bombPhase) || (podX.isSoft && wallPhase))
 		{
 			if (joyY >= 0 && tileY < _rows - 1 && isObstructed(nextX, tileY + 1))
 				joyY = -1;
@@ -209,7 +212,7 @@ void Player::moveLogic()
 
 	if (joyX < 0)			//If moving left, only check if collision if person is on the right half of the tile
 	{
-		if(!pods[tileY][nextX].isFilled || (pods[tileY][nextX].isBomb && bombPhase) || (pods[tileY][nextX].isSoft && wallPhase))
+		if (!podX.isFilled || (podX.isBomb && bombPhase) || (podX.isSoft && wallPhase))
 		{
 			if (joyY >= 0 && tileY < _rows - 1 && isObstructed(nextX, tileY + 1))
 				joyY = -1;
@@ -223,7 +226,7 @@ void Player::moveLogic()
 
 	if (joyY > 0)			//If moving down, only check if collision if person is on the lower half of the tile
 	{
-		if (!pods[nextY][tileX].isFilled||(pods[nextY][tileX].isBomb && bombPhase)||(pods[nextY][tileX].isSoft && wallPhase))
+		if (!podY.isFilled || (podY.isBomb && bombPhase) || (podY.isSoft && wallPhase))
 		{
 			if (joyX >= 0 && tileX < _cols - 1 && isObstructed(tileX + 1, nextY))
 				joyX = -1;
@@ -234,9 +237,10 @@ void Player::moveLogic()
 			if ((tileY * _scaledTile + _halfScaled) <= getSprite().getPosition().y)
 				joyY = 0;
 	}
+
 	if (joyY < 0)			//If moving up, only check if collision if person is on the upper half of the tile
 	{
-		if(!pods[nextY][tileX].isFilled || (pods[nextY][tileX].isBomb && bombPhase) || (pods[nextY][tileX].isSoft && wallPhase))
+		if (!podY.isFilled || (podY.isBomb && bombPhase) || (podY.isSoft && wallPhase))
 		{
 			if (joyX >= 0 && tileX < _cols - 1 && isObstructed(tileX + 1, nextY))
 				joyX = -1;
@@ -259,11 +263,9 @@ bool Player::isObstructed(int checkX, int checkY)
 
 	const Pod& pod = pods[checkY][checkX];
 
-	if (pod.isBomb && bombPhase)
+	if ((pod.isBomb && bombPhase) || (pod.isSoft && wallPhase))
 		return false;
-	if(pod.isSoft && wallPhase)
-		return false;
-	
+
 	// return if pod in question is solid and colliding
 	return pod.isFilled && intersects(checkX, checkY);
 }

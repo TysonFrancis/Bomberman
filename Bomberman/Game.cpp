@@ -4,7 +4,6 @@
 #include <SFML/Window.hpp>
 
 #include <iostream>
-#include <fstream>      // For highscores
 #include <cstdlib>      // For srand and rand
 #include <ctime>        // For time
 #include <algorithm>    // For std::min
@@ -721,6 +720,7 @@ void Game::titleLogic()
         highscoreFile.open("highscore.txt", std::ios::in);
         if (!highscoreFile.is_open())
             std::cerr << "Error opneing file highscore.txt!";
+
         highscoreFile >> highscore;
         highscoreFile.close();
 
@@ -747,6 +747,7 @@ void Game::gameOverLogic()
         highscoreFile.open("highscore.txt", std::ios::in);
         if (!highscoreFile.is_open())
             std::cerr << "Error opneing file highscore.txt!";
+
         highscoreFile >> highscore;
         highscoreFile.close();
 
@@ -755,6 +756,9 @@ void Game::gameOverLogic()
             highscore = s_gameScore;
 
             highscoreFile.open("highscore.txt", std::ios::out);
+            if (!highscoreFile.is_open())
+                std::cerr << "Error opneing file highscore.txt!";
+
             highscoreFile << s_gameScore;
             highscoreFile.close();
         }
@@ -768,6 +772,7 @@ void Game::gameOverLogic()
     if (audio.getStatus("gameOver") == sf::SoundSource::Status::Stopped)
     {
         textObjects.clear();
+
         if (highscore > 999'999'999)
             textObjects.emplace_back("999999999", _highscoreGameoverPosition, 1);
         else
