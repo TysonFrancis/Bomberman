@@ -463,7 +463,7 @@ void Game::update()
 
         if (!levelTransition)
         {
-            highscoreFile.open("highscore.txt", std::ios::in);
+            highscoreFile.open("Savedata/highscore.txt", std::ios::in);
             if (!highscoreFile.is_open())
                 std::cerr << "Error opneing file highscore.txt!";
             highscoreFile >> highscore;
@@ -473,7 +473,7 @@ void Game::update()
             {
                 highscore = s_gameScore;
 
-                highscoreFile.open("highscore.txt", std::ios::out);
+                highscoreFile.open("Savedata/highscore.txt", std::ios::out);
                 highscoreFile << s_gameScore;
                 highscoreFile.close();
             }
@@ -500,7 +500,7 @@ void Game::update()
 
         if (!done)
         {
-            highscoreFile.open("highscore.txt", std::ios::in);
+            highscoreFile.open("Savedata/highscore.txt", std::ios::in);
             if (!highscoreFile.is_open())
                 std::cerr << "Error opneing file highscore.txt!";
             highscoreFile >> highscore;
