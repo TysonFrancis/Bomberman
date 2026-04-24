@@ -11,13 +11,13 @@ using std::cout, std::endl;
 
 Player::Player(const sf::Texture& tex, Pod (&pods)[_rows][_cols],
 	std::vector<Bomb>& bombs, std::vector<Explosion>& explosions) :
-	Entity(tex, pods), bombs(bombs), explosions(explosions),
-	speed(_playerSpeed * _speedScale),
-	joyX(0), joyY(0), lives(3),
-	blast(1), maxBombs(1), wait(0), remote(false),
-	isFireShield(false), isInvincible(false),
-	wallPhase(false), bombPhase(false),
-	justDied(false)
+		Entity(tex, pods), bombs(bombs), explosions(explosions),
+		speed(_playerSpeed * _speedScale),
+		joyX(0), joyY(0), lives(3),
+		blast(1), maxBombs(1), wait(0), remote(false),
+		isFireShield(false), isInvincible(false),
+		wallPhase(false), bombPhase(false),
+		justDied(false)
 {
 	setTexture(64, 0);
 	setPosition(1, 1);
@@ -38,14 +38,14 @@ void Player::update()
 		joyX += (isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left));
 		joyY += (isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up));
 
-		joyX += std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X));
-		joyY += std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y));
+		joyX += static_cast<int>(std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X)));
+		joyY += static_cast<int>(std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y)));
 
 		moveLogic();
 
 		// Spawn a bomb
 		if (isKeyPressed(Scancode::Z))
-			if (!pods[tileY][tileX].isFilled && bombs.size() < maxBombs && !pods[tileY][tileX].isExit)
+			if (!pods[tileY][tileX].isFilled && static_cast<int>(bombs.size()) < maxBombs && !pods[tileY][tileX].isExit)
 			{
 				pods[tileY][tileX].isFilled = true;
 				pods[tileY][tileX].isHard = true;

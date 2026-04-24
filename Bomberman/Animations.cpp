@@ -1,4 +1,5 @@
 #include "Animations.h"
+#include "Text.h"
 #include <iostream>
 
 Animations::Animations()
@@ -13,6 +14,9 @@ Animations::Animations()
 		std::cerr << "Error loading from file Title.png!\n";
 	if (!icon.loadFromFile("Textures/Bomb Icon.png"))
 		std::cerr << "Error loading from file Bomb Icon.png!\n";
+
+	// Set Text texture before any objects created with text
+	Text::setTexture(title);
 }
 
 const sf::Texture& Animations::getEntities() const		{ return entities; }

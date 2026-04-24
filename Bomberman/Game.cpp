@@ -17,8 +17,7 @@ Game::Game() : background(animations.getBackground()),              // Load back
     window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     world(window.getDefaultView()), UI(window.getDefaultView()),    // Set view blocks
-    panel(animations.getMisc(), animations.getEntities(),           // Load information panel
-        animations.getTitle(), bomber),
+    panel(animations.getMisc(), animations.getEntities(), bomber),  // Load information panel
     gameState(GameState::Title), gameTick(0), stage(0),             // Set misc values to defaults
     invincibilePlayerTicks(0), isInvincibleLit(false),
     streak(0), combo(0), enemyType(0),
@@ -555,7 +554,6 @@ void Game::updateEntities()
     {
         powerUp->applyEffect(bomber);
         panel.updatePowerUp(powerUp->getType());
-        cout << *powerUp << "\n";
         powerUp.reset();
     }
 }
@@ -866,4 +864,12 @@ Enemy::Type Game::getEnemyType() const
     case PowerUp::Type::FireShield: return Enemy::Type::Pass;
     case PowerUp::Type::Invincible: return Enemy::Type::Pontan;
     }
+
+    return Enemy::Type::Ballom;     // If type somehow doesn't match
 }
+
+
+                                        // *** Accessors for static variables *** //
+
+int Game::getSeconds()    { return s_gameSeconds; }
+int Game::getScore()      { return s_gameScore; }
