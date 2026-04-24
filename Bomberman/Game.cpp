@@ -715,7 +715,7 @@ void Game::titleLogic()
 
     if (displayScore)
     {
-        highscoreFile.open("highscore.txt", std::ios::in);
+        highscoreFile.open("Savedata/highscore.txt", std::ios::in);
         if (!highscoreFile.is_open())
             std::cerr << "Error opneing file highscore.txt!";
 
