@@ -31,33 +31,47 @@ public:
 	Game();
 
 	void run();
+	
+	// Getters for static ints
+	static int getSeconds();
+	static int getScore();
 
-	// Public static variables for infoPanel display
-	inline static int s_gameSeconds = 0;
-	inline static int s_gameScore = 0;
-
-private:
+private:								// *** Main methods *** //
 	void events();
 	void update();
 	void render();
 	void closeGame();
-
+										// *** Level preparatory methods *** //
 	void level();
 	void clear();
 	void reset();
+										// *** Update submethods *** //
+	void timingAndStateChanges();
+	void updateEntities();
+	void updateUI();
 
+	void startRoundLogic();
+	void transitionLogic();
+	void deathLogic();
+	void titleLogic();
+	void gameOverLogic();
+										// *** Internal helper methods *** //
 	void spawnEnemies(Enemy::Type = Enemy::Type::Pontan);
 	Enemy::Type getEnemyType() const;
+
+
+	inline static int s_gameSeconds = 0;
+	inline static int s_gameScore = 0;
 
 	Animations animations;
 
 	Player bomber;
 	std::vector<Enemy> enemies;
-
 	std::vector<Bomb> bombs;
 	std::vector<Explosion> explosions;
 	std::vector<SoftWall> softWalls;
 	std::vector<Points> points;
+
 	std::optional<PowerUp> powerUp;
 
 	std::vector<Text> textObjects;
@@ -65,8 +79,6 @@ private:
 	Pod pods[Constants::_rows][Constants::_cols];
 
 	Audio audio;
-
-	std::fstream highscore;
 
 	sf::Sprite background;
 	sf::Sprite title;
@@ -90,8 +102,13 @@ private:
 
 	bool levelTransition;
 	bool levelTimerExpired;
+
 	bool enterPressed;
+	bool displayScore;
+	std::fstream highscoreFile;
+
 	bool gameOver;
+
 	bool bonus;
 
 	const char* song;		// To know which song to stop when level change or game over
