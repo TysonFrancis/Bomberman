@@ -201,9 +201,25 @@ void Player::moveLogic()
 		if (!podX.isFilled || (podX.isBomb && bombPhase) || (podX.isSoft && wallPhase))
 		{
 			if (joyY >= 0 && tileY < _rows - 1 && isObstructed(nextX, tileY + 1))
-				joyY = -1;
+			{
+				if(joyY>0)
+				{
+					joyY = 0;
+					joyX = 0;
+				}
+				else
+					joyY = -1;
+			}
 			else if (joyY <= 0 && tileY > 0 && isObstructed(nextX, tileY - 1))
-				joyY = 1;
+			{
+				if (joyY < 0)
+				{
+					joyY = 0;
+					joyX = 0;
+				}
+				else
+					joyY = 1;
+			}
 		}
 		else
 			if ((tileX * _scaledTile + _halfScaled) <= getSprite().getPosition().x)
@@ -215,9 +231,21 @@ void Player::moveLogic()
 		if (!podX.isFilled || (podX.isBomb && bombPhase) || (podX.isSoft && wallPhase))
 		{
 			if (joyY >= 0 && tileY < _rows - 1 && isObstructed(nextX, tileY + 1))
-				joyY = -1;
+				if (joyY > 0)
+				{
+					joyY = 0;
+					joyX = 0;
+				}
+				else
+					joyY = -1;
 			else if (joyY <= 0 && tileY > 0 && isObstructed(nextX, tileY - 1))
-				joyY = 1;
+				if (joyY < 0)
+				{
+					joyY = 0;
+					joyX = 0;
+				}
+				else
+					joyY = 1;
 		}
 		else
 			if ((tileX * _scaledTile + _halfScaled) >= getSprite().getPosition().x)
