@@ -153,9 +153,9 @@ void Player::gameReset()
 	bombPhase = false;
 }
 
-void Player::extraBomb()				{ if (maxBombs < 10)
+void Player::extraBomb()				{ if (maxBombs < _bombCountMax)
 											maxBombs++; }
-void Player::extraRange()				{ if (blast < 10)
+void Player::extraRange()				{ if (blast < _bombRangeMax)
 											blast++; }
 void Player::giveRemote()				{ remote = true; }
 void Player::giveSkate()				{ if (speed < _playerSpeed * _speedScale * 1.5f)

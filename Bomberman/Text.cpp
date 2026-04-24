@@ -57,9 +57,9 @@ void Text::construct(string text, bool isBlack, bool infoScale)
 		else																		// Else scale normally
 			sprite.setScale({ _scale, _scale });
 
-		if (infoScale)
-			sprite.setPosition({ position.x + i * _quarterScaled + offset, position.y });	// Position sprite
-		else
-			sprite.setPosition({ position.x + i * _halfScaled + offset, position.y });	// Position sprite
+		if (infoScale)																// If on info panel move over by only half
+			sprite.setPosition({ position.x + i * _quarterScaled + offset, position.y });
+		else																		// Else position normally
+			sprite.setPosition({ position.x + i * _halfScaled + offset, position.y });
 	}
 }

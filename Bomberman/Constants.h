@@ -39,8 +39,8 @@ namespace Constants
 	static constexpr int _playerDeathY = 32;
 	static constexpr int _playerDeathFrames = 7;
 	static constexpr float _playerSpeed = 4.f;
-	static constexpr int _bombCountMax = 4;
-	static constexpr int _bombRangeMax = 4;
+	static constexpr int _bombCountMax = 10;
+	static constexpr int _bombRangeMax = 10;
 	static constexpr int _playerTickSpeed = 5;
 																	// Enemies
 	static constexpr int _enemyDeathX = 96;
