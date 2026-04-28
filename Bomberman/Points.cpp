@@ -8,9 +8,9 @@ Entity(tex,pods),value(input), x(inX), y(inY)
 {
 	sprite.setPosition(sf::Vector2f(x + (_tileSize / 2), y + (_tileSize / 2)));
 	if (value <= 1000)
-		sprite.setTextureRect(sf::IntRect(sf::Vector2i(116, 8 * log2(value / 100) + 338), sf::Vector2i(16, 6)));
+		sprite.setTextureRect(sf::IntRect(sf::Vector2i(116, 8 * static_cast<int>(log2(value / 100)) + 338), _pointsTile));
 	else
-		sprite.setTextureRect(sf::IntRect(sf::Vector2i(116, 8 * log2(value / 1000) + 338), sf::Vector2i(16, 6)));
+		sprite.setTextureRect(sf::IntRect(sf::Vector2i(116, 8 * static_cast<int>(log2(value / 1000)) + 338), _pointsTile));
 }
 
 

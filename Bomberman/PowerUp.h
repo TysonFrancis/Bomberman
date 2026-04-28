@@ -28,6 +28,10 @@ public:
 	PowerUp& operator=(const PowerUp&);
 
 protected:
+	int getX() { return x; };
+	int getY() { return y; };
+
+private:
 	sf::Sprite sprite;
 	Type type;
 	int points;

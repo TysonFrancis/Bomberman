@@ -134,18 +134,22 @@ void Enemy::randomMove(bool canPhase)
 
 	if (!paused)
 	{
-		int nextX = tileX + moveX;			// Calculate next tile position based on input to avoid 
-		int nextY = tileY + moveY;			// repeated if blocks of y + 1, y - 1, x + 1, x - 1, etc.
+		int nextX = static_cast<int>(tileX + moveX);			// Calculate next tile position based on input to avoid 
+		int nextY = static_cast<int>(tileY + moveY);			// repeated if blocks of y + 1, y - 1, x + 1, x - 1, etc.
+		float tempX = moveX;
+		float tempY = moveY;
 
 		if (moveX != 0)						// If moving horizontally,
 			if (isObstructed(nextX, tileY, canPhase))		// If pod in next tile is solid and colliding, stop + change direction
 			{
 				changeDirection(canPhase);			//recovery variables say that when colliding into a wall recenter in the pod
+				tempX = moveX;
+				tempY = moveY;
 				if (!isObstructed(tileX, tileY, canPhase))
 				{
-					double recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
+					float recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
 					moveX = recoverX / speed;
-					double recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
+					float recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
 					moveY = recoverY / speed;
 				}
 			}
@@ -154,17 +158,21 @@ void Enemy::randomMove(bool canPhase)
 			if (isObstructed(tileX, nextY, canPhase))		// If pod in next tile is solid and colliding, stop + change direction
 			{
 				changeDirection(canPhase);			//recovery variables say that when colliding into a wall recenter in the pod
-				if(!isObstructed(tileX,tileY,canPhase))
+				tempX = moveX;
+				tempY = moveY;
+				if (!isObstructed(tileX, tileY, canPhase))
 				{
-					double recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
+					float recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
 					moveY = recoverY / speed;
-					double recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
+					float recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
 					moveX = recoverX / speed;
 				}
 			}
 
 		move(moveX * speed, moveY * speed);
 
+		moveX = tempX;
+		moveY = tempY;
 	}
 	else
 		changeDirection(canPhase);
@@ -207,16 +215,16 @@ void Enemy::chasePlayer(bool x, bool y, bool phase)
 		randomMove(phase);
 	else
 	{
-		int nextX = tileX + moveX;			// Calculate next tile position based on input to avoid 
-		int nextY = tileY + moveY;			// repeated if blocks of y + 1, y - 1, x + 1, x - 1, etc.
+		int nextX = static_cast<int>(tileX + moveX);			// Calculate next tile position based on input to avoid 
+		int nextY = static_cast<int>(tileY + moveY);			// repeated if blocks of y + 1, y - 1, x + 1, x - 1, etc.
 
 		if (moveX != 0)						// If moving horizontally,
 			if (isObstructed(nextX, tileY, phase))		// If pod in next tile is solid and colliding, stop + change direction
 			{
 				changeDirection(phase);			//recovery variables say that when colliding into a wall recenter in the pod
-				double recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
+				float recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
 				moveX = recoverX / speed;
-				double recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
+				float recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
 				moveY = recoverY / speed;
 			}
 
@@ -224,9 +232,9 @@ void Enemy::chasePlayer(bool x, bool y, bool phase)
 			if (isObstructed(tileX, nextY, phase))		// If pod in next tile is solid and colliding, stop + change direction
 			{
 				changeDirection(phase);			//recovery variables say that when colliding into a wall recenter in the pod
-				double recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
+				float recoverY = (tileY * _scaledTile + _halfScaled) - getSprite().getPosition().y;
 				moveY = recoverY / speed;
-				double recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
+				float recoverX = (tileX * _scaledTile + _halfScaled) - getSprite().getPosition().x;
 				moveX = recoverX / speed;
 			}
 
@@ -243,9 +251,10 @@ void Enemy::changeDirection(bool phase)
 	case Facing::Up:
 		moveX = 0;
 		moveY = -1;
-		if (!pods[tileY - 1][tileX].isFilled)
+		if (!phase&&!pods[tileY - 1][tileX].isFilled)
 			break;
-		[[fallthrough]];
+		if (phase && !pods[tileY - 1][tileX].isHard)
+			[[fallthrough]];
 	case Facing::Down:
 		moveX = 0;
 		moveY = 1;

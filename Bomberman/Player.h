@@ -23,6 +23,7 @@ public:
 	void die();
 
 	void reset();
+	void gameReset();
 
 	void extraBomb();
 	void extraRange();

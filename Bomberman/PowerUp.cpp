@@ -4,12 +4,13 @@
 using namespace Constants;
 
 PowerUp::PowerUp(const sf::Texture& tex, Type input, int x, int y) :
-	sprite(tex), type(input)
+	sprite(tex), type(input),x(x),y(y)
 {
 	sprite.setTextureRect(sf::IntRect({ static_cast<int>(type) * _tileSize, 0 }, _tile));
 	sprite.setOrigin(sf::Vector2f(_halfTile, _halfTile));
 	sprite.setScale(sf::Vector2f(_scale, _scale));
-	sprite.setPosition(sf::Vector2f(x * _scaledTile + _halfScaled, y * _scaledTile + _halfScaled));
+	sprite.setPosition(sf::Vector2f
+		(static_cast<float>(x * _scaledTile + _halfScaled), static_cast<float>(y * _scaledTile + _halfScaled)));
 }
 
 void PowerUp::applyEffect(Player& bomber)

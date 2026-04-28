@@ -30,7 +30,7 @@ namespace Constants
 
 	// Window size
 	static constexpr unsigned int _windowWidth = _cols * _scaledTile;
-	static constexpr unsigned int _windowHeight = _rows * _scaledTile + 2 * _scaledTile ;
+	static constexpr unsigned int _windowHeight = _rows * _scaledTile + 2 * _scaledTile;
 
 	// Animations
 	static constexpr int _fps = 60;
@@ -39,6 +39,8 @@ namespace Constants
 	static constexpr int _playerDeathY = 32;
 	static constexpr int _playerDeathFrames = 7;
 	static constexpr float _playerSpeed = 4.f;
+	static constexpr int _bombCountMax = 10;
+	static constexpr int _bombRangeMax = 10;
 	static constexpr int _playerTickSpeed = 5;
 																	// Enemies
 	static constexpr int _enemyDeathX = 96;
@@ -65,6 +67,18 @@ namespace Constants
 	static constexpr int _softWallY = 48;
 	static constexpr int _softWallDeathFrames = 6;
 	static constexpr int _wallTickSpeed = 6;
+																	// Infopanel
+
+	static constexpr int _infoPaneltimerX = static_cast<int>(_windowWidth * 0.175f);
+	static constexpr int _infoPanelScoreX = static_cast<int>(_windowWidth * 0.25f);
+	static constexpr int _infoPanelPowerupStartX = static_cast<int>(_windowWidth * 0.475f);
+	static constexpr int _infoPanelLivesStartX = static_cast<int>(_windowWidth * 0.825f);
+	static constexpr int _infoPanelBombCountX = static_cast<int>(_windowWidth * 0.5125f);
+	static constexpr int _infoPanelBombRangeX = static_cast<int>(_windowWidth * 0.545f);
+
+	static constexpr int _infoPanelLetterY = _halfScaled + _quarterScaled;
+	static constexpr int _infoPanelPowerupLetterY = _infoPanelLetterY + _halfScaled + _quarterScaled / 4;
+
 																	// Misc
 	static constexpr int _exitX = 176;										// Exit
 	static constexpr int _exitY = 48;
@@ -84,10 +98,14 @@ namespace Constants
 	static constexpr int _fastBlinkSpeed = _invincibilityTimer - static_cast<int>(1.5 * _fps);
 	static constexpr int _fastBlinkInterval = 4;
 
-	static constexpr sf::Vector2i _spaceCharacter({ 88, 248 });				// Position vector
+	static constexpr sf::Vector2i _spaceCharacter({ 88, 248 });				// Position vectors
+
+	static constexpr sf::Vector2f _highscoreTitlePosition({ 912, 504 });
+	static constexpr sf::Vector2f _highscoreGameoverPosition({ 888, 624 });
 
 	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });			// Size vectors
 	static constexpr sf::Vector2i _letterTile({ _halfTile, _halfTile });
+	static constexpr sf::Vector2i _pointsTile({ _tileSize, 6 });
 
 	static constexpr sf::Vector2f _centerScreen({ _windowWidth / 2.f, _windowHeight / 2.f });
 };
