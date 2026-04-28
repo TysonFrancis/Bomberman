@@ -27,7 +27,11 @@ public:
 	friend std::ostream& operator<<(std::ostream&, const PowerUp&);
 	PowerUp& operator=(const PowerUp&);
 
+	int getX() { return x; };
+	int getY() { return y; };
+
 private:
 	sf::Sprite sprite;
 	Type type;
+	int x, y;
 };
