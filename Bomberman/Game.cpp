@@ -23,7 +23,7 @@ Game::Game() : background(animations.getBackground()),              // Load back
     streak(0), combo(0), enemyType(0),
     levelTransition(false), levelTimerExpired(false),
     enterPressed(false), displayScore(true),
-    gameOver(false), bonus(false)
+    gameOver(false), bonus(false), paused(false)
 {
     // Seed random number table
     srand((static_cast<unsigned>(time(nullptr))));
@@ -98,22 +98,35 @@ void Game::events()
             closeGame();
 
         if (gameState == GameState::GameOver &&
-            sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter))
+            (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter) 
+            || sf::Joystick::isButtonPressed(0, 7)))
         {
             enterPressed = true;
             displayScore = true;
             reset();
         }
 
+        //Check if pausing
+        if (gameState == GameState::Playing && !enterPressed &&
+            (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)
+            || sf::Joystick::isButtonPressed(0, 7)))
+        {
+            pause();
+            enterPressed = true;
+        }
+
         // Check if enter key is released
         if (auto* key = event->getIf<sf::Event::KeyReleased>())
             if (key->scancode == sf::Keyboard::Scan::Enter)
+                enterPressed = false;
+        if (auto* button = event->getIf<sf::Event::JoystickButtonReleased>())
+            if (button->button == 7)
                 enterPressed = false;
     }
 
     // If on title screen and enter is pressed, start game
     if (gameState == GameState::Title &&
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter) &&
+        (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter) || sf::Joystick::isButtonPressed(0, 7)) &&
         !enterPressed)
     {
         audio.getMusic(song).stop();
@@ -129,11 +142,16 @@ void Game::update()
     switch (gameState)
     {
     case (GameState::Playing):
-
-        timingAndStateChanges();
-        updateEntities();
-        updateUI();
-
+        if(!paused)
+        {
+            timingAndStateChanges();
+            updateEntities();
+            updateUI();
+        }
+        else
+        {
+            //Draw a giant "PAUSED" in the middle of the screen
+        }
         break;
 
     case (GameState::RoundStart):   startRoundLogic();  break;

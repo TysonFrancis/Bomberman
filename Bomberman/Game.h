@@ -49,6 +49,7 @@ private:								// *** Main methods *** //
 	void timingAndStateChanges();
 	void updateEntities();
 	void updateUI();
+	void pause() { paused = !paused; };
 
 	void startRoundLogic();
 	void transitionLogic();
@@ -110,6 +111,7 @@ private:								// *** Main methods *** //
 	bool gameOver;
 
 	bool bonus;
+	bool paused;
 
 	const char* song;		// To know which song to stop when level change or game over
 
