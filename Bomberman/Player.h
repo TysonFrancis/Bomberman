@@ -27,15 +27,22 @@ public:
 
 	void extraBomb();
 	void extraRange();
-	void giveRemote();
 	void giveSkate();
 	void phaseWalls();
+	void giveRemote();
 	void phaseBombs();
 	void shieldFire();
 	void invincible();
 
+	int  getMaxBombs() const;
+	int  getBlast() const;
+	bool hasSkate() const;
+	bool hasWallPhase() const;
+	bool hasRemote() const;
+	bool hasBombPhase() const;
 	bool hasFireShield() const;
 	bool hasInvinciblity() const;
+
 	void removeInvincibility();
 
 	int getLives() const;
@@ -60,8 +67,8 @@ private:
 	int joyX, joyY;
 	int lives;
 
-	int blast;		// Used to determine blast radius of bombs
 	int maxBombs;	// Used to determine how many bombs player can have out at once
+	int blast;		// Used to determine blast radius of bombs
 	int wait;		// Delay between exploding bombs
 	bool remote;	// Used to determine if player has remote control powerup, default false
 

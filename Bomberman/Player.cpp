@@ -157,16 +157,23 @@ void Player::extraBomb()				{ if (maxBombs < _bombCountMax)
 											maxBombs++; }
 void Player::extraRange()				{ if (blast < _bombRangeMax)
 											blast++; }
-void Player::giveRemote()				{ remote = true; }
 void Player::giveSkate()				{ if (speed < _playerSpeed * _speedScale * 1.5f)
 											speed *= (1.5f * _speedScale); }
 void Player::phaseWalls()				{ wallPhase = true; }
+void Player::giveRemote()				{ remote = true; }
 void Player::phaseBombs()				{ bombPhase = true; }
 void Player::shieldFire()				{ isFireShield = true; }
 void Player::invincible()				{ isInvincible = true; }
 
+int  Player::getMaxBombs() const		{ return maxBombs; }
+int  Player::getBlast() const			{ return blast; }
+bool Player::hasSkate() const			{ return speed == _playerSpeed * _speedScale * 1.5f; }	// lol
+bool Player::hasWallPhase() const		{ return wallPhase; }
+bool Player::hasRemote() const			{ return remote; }
+bool Player::hasBombPhase() const		{ return bombPhase; }
 bool Player::hasFireShield() const		{ return isFireShield; }
 bool Player::hasInvinciblity() const	{ return isInvincible; }
+
 void Player::removeInvincibility()		{ isInvincible = false; }
 
 int  Player::getLives() const			{ return lives; }
