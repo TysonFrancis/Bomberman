@@ -131,8 +131,7 @@ void InfoPanel::updatePowerUp(PowerUp::Type type, bool turnOn)
         return;
     }
 
-        powerUps[static_cast<int>(type)].setColor(sf::Color(128, 128, 128));
-    }
+       powerUps[static_cast<int>(type)].setColor(sf::Color(128, 128, 128));
 }
 
 void InfoPanel::draw(sf::RenderTarget& target, sf::RenderStates states) const

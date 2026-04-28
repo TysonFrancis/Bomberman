@@ -6,7 +6,7 @@
 class BonusPoint : public PowerUp
 {
 public:
-	enum class Bonus { BPanel, Goddess, Cola, Famicom, Nakamoto, Dezeniman };
+	enum class Bonus { BPanel, Goddess, Nakamoto, Famicom, Cola, Dezeniman };
 
 	BonusPoint(const sf::Texture&, std::pair<int, int>, Bonus);
 	

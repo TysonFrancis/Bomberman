@@ -48,6 +48,8 @@ public:
 	friend std::ostream& operator<<(std::ostream&, const Player&);
 	Player& operator=(const Player&);
 
+	std::pair<int, int> getJoy() const { return { joyX, joyY }; }//For Cola
+
 private:
 	void moveLogic();
 	bool isObstructed(int, int);

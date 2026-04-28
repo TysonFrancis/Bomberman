@@ -102,6 +102,9 @@ private:								// *** Main methods *** //
 	int combo;
 	int enemyType;
 	int point;
+	int goddessCount;
+	int colaTimer;
+	int colaTick;
 
 	bool levelTransition;
 	bool levelTimerExpired;
@@ -113,6 +116,7 @@ private:								// *** Main methods *** //
 	bool gameOver;
 
 	bool bonus;
+	bool bonusSpawned;
 	bool enemiesKilled;
 
 	const char* song;		// To know which song to stop when level change or game over

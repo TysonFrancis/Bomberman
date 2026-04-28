@@ -160,6 +160,9 @@ void Game::render()
         if (powerUp)
             window.draw(powerUp->getSprite());
 
+        if(bonusPoints)
+			window.draw(bonusPoints->getSprite());
+
         for (SoftWall& wall : softWalls)
             window.draw(wall);
 
@@ -420,6 +423,41 @@ void Game::updateEntities()
 {
     bomber.update();
 
+    if (!bonusSpawned)
+    {
+        if (bomber.isOnExit() && !enemiesKilled && !bonusSpawned) //BPanel
+        {
+            //bonusSpawned = true;
+            //bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::BPanel);
+        }
+
+        if ((bomber.isOnExit() && !enemiesKilled)) //Cola
+            colaTimer = true;
+
+        if (colaTimer)
+        {  
+            if (!(bomber.getJoy().first == 0 && bomber.getJoy().second == 0)) // If player stops moving
+            {
+                colaTick++;
+                if (colaTick >= 900)//About 15 seconds
+                {
+                    bonusSpawned = true;
+                    bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Cola);
+                }
+            }
+            else 
+            colaTimer = false;
+        }
+
+
+        /*if (enemies.size() == 0 && !bonusSpawned) //Goddess
+        {
+            if()
+            bonusPoints.emplace(animations.getMisc(), std::pair<int, int>(1, 1), BonusPoint::Bonus::Goddess);
+        }*/
+    }
+
+
     // Enemies
     for (size_t i = 0; i < enemies.size(); i++)
     {
@@ -556,24 +594,17 @@ void Game::updateEntities()
         panel.updatePowerUp(powerUp->getType());
         powerUp.reset();
     }
-}
-        //BonusPoints
-        if(bonusPoints && bonusPoints->intersects(bomber))
-        {
-            bonusPoints->applyEffect(s_gameScore);
-            panel.updatePowerUp(bonusPoints->getType());
-            cout << *bonusPoints << "\n";
-            bonusPoints.reset();
-        }
 
-        // Powerup
-        if (powerUp && powerUp->intersects(bomber))
-        {
-            powerUp->applyEffect(bomber);
-            panel.updatePowerUp(powerUp->getType());
-            cout << *powerUp << "\n";
-            powerUp.reset();
-        }
+    //BonusPoints
+    if (bonusPoints && bonusPoints->intersects(bomber))
+    {
+        bonusPoints->applyEffect(s_gameScore);
+        panel.updatePowerUp(bonusPoints->getType());
+        cout << *bonusPoints << "\n";
+        bonusPoints.reset();
+    }
+}
+       
 
 void Game::updateUI()
 {
@@ -890,7 +921,7 @@ Enemy::Type Game::getEnemyType() const
 
 int Game::getSeconds()    { return s_gameSeconds; }
 int Game::getScore()      { return s_gameScore; }
-}
+
 
 std::pair<int, int> Game::getFree() //Find free position for bonus points
 {
