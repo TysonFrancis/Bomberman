@@ -111,7 +111,7 @@ private:								// *** Main methods *** //
 
 	bool enterPressed;
 	bool displayScore;
-	std::fstream highscoreFile;
+	std::fstream file;
 
 	bool gameOver;
 

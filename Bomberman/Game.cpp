@@ -649,6 +649,28 @@ void Game::startRoundLogic()
 
     if (!levelTransition)
     {
+        std::string temp;
+        // Save progress TODO
+        file.open("Savedata/gamestate.txt", std::ios::out);
+        if (!file.is_open())
+            std::cerr << "Error opening gamestate.txt!\n";
+
+        file
+            << stage                    << endl
+            << s_gameScore              << endl
+            << bomber.getLives()        << endl
+            << bomber.getMaxBombs()     << endl
+            << bomber.getBlast()        << endl
+            << bomber.hasSkate()        << endl
+            << bomber.hasWallPhase()    << endl
+            << bomber.hasRemote()       << endl
+            << bomber.hasBombPhase()    << endl
+            << bomber.hasFireShield();
+
+        file.close();
+        std::cout << "Progress saved.\n";
+
+        // Audio/visual
         audio.playSound("roundStart");
 
         if (bonus)
@@ -763,12 +785,12 @@ void Game::titleLogic()
 
     if (displayScore)
     {
-        highscoreFile.open("Savedata/highscore.txt", std::ios::in);
-        if (!highscoreFile.is_open())
+        file.open("Savedata/highscore.txt", std::ios::in);
+        if (!file.is_open())
             std::cerr << "Error opneing file highscore.txt!";
 
-        highscoreFile >> highscore;
-        highscoreFile.close();
+        file >> highscore;
+        file.close();
 
         if (highscore > 999'999'999)
             textObjects.emplace_back("999999999", _highscoreTitlePosition, 1);
@@ -790,25 +812,30 @@ void Game::gameOverLogic()
 
     if (!levelTransition)
     {
-        highscoreFile.open("Savedata/highscore.txt", std::ios::in);
-        if (!highscoreFile.is_open())
+        // Clear save
+        std::remove("Savedata/gamestate.txt");
+
+        // Save highscore
+        file.open("Savedata/highscore.txt", std::ios::in);
+        if (!file.is_open())
             std::cerr << "Error opneing file highscore.txt!";
 
-        highscoreFile >> highscore;
-        highscoreFile.close();
-
+        file >> highscore;
+        file.close();
+        
         if (highscore < s_gameScore)
         {
             highscore = s_gameScore;
 
-            highscoreFile.open("Savedata/highscore.txt", std::ios::out);
-            if (!highscoreFile.is_open())
+            file.open("Savedata/highscore.txt", std::ios::out);
+            if (!file.is_open())
                 std::cerr << "Error opneing file highscore.txt!";
 
-            highscoreFile << s_gameScore;
-            highscoreFile.close();
+            file << s_gameScore;
+            file.close();
         }
 
+        // Audio/visual
         audio.playSound("gameOver");
         textObjects.emplace_back("game over", _centerScreen);
         levelTransition = true;
