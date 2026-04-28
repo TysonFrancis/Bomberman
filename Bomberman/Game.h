@@ -6,6 +6,7 @@
 #include "Animations.h"
 #include "Audio.h"
 #include "Bomb.h"
+#include "BonusPoint.h"
 #include "Constants.h"
 #include "Enemy.h"
 #include "Explosion.h"
@@ -45,6 +46,7 @@ private:
 	void clear();
 	void spawnEnemies(Enemy::Type = Enemy::Type::Pontan);
 	Enemy::Type getEnemyType() const;
+	std::pair<int, int> getFree();
 
 	Animations animations;
 
@@ -56,6 +58,7 @@ private:
 	std::vector<SoftWall> softWalls;
 	std::vector<Points> points;
 	std::optional<PowerUp> powerUp;
+	std::optional<BonusPoint> bonusPoints;
 
 	std::vector<Text> textObjects;
 
@@ -87,6 +90,7 @@ private:
 	bool levelTimerExpired;
 	bool gameOver;
 	bool bonus;
+	bool enemiesKilled;
 
 	const char* song;		// To know which song to stop when level change or game over
 

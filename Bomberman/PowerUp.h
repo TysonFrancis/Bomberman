@@ -14,7 +14,7 @@ class Player;
 class PowerUp
 {
 public:
-	enum class Type { ExtraBomb, ExtraRange, Skate, WallPhase, Remote, BombPhase, FireShield, Invincible };
+	enum class Type { ExtraBomb, ExtraRange, Skate, WallPhase, Remote, BombPhase, FireShield, Invincible, BonusPoints };
 
 	PowerUp(const sf::Texture&, Type, int, int);
 
@@ -27,7 +27,8 @@ public:
 	friend std::ostream& operator<<(std::ostream&, const PowerUp&);
 	PowerUp& operator=(const PowerUp&);
 
-private:
+protected:
 	sf::Sprite sprite;
 	Type type;
+	int points;
 };

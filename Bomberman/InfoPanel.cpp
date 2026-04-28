@@ -88,13 +88,16 @@ void InfoPanel::updateLives(bool addLife)
 // Make powerup change colors based on bool input
 void InfoPanel::updatePowerUp(PowerUp::Type type, bool turnOn)
 {
-    if (turnOn)
+    if (static_cast <int>(type) < 8)
     {
-        powerUps[static_cast<int>(type)].setColor(sf::Color::White);
-        return;
-    }
+        if (turnOn)
+        {
+            powerUps[static_cast<int>(type)].setColor(sf::Color::White);
+            return;
+        }
 
-    powerUps[static_cast<int>(type)].setColor(sf::Color(128, 128, 128));
+        powerUps[static_cast<int>(type)].setColor(sf::Color(128, 128, 128));
+    }
 }
 
 void InfoPanel::draw(sf::RenderTarget& target, sf::RenderStates states) const

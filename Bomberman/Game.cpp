@@ -135,6 +135,8 @@ void Game::update()
         if ((bomber.isOnExit() && enemies.size() == 0)
             || (gameTick >= _bonusTimer && bonus))
             gameState = GameState::Transition;
+        else if((bomber.isOnExit() && !enemiesKilled && !bonusPoints.has_value())) //Spawn B Panel
+			bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::BPanel);
 
         // Spawn enemies for bonus stage                        // *** Enemy spawning *** //
         if (bonus)
@@ -168,6 +170,9 @@ void Game::update()
             streak -= 1;
             if (enemies[i].getState() == Entity::State::Dead)
             {
+                if(!enemiesKilled)
+					enemiesKilled = true;
+
                 //Check for combo kills
                 if (streak > 0)
                     combo += 1;
@@ -187,7 +192,9 @@ void Game::update()
                 s_gameScore += point;
                 streak = 20;            // Waits 20 frames to check for other deaths
 
-                points.push_back(Points(animations.getEntities(), pods, point, enemies[i].getX(), enemies[i].getY()));
+                points.push_back(Points(animations.getEntities(), pods, point,
+                    static_cast<int>(enemies[i].getSprite().getPosition().x),
+                    static_cast<int>(enemies[i].getSprite().getPosition().y)));
 
                 enemies.erase(enemies.begin() + i);
                 i--;
@@ -281,6 +288,15 @@ void Game::update()
                 points.erase(points.begin() + i);
                 i--;
             }
+        }
+
+        //BonusPoints
+        if(bonusPoints && bonusPoints->intersects(bomber))
+        {
+            bonusPoints->applyEffect(s_gameScore);
+            panel.updatePowerUp(bonusPoints->getType());
+            cout << *bonusPoints << "\n";
+            bonusPoints.reset();
         }
 
         // Powerup
@@ -473,6 +489,9 @@ void Game::render()
         if (powerUp)
             window.draw(powerUp->getSprite());
 
+        if(bonusPoints)
+			window.draw(bonusPoints->getSprite());
+
         for (SoftWall& wall : softWalls)
             window.draw(wall);
 
@@ -534,6 +553,7 @@ void Game::level()
 
     int walls = stage * 2 + 54;
     int playable = _softPods;
+	bool enemiesKilled = false;
 
     for (int row = 0; row < _rows; row++)
     {
@@ -721,4 +741,15 @@ Enemy::Type Game::getEnemyType() const
     case PowerUp::Type::FireShield: return Enemy::Type::Pass;
     case PowerUp::Type::Invincible: return Enemy::Type::Pontan;
     }
+}
+
+std::pair<int, int> Game::getFree() //Find free position for bonus points
+{
+    int x, y;
+    do
+    {
+        x = rand() % (_cols - 1) + 1;
+        y = rand() % (_rows - 1) + 1;
+    } while (pods[y][x].isFilled);
+    return { x  , y };
 }
