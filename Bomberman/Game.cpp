@@ -550,7 +550,7 @@ void Game::updateEntities()
     }
 
     // Powerup
-    if (powerUp && powerUp->intersects(bomber))
+    if (powerUp && powerUp->intersects(bomber)&&!pods[powerUp->getY()][powerUp->getX()].isFilled)
     {
         powerUp->applyEffect(bomber);
         panel.updatePowerUp(powerUp->getType());
