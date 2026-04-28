@@ -7,6 +7,7 @@
 #include "Animations.h"
 #include "Audio.h"
 #include "Bomb.h"
+#include "BonusPoint.h"
 #include "Constants.h"
 #include "Enemy.h"
 #include "Explosion.h"
@@ -59,6 +60,7 @@ private:								// *** Main methods *** //
 										// *** Internal helper methods *** //
 	void spawnEnemies(Enemy::Type = Enemy::Type::Pontan);
 	Enemy::Type getEnemyType() const;
+	std::pair<int, int> getFree();
 
 
 	inline static int s_gameSeconds = 0;
@@ -74,6 +76,7 @@ private:								// *** Main methods *** //
 	std::vector<Points> points;
 
 	std::optional<PowerUp> powerUp;
+	std::optional<BonusPoint> bonusPoints;
 
 	std::vector<Text> textObjects;
 
@@ -100,17 +103,22 @@ private:								// *** Main methods *** //
 	int combo;
 	int enemyType;
 	int point;
+	int goddessCount;
+	int colaTimer;
+	int colaTick;
 
 	bool levelTransition;
 	bool levelTimerExpired;
 
 	bool enterPressed;
 	bool displayScore;
-	std::fstream highscoreFile;
+	std::fstream file;
 
 	bool gameOver;
 
 	bool bonus;
+	bool bonusSpawned;
+	bool enemiesKilled;
 	bool paused;
 
 	const char* song;		// To know which song to stop when level change or game over

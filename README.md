@@ -1,5 +1,9 @@
-Emulator: https://emulatorgamer.com/games/bomberman/play
 
-Emulator (blocked): https://randomhoohaas.flyingomelette.com/bomb/nes-1/game.html
+## **Contributors**
+&emsp;Team lead: **Tyson Francis**  
+&emsp;Developers: **Dylan Fletcher, Emery Chiang, Henry Steele**
 
-Audio download (blocked): https://downloads.khinsider.com/game-soundtracks/album/bomberman-nes
+## **Resources used:**
+[Emulator](https://emulatorgamer.com/games/bomberman/play)<br/>
+[Game info](https://randomhoohaas.flyingomelette.com/bomb/nes-1/game.html)<br/>
+[Audio](https://downloads.khinsider.com/game-soundtracks/album/bomberman-nes)

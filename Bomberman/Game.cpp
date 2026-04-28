@@ -178,6 +178,9 @@ void Game::render()
         if (powerUp)
             window.draw(powerUp->getSprite());
 
+        if(bonusPoints)
+			window.draw(bonusPoints->getSprite());
+
         for (SoftWall& wall : softWalls)
             window.draw(wall);
 
@@ -438,6 +441,41 @@ void Game::updateEntities()
 {
     bomber.update();
 
+    if (!bonusSpawned)
+    {
+        if (bomber.isOnExit() && !enemiesKilled && !bonusSpawned) //BPanel
+        {
+            //bonusSpawned = true;
+            //bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::BPanel);
+        }
+
+        if ((bomber.isOnExit() && !enemiesKilled)) //Cola
+            colaTimer = true;
+
+        if (colaTimer)
+        {  
+            if (!(bomber.getJoy().first == 0 && bomber.getJoy().second == 0)) // If player stops moving
+            {
+                colaTick++;
+                if (colaTick >= 900)//About 15 seconds
+                {
+                    bonusSpawned = true;
+                    bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Cola);
+                }
+            }
+            else 
+            colaTimer = false;
+        }
+
+
+        /*if (enemies.size() == 0 && !bonusSpawned) //Goddess
+        {
+            if()
+            bonusPoints.emplace(animations.getMisc(), std::pair<int, int>(1, 1), BonusPoint::Bonus::Goddess);
+        }*/
+    }
+
+
     // Enemies
     for (size_t i = 0; i < enemies.size(); i++)
     {
@@ -574,7 +612,17 @@ void Game::updateEntities()
         panel.updatePowerUp(powerUp->getType());
         powerUp.reset();
     }
+
+    //BonusPoints
+    if (bonusPoints && bonusPoints->intersects(bomber))
+    {
+        bonusPoints->applyEffect(s_gameScore);
+        panel.updatePowerUp(bonusPoints->getType());
+        cout << *bonusPoints << "\n";
+        bonusPoints.reset();
+    }
 }
+       
 
 void Game::updateUI()
 {
@@ -619,6 +667,28 @@ void Game::startRoundLogic()
 
     if (!levelTransition)
     {
+        std::string temp;
+        // Save progress TODO
+        file.open("Savedata/gamestate.txt", std::ios::out);
+        if (!file.is_open())
+            std::cerr << "Error opening gamestate.txt!\n";
+
+        file
+            << stage                    << endl
+            << s_gameScore              << endl
+            << bomber.getLives()        << endl
+            << bomber.getMaxBombs()     << endl
+            << bomber.getBlast()        << endl
+            << bomber.hasSkate()        << endl
+            << bomber.hasWallPhase()    << endl
+            << bomber.hasRemote()       << endl
+            << bomber.hasBombPhase()    << endl
+            << bomber.hasFireShield();
+
+        file.close();
+        std::cout << "Progress saved.\n";
+
+        // Audio/visual
         audio.playSound("roundStart");
 
         if (bonus)
@@ -733,12 +803,12 @@ void Game::titleLogic()
 
     if (displayScore)
     {
-        highscoreFile.open("Savedata/highscore.txt", std::ios::in);
-        if (!highscoreFile.is_open())
+        file.open("Savedata/highscore.txt", std::ios::in);
+        if (!file.is_open())
             std::cerr << "Error opneing file highscore.txt!";
 
-        highscoreFile >> highscore;
-        highscoreFile.close();
+        file >> highscore;
+        file.close();
 
         if (highscore > 999'999'999)
             textObjects.emplace_back("999999999", _highscoreTitlePosition, 1);
@@ -760,25 +830,30 @@ void Game::gameOverLogic()
 
     if (!levelTransition)
     {
-        highscoreFile.open("Savedata/highscore.txt", std::ios::in);
-        if (!highscoreFile.is_open())
+        // Clear save
+        std::remove("Savedata/gamestate.txt");
+
+        // Save highscore
+        file.open("Savedata/highscore.txt", std::ios::in);
+        if (!file.is_open())
             std::cerr << "Error opneing file highscore.txt!";
 
-        highscoreFile >> highscore;
-        highscoreFile.close();
-
+        file >> highscore;
+        file.close();
+        
         if (highscore < s_gameScore)
         {
             highscore = s_gameScore;
 
-            highscoreFile.open("Savedata/highscore.txt", std::ios::out);
-            if (!highscoreFile.is_open())
+            file.open("Savedata/highscore.txt", std::ios::out);
+            if (!file.is_open())
                 std::cerr << "Error opneing file highscore.txt!";
 
-            highscoreFile << s_gameScore;
-            highscoreFile.close();
+            file << s_gameScore;
+            file.close();
         }
 
+        // Audio/visual
         audio.playSound("gameOver");
         textObjects.emplace_back("game over", _centerScreen);
         levelTransition = true;
@@ -891,3 +966,15 @@ Enemy::Type Game::getEnemyType() const
 
 int Game::getSeconds()    { return s_gameSeconds; }
 int Game::getScore()      { return s_gameScore; }
+
+
+std::pair<int, int> Game::getFree() //Find free position for bonus points
+{
+    int x, y;
+    do
+    {
+        x = rand() % (_cols - 1) + 1;
+        y = rand() % (_rows - 1) + 1;
+    } while (pods[y][x].isFilled);
+    return { x  , y };
+}
