@@ -148,10 +148,6 @@ void Game::update()
             updateEntities();
             updateUI();
         }
-        else
-        {
-            //Draw a giant "PAUSED" in the middle of the screen
-        }
         break;
 
     case (GameState::RoundStart):   startRoundLogic();  break;
@@ -201,7 +197,7 @@ void Game::render()
         window.setView(UI);
 
         window.draw(panel);
-        if (paused)
+        if (paused)                         // If game is paused, draw "paused" on a black background
         {
             sf::RectangleShape pauseBlock({ _scaledTile*3.5,_scaledTile });
             pauseBlock.setOrigin({ _halfScaled*3.5,_quarterScaled });
