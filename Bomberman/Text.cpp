@@ -15,6 +15,8 @@ Text::Text(const string& text, sf::Vector2f pos, int align, bool isBlack, bool i
 // Load texture once at startup in game constructor -> method is static for this
 void Text::setTexture(const sf::Texture& tex) { texture = &tex; }
 
+const sf::Vector2f Text::getPosition() const	{ return position; }
+
 void Text::edit(const string& newText, bool isBlack, bool infoScale)
 {
 	sprites.clear();

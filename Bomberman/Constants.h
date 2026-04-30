@@ -103,6 +103,9 @@ namespace Constants
 	static constexpr sf::Vector2f _highscoreTitlePosition({ 912, 504 });
 	static constexpr sf::Vector2f _highscoreGameoverPosition({ 888, 624 });
 
+	static constexpr sf::Vector2f _startPointerPosition({ 564, 456 });
+	static constexpr sf::Vector2f _continuePointerPosition({ 756, 456 });
+
 	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });			// Size vectors
 	static constexpr sf::Vector2i _letterTile({ _halfTile, _halfTile });
 	static constexpr sf::Vector2i _pointsTile({ _tileSize, 6 });

@@ -90,6 +90,8 @@ void Game::run()
 // Handles window events like game starting and closing
 void Game::events()
 {
+    bool arrowKeyDown = false;
+
     // Close game if window is closed, escape key pressed, or on game over screen and enter pressed
     while (const std::optional event = window.pollEvent())
     {
@@ -98,8 +100,8 @@ void Game::events()
             closeGame();
 
         if (gameState == GameState::GameOver &&
-            (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter) 
-            || sf::Joystick::isButtonPressed(0, 7)))
+            (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)
+                || sf::Joystick::isButtonPressed(0, 7)))
         {
             enterPressed = true;
             displayScore = true;
@@ -109,7 +111,7 @@ void Game::events()
         //Check if pausing
         if (gameState == GameState::Playing && !enterPressed &&
             (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)
-            || sf::Joystick::isButtonPressed(0, 7)))
+                || sf::Joystick::isButtonPressed(0, 7)))
         {
             pause();
             enterPressed = true;
@@ -122,16 +124,77 @@ void Game::events()
         if (auto* button = event->getIf<sf::Event::JoystickButtonReleased>())
             if (button->button == 7)
                 enterPressed = false;
+
+        if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+            if (keyPressed->scancode == sf::Keyboard::Scancode::Left
+                || keyPressed->scancode == sf::Keyboard::Scancode::Right)
+                arrowKeyDown = true;
     }
 
-    // If on title screen and enter is pressed, start game
-    if (gameState == GameState::Title &&
-        (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter) || sf::Joystick::isButtonPressed(0, 7)) &&
-        !enterPressed)
+    // If on title screen
+    if (gameState == GameState::Title)
     {
-        audio.getMusic(song).stop();
-        textObjects.clear();
-        gameState = GameState::RoundStart;
+        // If enter is pressed, start game
+        if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)
+            || sf::Joystick::isButtonPressed(0, 7)) && !enterPressed)
+        {
+            file.open("Savedata/gamestate.txt", std::ios::in);
+
+            if (file.is_open() && textObjects.back().getPosition() == _continuePointerPosition)
+            {
+                cout << "Loading game from file...\n";
+                int temp; // For loading from file into methods
+
+                // yeah don't worry about it
+                // it works
+                file >> stage;
+                file >> s_gameScore;
+                file >> temp;
+                bomber.setLives(temp);
+                file >> temp;
+                while (--temp)
+                {
+                    bomber.extraBomb();
+                }
+                file >> temp;
+                while (--temp)
+                {
+                    bomber.extraRange();
+                }
+                file >> temp;
+                if (temp)
+                    bomber.giveSkate();
+                file >> temp;
+                if (temp)
+                    bomber.phaseWalls();
+                file >> temp;
+                if (temp)
+                    bomber.giveRemote();
+                file >> temp;
+                if (temp)
+                    bomber.phaseBombs();
+                file >> temp;
+                if (temp)
+                    bomber.shieldFire();
+            }
+
+            audio.getMusic(song).stop();
+            textObjects.clear();
+            gameState = GameState::RoundStart;
+        }
+
+        // If left/right pressed, navigate menu
+        if (arrowKeyDown)
+            if (textObjects.back().getPosition() == _startPointerPosition)
+            {
+                textObjects.pop_back();
+                textObjects.emplace_back(">", _continuePointerPosition);
+            }
+            else
+            {
+                textObjects.pop_back();
+                textObjects.emplace_back(">", _startPointerPosition);
+            }
     }
 }
 
@@ -668,7 +731,6 @@ void Game::startRoundLogic()
     if (!levelTransition)
     {
         std::string temp;
-        // Save progress TODO
         file.open("Savedata/gamestate.txt", std::ios::out);
         if (!file.is_open())
             std::cerr << "Error opening gamestate.txt!\n";
@@ -816,6 +878,10 @@ void Game::titleLogic()
             textObjects.emplace_back(std::to_string(highscore), _highscoreTitlePosition, 1);
 
         displayScore = false;
+
+        // Menu cursor
+        // unrelated to score but triggers on the same condition
+        textObjects.emplace_back(">", _startPointerPosition);
     }
 }
 

@@ -177,6 +177,7 @@ bool Player::hasInvinciblity() const	{ return isInvincible; }
 void Player::removeInvincibility()		{ isInvincible = false; }
 
 int  Player::getLives() const			{ return lives; }
+void Player::setLives(int amount)		{ lives = amount; }
 void Player::addLife()					{ lives++; }
 
 bool Player::isOnExit() const			{ return pods[tileY][tileX].isExit&&!pods[tileY][tileX].isFilled; }

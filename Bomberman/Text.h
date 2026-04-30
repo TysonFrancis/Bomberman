@@ -30,6 +30,8 @@ public:
 
 	static void setTexture(const sf::Texture&);		// To not reload texture for every text object
 
+	const sf::Vector2f getPosition() const;
+
 	void edit(const std::string&, bool = false, bool = false);
 
 	std::vector<sf::Sprite> sprites;

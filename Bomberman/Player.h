@@ -46,6 +46,7 @@ public:
 	void removeInvincibility();
 
 	int getLives() const;
+	void setLives(int);
 	void addLife();
 
 	bool isOnExit() const;
