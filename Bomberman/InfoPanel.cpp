@@ -7,8 +7,8 @@
 using std::cout, std::endl;
 using namespace Constants;
 
-InfoPanel::InfoPanel(const sf::Texture& miscTex, const sf::Texture& playTex, const Player& player) :
-    lifeTex(playTex),
+InfoPanel::InfoPanel(const sf::Texture& miscTex, const sf::Texture& playTex) :
+    powerUpTex(miscTex), lifeTex(playTex),
     giveBomb(0), giveRange(0),
     timer("time " + std::to_string(Game::getSeconds()),         // Time text
         sf::Vector2f(_infoPaneltimerX, _infoPanelLetterY),
@@ -22,29 +22,13 @@ InfoPanel::InfoPanel(const sf::Texture& miscTex, const sf::Texture& playTex, con
     backdrop.setFillColor(sf::Color(189, 190, 189));
     backdrop.setPosition(sf::Vector2f(0, 0));
 
-
     // Initialize powerup placements and construction
     powerUps.reserve(8);
-    for (int i = 0; i < 8; i++)
-    {
-        auto& sprite = powerUps.emplace_back(miscTex);
-        sprite.setTextureRect(sf::IntRect({ i * _tileSize, 0 }, _tile));
-        sprite.setColor(sf::Color(128, 128, 128));
-        sprite.setScale(sf::Vector2f(_scale, _scale));
-        sprite.setPosition(sf::Vector2f
-            (static_cast<float>(_infoPanelPowerupStartX + i * _scaledTile), static_cast<float>(_halfScaled)));
-    }
+	setPowerUps();
 
     // Initialize life placements and construction
     lives.reserve(2);
-    for (int i = 0; i < 2; i++)
-    {
-        auto& sprite = lives.emplace_back(lifeTex);
-        sprite.setTextureRect(sf::IntRect({ 64, 0 }, _tile));
-        sprite.setScale(sf::Vector2f(_scale, _scale));
-        sprite.setPosition(sf::Vector2f
-            (static_cast<float>(_infoPanelLivesStartX + i * _scaledTile), static_cast<float>(_halfScaled)));
-    }
+    setLives();
 }
 
 // Update game seconds and score
@@ -72,24 +56,24 @@ void InfoPanel::update()
 // Update player life display
 void InfoPanel::updateLives(bool addLife)
 {
-    if (lives.size() < 1 && !addLife)
+	if (lives.size() < 1 && !addLife)               // If no lives left and not adding life, return
         return;
 
-    if (addLife)
+    if (addLife)                                    // If adding life
     {
-        auto& sprite = lives.emplace_back(lifeTex);
+		auto& sprite = lives.emplace_back(lifeTex);     // Add new life sprite
         sprite.setTextureRect(sf::IntRect({ 64, 0 }, _tile));
         sprite.setScale(sf::Vector2f(_scale, _scale));
 
-        if (lives.size() == 1)
+		if (lives.size() == 1)                          // If only one life, put in middle of where two lives would be
             sprite.setPosition(sf::Vector2f(_infoPanelLivesStartX, _halfScaled));
-        else
+		else                                            // Else, put in normal position
             sprite.setPosition(sf::Vector2f(_infoPanelLivesStartX + _scaledTile, _halfScaled));
 
         return;
     }
 
-    lives.erase(lives.begin() + lives.size() - 1);
+	lives.erase(lives.begin() + lives.size() - 1);      // Else, remove a life sprite
 }
 
 // Make powerup change colors based on bool input
@@ -134,6 +118,20 @@ void InfoPanel::updatePowerUp(PowerUp::Type type, bool turnOn)
        powerUps[static_cast<int>(type)].setColor(sf::Color(128, 128, 128));
 }
 
+// Reset infoPanel to default
+// when starting a new game
+void InfoPanel::reset()
+{
+    giveBomb = 0;
+    giveRange = 0;
+
+    bombCount.reset();
+    bombRange.reset();
+
+	setPowerUps();
+	setLives();
+}
+
 void InfoPanel::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.draw(backdrop, states);          // Draw backdrop first
@@ -157,4 +155,40 @@ void InfoPanel::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
     for (auto& sprite : lives)              // Draw lives
         target.draw(sprite);
+}
+
+
+// *** Private helper methods *** //
+
+// Initialize powerup sprites and placements,
+// called in constructor and on reset
+void InfoPanel::setPowerUps()
+{
+    powerUps.clear();
+
+    for (int i = 0; i < 8; i++)
+    {
+        auto& sprite = powerUps.emplace_back(powerUpTex);
+        sprite.setTextureRect(sf::IntRect({ i * _tileSize, 0 }, _tile));
+        sprite.setColor(sf::Color(128, 128, 128));
+        sprite.setScale(sf::Vector2f(_scale, _scale));
+        sprite.setPosition(sf::Vector2f
+        (static_cast<float>(_infoPanelPowerupStartX + i * _scaledTile), static_cast<float>(_halfScaled)));
+    }
+}
+
+// Initialize life sprites and placements,
+// called in constructor and on reset
+void InfoPanel::setLives()
+{
+    lives.clear();
+
+    for (int i = 0; i < 2; i++)
+    {
+        auto& sprite = lives.emplace_back(lifeTex);
+        sprite.setTextureRect(sf::IntRect({ 64, 0 }, _tile));
+        sprite.setScale(sf::Vector2f(_scale, _scale));
+        sprite.setPosition(sf::Vector2f
+        (static_cast<float>(_infoPanelLivesStartX + i * _scaledTile), static_cast<float>(_halfScaled)));
+    }
 }

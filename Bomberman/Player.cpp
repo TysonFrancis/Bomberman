@@ -44,7 +44,7 @@ void Player::update()
 		moveLogic();
 
 		// Spawn a bomb
-		if (isKeyPressed(Scancode::Z))
+		if (isKeyPressed(Scancode::Z)||sf::Joystick::isButtonPressed(0,0))
 			if (!pods[tileY][tileX].isFilled && static_cast<int>(bombs.size()) < maxBombs && !pods[tileY][tileX].isExit)
 			{
 				pods[tileY][tileX].isFilled = true;
@@ -56,7 +56,7 @@ void Player::update()
 		//Remote Detonation
 		if (wait > 0)
 			wait--;
-		if ((isKeyPressed(Scancode::X)) && remote && bombs.size() > 0 && wait == 0)
+		if ((isKeyPressed(Scancode::X) || sf::Joystick::isButtonPressed(0, 1)) && remote && bombs.size() > 0 && wait == 0)
 		{
 			bombs[0].die();
 			wait = 10;

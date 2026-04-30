@@ -4,7 +4,7 @@
 using namespace Constants;
 
 PowerUp::PowerUp(const sf::Texture& tex, Type input, int x, int y) :
-	sprite(tex), type(input),x(x),y(y)
+	sprite(tex), type(input),points(0), x(x),y(y)
 {
 	sprite.setTextureRect(sf::IntRect({ static_cast<int>(type) * _tileSize, 0 }, _tile));
 	sprite.setOrigin(sf::Vector2f(_halfTile, _halfTile));
