@@ -201,6 +201,17 @@ void Game::render()
         window.setView(UI);
 
         window.draw(panel);
+        if (paused)
+        {
+            sf::RectangleShape pauseBlock({ _scaledTile*3.5,_scaledTile });
+            pauseBlock.setOrigin({ _halfScaled*3.5,_quarterScaled });
+            pauseBlock.setPosition(_centerScreen);
+            pauseBlock.setFillColor(sf::Color());
+            window.draw(pauseBlock);
+            Text pauses("paused", { _centerScreen });
+            for (sf::Sprite& glyph : pauses.sprites)
+                window.draw(glyph);
+        }
 
         break;
 
