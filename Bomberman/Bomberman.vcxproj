@@ -137,6 +137,7 @@
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Bomb.cpp" />
     <ClCompile Include="Bomberman.cpp" />
+    <ClCompile Include="BonusPoint.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Explosion.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="Animations.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Bomb.h" />
+    <ClInclude Include="BonusPoint.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Entity.h" />
