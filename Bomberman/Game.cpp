@@ -14,6 +14,8 @@ using std::cout, std::endl;
 Game::Game() : background(animations.getBackground()),              // Load background sprite
     title(animations.getTitle()), endTitle(animations.getTitle()),  // Load title sprites
     bomber(animations.getEntities(), pods, bombs, explosions),      // Load bomber entity
+	pauseBlock({ _scaledTile * 3.5, _scaledTile }),                 // Set pause block size
+	pauses("paused", { _centerScreen }),                            // Set pause text
     window(sf::VideoMode({ _windowWidth, _windowHeight }),          // Create window with title and size
         "Bomberman", sf::Style::Titlebar | sf::Style::Close),
     world(window.getDefaultView()), UI(window.getDefaultView()),    // Set view blocks
@@ -54,6 +56,11 @@ Game::Game() : background(animations.getBackground()),              // Load back
     // Set background sprite on right texture and scale to fit window
     background.setTextureRect(sf::IntRect({ 0, 0 }, { 496, 208 }));
     background.setScale({ _scale, _scale });
+
+    // Set pause block for middle of screen
+    pauseBlock.setOrigin({ _halfScaled * 3.5, _quarterScaled });
+    pauseBlock.setPosition(_centerScreen);
+    pauseBlock.setFillColor(sf::Color::Black);
 
     // Create pod system of walls and border
     for (int row = 0; row < _rows; row++)
@@ -142,12 +149,14 @@ void Game::update()
     switch (gameState)
     {
     case (GameState::Playing):
-        if(!paused)
+
+        if (!paused)
         {
             timingAndStateChanges();
             updateEntities();
             updateUI();
         }
+
         break;
 
     case (GameState::RoundStart):   startRoundLogic();  break;
@@ -167,7 +176,8 @@ void Game::render()
     {
     case(GameState::Playing):
     case(GameState::Death):
-        window.setView(world);
+
+		window.setView(world);                              // Set view to world for drawing entities
 
         window.draw(background);
 
@@ -194,17 +204,14 @@ void Game::render()
         for (Points& point : points)
             window.draw(point);
 
-        window.setView(UI);
+		window.setView(UI);                                 // Set view to UI for drawing information panel and text
 
         window.draw(panel);
+
         if (paused)                         // If game is paused, draw "paused" on a black background
         {
-            sf::RectangleShape pauseBlock({ _scaledTile*3.5,_scaledTile });
-            pauseBlock.setOrigin({ _halfScaled*3.5,_quarterScaled });
-            pauseBlock.setPosition(_centerScreen);
-            pauseBlock.setFillColor(sf::Color());
             window.draw(pauseBlock);
-            Text pauses("paused", { _centerScreen });
+
             for (sf::Sprite& glyph : pauses.sprites)
                 window.draw(glyph);
         }
@@ -212,17 +219,21 @@ void Game::render()
         break;
 
     case(GameState::GameOver):
+
 		if (gameOver)                       // If game over audio has finished, show game over screen
         {
             window.draw(endTitle);
+
             for (Text& text : textObjects)
                 for (sf::Sprite& glyph : text.sprites)
                     window.draw(glyph);
             break;
         }
         [[fallthrough]];
+
 	case(GameState::RoundStart):            // Display text during music transitions
     case(GameState::Transition):            // for round start, stage clear, and game over
+
         for (Text& text : textObjects)
             for (sf::Sprite& glyph : text.sprites)
                 window.draw(glyph);
@@ -230,7 +241,9 @@ void Game::render()
         break;
 
     case(GameState::Title):
+
         window.draw(title);
+
         for (Text& text : textObjects)
             for (sf::Sprite& glyph : text.sprites)
                 window.draw(glyph);
@@ -508,8 +521,8 @@ void Game::updateEntities()
 
             switch (enemyType)      // Update score when enemy dies
             {
-            case 0: case 1: point = (enemyType + 1) * 100 * combo; break;
-            case 2: case 3: point = (enemyType - 1) * 200 * combo; break;
+            case 0: case 1: point = (enemyType + 1) * 100 * combo;  break;
+            case 2: case 3: point = (enemyType - 1) * 200 * combo;  break;
             case 4: case 5: point = (enemyType - 3) * 1000 * combo; break;
             case 6: case 7: point = (enemyType - 5) * 2000 * combo; break;
             }
@@ -630,7 +643,6 @@ void Game::updateEntities()
         bonusPoints.reset();
     }
 }
-       
 
 void Game::updateUI()
 {
@@ -969,14 +981,8 @@ Enemy::Type Game::getEnemyType() const
     return Enemy::Type::Ballom;     // If type somehow doesn't match
 }
 
-
-                                        // *** Accessors for static variables *** //
-
-int Game::getSeconds()    { return s_gameSeconds; }
-int Game::getScore()      { return s_gameScore; }
-
-
-std::pair<int, int> Game::getFree() //Find free position for bonus points
+// Find free position for bonus points
+std::pair<int, int> Game::getFree() const
 {
     int x, y;
     do
@@ -984,5 +990,11 @@ std::pair<int, int> Game::getFree() //Find free position for bonus points
         x = rand() % (_cols - 1) + 1;
         y = rand() % (_rows - 1) + 1;
     } while (pods[y][x].isFilled);
-    return { x  , y };
+    return { x, y };
 }
+
+
+                                        // *** Accessors for static variables *** //
+
+int Game::getSeconds()    { return s_gameSeconds; }
+int Game::getScore()      { return s_gameScore; }

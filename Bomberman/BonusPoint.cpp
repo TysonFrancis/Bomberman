@@ -15,10 +15,10 @@ void BonusPoint::applyEffect(int& score)
 {
 	switch (bonus)
 	{
-	case Bonus::BPanel:		score += 10'000;	break;
-	case Bonus::Goddess:	score += 20'000;	break;
-	case Bonus::Cola:		score += 30'000;	break;
-	case Bonus::Famicom:	score += 500'000;	break;
+	case Bonus::BPanel:		score += 10'000;		break;
+	case Bonus::Goddess:	score += 20'000;		break;
+	case Bonus::Cola:		score += 30'000;		break;
+	case Bonus::Famicom:	score += 500'000;		break;
 	case Bonus::Nakamoto:	score += 10'000'000;	break;
 	case Bonus::Dezeniman:	score += 20'000'000;	break;
 	}

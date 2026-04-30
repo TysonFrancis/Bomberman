@@ -249,37 +249,55 @@ void Enemy::changeDirection(bool phase)
 	switch (dir)
 	{
 	case Facing::Up:
+
 		moveX = 0;
 		moveY = -1;
+
 		if (!phase&&!pods[tileY - 1][tileX].isFilled)
 			break;
 		if (phase && !pods[tileY - 1][tileX].isHard)
-			[[fallthrough]];
+			break;
+
+		[[fallthrough]];
+
 	case Facing::Down:
+
 		moveX = 0;
 		moveY = 1;
+
 		if (!phase && !pods[tileY + 1][tileX].isFilled)
 			break;
 		if (phase && !pods[tileY + 1][tileX].isHard)
 			break;
+
 		[[fallthrough]];
+
 	case Facing::Left:
+
 		moveX = -1;
 		moveY = 0;
+
 		if (!phase && !pods[tileY][tileX - 1].isFilled)
 			break;
 		if (phase && !pods[tileY][tileX - 1].isHard)
 			break;
+
 		[[fallthrough]];
+
 	case Facing::Right:
+
 		moveX = 1;
 		moveY = 0;
+
 		if (!phase && !pods[tileY][tileX + 1].isFilled)
 			break;
 		if (phase && !pods[tileY][tileX + 1].isHard)
 			break;
+
 		[[fallthrough]];
+
 	default:
+
 		moveX = 0;
 		moveY = 0;
 	}
