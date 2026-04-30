@@ -341,6 +341,16 @@ void Game::clear()
 
     bomber.removeInvincibility();           // Make sure invincibility is gone after bonus stage
     panel.updatePowerUp(PowerUp::Type::Invincible, isInvincibleLit);
+
+    goddessCount=0;
+    colaTimer=0;
+    colaTick=0;
+    exitBombs=0;
+    chain = 0;
+    bonusSpawned = false;
+    enemiesKilled = false;
+    softDestroyed = false;
+
 }
 
 // Called when game over and continuing,
@@ -423,38 +433,130 @@ void Game::updateEntities()
 {
     bomber.update();
 
-    if (!bonusSpawned)
+    if (!bonusSpawned) //Bonus point spawning logic
     {
-        if (bomber.isOnExit() && !enemiesKilled && !bonusSpawned) //BPanel
+        switch (bonusPointPreset[stage])
         {
-            //bonusSpawned = true;
-            //bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::BPanel);
-        }
-
-        if ((bomber.isOnExit() && !enemiesKilled)) //Cola
-            colaTimer = true;
-
-        if (colaTimer)
-        {  
-            if (!(bomber.getJoy().first == 0 && bomber.getJoy().second == 0)) // If player stops moving
+        case 0:
+            if (bomber.isOnExit() && !enemiesKilled && !bonusSpawned) //BPanel
             {
-                colaTick++;
-                if (colaTick >= 900)//About 15 seconds
-                {
-                    bonusSpawned = true;
-                    bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Cola);
-                }
+                bonusSpawned = true;
+                bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::BPanel);
             }
-            else 
-            colaTimer = false;
+            break;
+
+        case 1:
+            if (enemies.size() == 0) //Goddess
+            {
+                if (bomber.getX() == 1 || bomber.getX() == _cols - 2 || bomber.getY() == 1 || bomber.getY() == _rows - 2)
+                {
+                    if (!goddessSet) // If player is on edge of map, make starting spot and "nodes"
+                    {
+						goddessSet = true;
+                        goddessStart = { bomber.getX(), bomber.getY() };
+                        if((bomber.getX()==1 ||bomber.getX()==_cols-2) && (bomber.getY()==1 ||bomber.getY()==_rows-2)) //if corner
+                        {
+                            if (bomber.getX() == 1)
+                            {
+                                goddessNode = { bomber.getX() + 1,bomber.getY() };
+                                if (bomber.getY() == 1)
+                                    goddessTarget = { bomber.getX(), bomber.getY() + 1 };
+                                else goddessTarget = { bomber.getX(), bomber.getY() - 1 };
+                            }
+                            else
+                            {
+                                goddessNode = { bomber.getX() - 1,bomber.getY() };
+                                if (bomber.getY() == 1)
+                                    goddessTarget = { bomber.getX(), bomber.getY() + 1 };
+                                else goddessTarget = { bomber.getX(), bomber.getY() - 1 };
+                            }
+                        }
+                        else
+                        if(bomber.getX()==1 || bomber.getX()==_cols-2) // If on left or right edge, make node up or down
+                        {
+							goddessNode = { bomber.getX(),bomber.getY() + 1 };
+                            goddessTarget = { bomber.getX(),bomber.getY() - 1 };
+                        }
+                        else // If on top or bottom edge, make node directly vertical from start
+                        {
+                            goddessNode = { bomber.getX()+1,bomber.getY()};
+                            goddessTarget = { bomber.getX()-1,bomber.getY()};
+						}
+                    }
+
+                    if(bomber.getX() == goddessNode.first && bomber.getY() == goddessNode.second)
+						node = true;
+					if (bomber.getX() == goddessTarget.first && bomber.getY() == goddessTarget.second)
+						target = true;
+
+                    if (bomber.getX() == goddessStart.first && bomber.getY() == goddessStart.second)
+                    {
+                        if (node && target)
+                        {
+                            bonusSpawned = true;
+                            bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Goddess);
+                        }
+						node = false;
+						target = false;
+                    }
+                    
+                }
+                else
+                    goddessSet = false;
+            }
+			std::cout << "Start: (" << goddessStart.first << "," << goddessStart.second << ") Node: (" << goddessNode.first << "," << goddessNode.second << ") Target: (" << goddessTarget.first << "," << goddessTarget.second << ")\n";
+        
+
+
+			break;
+
+        case 2:
+            if (enemies.size() == 0 && !softDestroyed) //Nakamoto
+            {
+                bonusSpawned = true;
+                bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Nakamoto);
+			}
+            break;
+
+        case 3:
+            if (explosions.size() == 0) //If streak stops, reset
+                chain = 0;
+            if (chain >=10) //Famicom
+            {
+                bonusSpawned = true;
+                bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Famicom);
+			}
+            break;
+
+        case 4:
+             if (bomber.isOnExit() && !enemiesKilled && bonusPointPreset[stage]==4) //Cola
+            {
+                colaTimer = true;
+            }
+             if (colaTimer)
+             {  
+                if (!(bomber.getJoy().first == 0 && bomber.getJoy().second == 0)) // If player stops moving
+                {
+                    colaTick++;
+                    if (colaTick >= 900)//About 15 seconds
+                    {
+                        bonusSpawned = true;
+                        bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Cola);
+                    }
+                }
+                else 
+                colaTimer = false;
+             }
+			 break;
+
+        case 5:
+            if (softWalls.size() == 0 && !enemiesKilled && exitBombs >=3) //Dezeniman
+            {
+				bonusSpawned = true;
+				bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Dezeniman);
+            }
+			break;
         }
-
-
-        /*if (enemies.size() == 0 && !bonusSpawned) //Goddess
-        {
-            if()
-            bonusPoints.emplace(animations.getMisc(), std::pair<int, int>(1, 1), BonusPoint::Bonus::Goddess);
-        }*/
     }
 
 
@@ -529,7 +631,11 @@ void Game::updateEntities()
         // If explosion is colliding with bomb, explode bomb after 3 frames
         for (Bomb& bomb : bombs)
             if (explosions[i].intersects(bomb) && !bomb.getWillExplode())
+            {
                 bomb.delay();       // Explodes in 5 frames
+                if (enemies.size() == 0)
+                    chain++;
+            }
 
         // If explosion is colliding with powerup, spawn enemies and remove powerup
         if (powerUp && powerUp->intersects(explosions[i]))
@@ -540,7 +646,10 @@ void Game::updateEntities()
 
         // If explosion tile is the exit, spawn enemies
         if (pods[explosions[i].getY()][explosions[i].getX()].isExit)
+        {
             spawnEnemies(static_cast<Enemy::Type>(powerupPresets[stage]));
+			exitBombs++;
+        }
 
         // Remove explosion if animation is finished
         if (explosions[i].getState() == Entity::State::Dead)
@@ -572,6 +681,7 @@ void Game::updateEntities()
         {
             softWalls.erase(softWalls.begin() + i);
             i--;
+			softDestroyed = true;
         }
     }
 
