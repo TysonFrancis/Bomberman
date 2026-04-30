@@ -50,6 +50,7 @@ private:								// *** Main methods *** //
 	void timingAndStateChanges();
 	void updateEntities();
 	void updateUI();
+	void pause() { paused = !paused; };
 
 	void startRoundLogic();
 	void transitionLogic();
@@ -59,7 +60,7 @@ private:								// *** Main methods *** //
 										// *** Internal helper methods *** //
 	void spawnEnemies(Enemy::Type = Enemy::Type::Pontan);
 	Enemy::Type getEnemyType() const;
-	std::pair<int, int> getFree();
+	std::pair<int, int> getFree() const;
 
 
 	inline static int s_gameSeconds = 0;
@@ -86,6 +87,9 @@ private:								// *** Main methods *** //
 	sf::Sprite background;
 	sf::Sprite title;
 	sf::Sprite endTitle;
+
+	sf::RectangleShape pauseBlock;
+	Text pauses;
 
 	sf::RenderWindow window;
 	sf::View world, UI;
@@ -118,6 +122,9 @@ private:								// *** Main methods *** //
 	bool gameOver;
 
 	bool bonus;
+	bool bonusSpawned;
+	bool enemiesKilled;
+	bool paused;
 	bool bonusSpawned=false;
 	bool enemiesKilled=false;
 	bool softDestroyed = false;
