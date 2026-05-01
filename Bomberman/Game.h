@@ -48,6 +48,7 @@ private:								// *** Main methods *** //
 	void reset();
 										// *** Update submethods *** //
 	void timingAndStateChanges();
+	void checkBonusConditions();
 	void updateEntities();
 	void updateUI();
 	void pause() { paused = !paused; };
@@ -122,9 +123,8 @@ private:								// *** Main methods *** //
 	bool gameOver;
 
 	bool bonus;
-	bool bonusSpawned;
-	bool enemiesKilled;
 	bool paused;
+
 	bool bonusSpawned=false;
 	bool enemiesKilled=false;
 	bool softDestroyed = false;
@@ -157,7 +157,8 @@ private:								// *** Main methods *** //
 
 	int enemyPresets[50][8] =
 	{
-		{0,0,0,0,0,0,0,0}, {3,3,0,0,0,0,0,0}, {2,2,2,0,0,0,0,0}, {1,1,2,2,0,0,0,0}, {0,4,3,0,0,0,0,0},
+		// Who deleted stage 1 brah i been tweaking out why nothings spawning
+		{8,0,0,0,0,0,0,0}, {3,3,0,0,0,0,0,0}, {2,2,2,0,0,0,0,0}, {1,1,2,2,0,0,0,0}, {0,4,3,0,0,0,0,0},
 		{0,2,3,2,0,0,0,0}, {0,2,3,0,2,0,0,0}, {0,1,2,4,0,0,0,0}, {0,1,1,4,0,1,0,0}, {0,1,1,1,1,3,0,0},
 		{0,1,2,3,1,1,0,0}, {0,1,1,1,1,4,0,0}, {0,0,3,3,0,2,0,0}, {0,0,0,0,7,0,1,0}, {0,0,1,3,0,3,1,0},
 		{0,0,0,3,0,4,1,0}, {0,0,5,0,0,2,1,0}, {3,3,0,0,0,0,2,0}, {1,1,3,0,1,0,2,0}, {0,1,1,1,1,2,2,0},

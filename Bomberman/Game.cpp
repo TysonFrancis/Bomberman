@@ -9,6 +9,9 @@
 #include <algorithm>    // For std::min
 
 using namespace Constants;
+using namespace sf::Keyboard;
+using namespace sf::Joystick;
+
 using std::cout, std::endl;
 
 Game::Game() : background(animations.getBackground()),              // Load background sprite
@@ -84,11 +87,12 @@ Game::Game() : background(animations.getBackground()),              // Load back
 void Game::run()
 {
     while (window.isOpen())
-    {
-        events();
-        update();
-        render();
-    }
+		while (window.hasFocus())
+        {
+            events();
+            update();
+            render();
+        }
 }
 
 
@@ -102,39 +106,35 @@ void Game::events()
     // Close game if window is closed, escape key pressed, or on game over screen and enter pressed
     while (const std::optional event = window.pollEvent())
     {
-        if (event->is<sf::Event::Closed>() ||
-            sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Escape))
+		// Close game if window is closed or escape key is pressed
+        if (event->is<sf::Event::Closed>() || isKeyPressed(Scancode::Escape))
             closeGame();
 
-        if (gameState == GameState::GameOver &&
-            (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)
-                || sf::Joystick::isButtonPressed(0, 7)))
+        if (gameState == GameState::GameOver &&                                     // Restart if gameover
+            (isKeyPressed(Scancode::Enter) || isButtonPressed(0, 7)))
         {
             enterPressed = true;
             displayScore = true;
             reset();
         }
 
-        //Check if pausing
-        if (gameState == GameState::Playing && !enterPressed &&
-            (sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)
-                || sf::Joystick::isButtonPressed(0, 7)))
+        if (gameState == GameState::Playing && !enterPressed &&                     // Check for pausing
+            (isKeyPressed(Scancode::Enter) || isButtonPressed(0, 7)))
         {
             pause();
             enterPressed = true;
         }
 
-        // Check if enter key is released
-        if (auto* key = event->getIf<sf::Event::KeyReleased>())
-            if (key->scancode == sf::Keyboard::Scan::Enter)
+		if (auto* key = event->getIf<sf::Event::KeyReleased>())                     // Enter key released
+            if (key->scancode == Scan::Enter)
                 enterPressed = false;
-        if (auto* button = event->getIf<sf::Event::JoystickButtonReleased>())
+
+        if (auto* button = event->getIf<sf::Event::JoystickButtonReleased>())       // Start button released
             if (button->button == 7)
                 enterPressed = false;
 
-        if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
-            if (keyPressed->scancode == sf::Keyboard::Scancode::Left
-                || keyPressed->scancode == sf::Keyboard::Scancode::Right)
+        if (auto* key = event->getIf<sf::Event::KeyPressed>())                      // Menu navigation with keyboard
+            if (key->scancode == Scancode::Left || key->scancode == Scancode::Right)
                 arrowKeyDown = true;
     }
 
@@ -142,8 +142,7 @@ void Game::events()
     if (gameState == GameState::Title)
     {
         // If enter is pressed, start game
-        if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Enter)
-            || sf::Joystick::isButtonPressed(0, 7)) && !enterPressed)
+        if ((isKeyPressed(Scancode::Enter) || isButtonPressed(0, 7)) && !enterPressed)
         {
             file.open("Savedata/gamestate.txt", std::ios::in);
 
@@ -216,6 +215,7 @@ void Game::update()
         if (!paused)
         {
             timingAndStateChanges();
+			checkBonusConditions();
             updateEntities();
             updateUI();
         }
@@ -531,10 +531,8 @@ void Game::timingAndStateChanges()
     }
 }
 
-void Game::updateEntities()
+void Game::checkBonusConditions()
 {
-    bomber.update();
-
     if (!bonusSpawned) //Bonus point spawning logic
     {
         switch (bonusPointPreset[stage])
@@ -554,9 +552,9 @@ void Game::updateEntities()
                 {
                     if (!goddessSet) // If player is on edge of map, make starting spot and "nodes"
                     {
-						goddessSet = true;
+                        goddessSet = true;
                         goddessStart = { bomber.getX(), bomber.getY() };
-                        if((bomber.getX()==1 ||bomber.getX()==_cols-2) && (bomber.getY()==1 ||bomber.getY()==_rows-2)) //if corner
+                        if ((bomber.getX() == 1 || bomber.getX() == _cols - 2) && (bomber.getY() == 1 || bomber.getY() == _rows - 2)) //if corner
                         {
                             if (bomber.getX() == 1)
                             {
@@ -574,22 +572,22 @@ void Game::updateEntities()
                             }
                         }
                         else
-                        if(bomber.getX()==1 || bomber.getX()==_cols-2) // If on left or right edge, make node up or down
-                        {
-							goddessNode = { bomber.getX(),bomber.getY() + 1 };
-                            goddessTarget = { bomber.getX(),bomber.getY() - 1 };
-                        }
-                        else // If on top or bottom edge, make node directly vertical from start
-                        {
-                            goddessNode = { bomber.getX()+1,bomber.getY()};
-                            goddessTarget = { bomber.getX()-1,bomber.getY()};
-						}
+                            if (bomber.getX() == 1 || bomber.getX() == _cols - 2) // If on left or right edge, make node up or down
+                            {
+                                goddessNode = { bomber.getX(),bomber.getY() + 1 };
+                                goddessTarget = { bomber.getX(),bomber.getY() - 1 };
+                            }
+                            else // If on top or bottom edge, make node directly vertical from start
+                            {
+                                goddessNode = { bomber.getX() + 1,bomber.getY() };
+                                goddessTarget = { bomber.getX() - 1,bomber.getY() };
+                            }
                     }
 
-                    if(bomber.getX() == goddessNode.first && bomber.getY() == goddessNode.second)
-						node = true;
-					if (bomber.getX() == goddessTarget.first && bomber.getY() == goddessTarget.second)
-						target = true;
+                    if (bomber.getX() == goddessNode.first && bomber.getY() == goddessNode.second)
+                        node = true;
+                    if (bomber.getX() == goddessTarget.first && bomber.getY() == goddessTarget.second)
+                        target = true;
 
                     if (bomber.getX() == goddessStart.first && bomber.getY() == goddessStart.second)
                     {
@@ -598,45 +596,45 @@ void Game::updateEntities()
                             bonusSpawned = true;
                             bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Goddess);
                         }
-						node = false;
-						target = false;
+                        node = false;
+                        target = false;
                     }
-                    
+
                 }
                 else
                     goddessSet = false;
             }
-			std::cout << "Start: (" << goddessStart.first << "," << goddessStart.second << ") Node: (" << goddessNode.first << "," << goddessNode.second << ") Target: (" << goddessTarget.first << "," << goddessTarget.second << ")\n";
-        
+            std::cout << "Start: (" << goddessStart.first << "," << goddessStart.second << ") Node: (" << goddessNode.first << "," << goddessNode.second << ") Target: (" << goddessTarget.first << "," << goddessTarget.second << ")\n";
 
 
-			break;
+
+            break;
 
         case 2:
             if (enemies.size() == 0 && !softDestroyed) //Nakamoto
             {
                 bonusSpawned = true;
                 bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Nakamoto);
-			}
+            }
             break;
 
         case 3:
             if (explosions.size() == 0) //If streak stops, reset
                 chain = 0;
-            if (chain >=10) //Famicom
+            if (chain >= 10) //Famicom
             {
                 bonusSpawned = true;
                 bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Famicom);
-			}
+            }
             break;
 
         case 4:
-             if (bomber.isOnExit() && !enemiesKilled && bonusPointPreset[stage]==4) //Cola
+            if (bomber.isOnExit() && !enemiesKilled && bonusPointPreset[stage] == 4) //Cola
             {
                 colaTimer = true;
             }
-             if (colaTimer)
-             {  
+            if (colaTimer)
+            {
                 if (!(bomber.getJoy().first == 0 && bomber.getJoy().second == 0)) // If player stops moving
                 {
                     colaTick++;
@@ -646,21 +644,25 @@ void Game::updateEntities()
                         bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Cola);
                     }
                 }
-                else 
-                colaTimer = false;
-             }
-			 break;
+                else
+                    colaTimer = false;
+            }
+            break;
 
         case 5:
-            if (softWalls.size() == 0 && !enemiesKilled && exitBombs >=3) //Dezeniman
+            if (softWalls.size() == 0 && !enemiesKilled && exitBombs >= 3) //Dezeniman
             {
-				bonusSpawned = true;
-				bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Dezeniman);
+                bonusSpawned = true;
+                bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Dezeniman);
             }
-			break;
+            break;
         }
     }
+}
 
+void Game::updateEntities()
+{
+    bomber.update();
 
     // Enemies
     for (size_t i = 0; i < enemies.size(); i++)
