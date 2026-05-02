@@ -1,8 +1,8 @@
 # **Bomberman Game Clone**
 
-+ Made for our second semester project in our Advanced C++ class.
-+ Clone of original 1983 Bomberman game made with SFML and Visual Studio.
-+ Windows exclusive, compatable with keyboard and Xbox controllers.
+Made for our second semester project in an Advanced C++ class.<br/>
+Clone of original 1983 Bomberman game made with SFML and Visual Studio.<br/>
+Windows exclusive, compatable with keyboard and Xbox controllers.
 
 ## **Preview**
 
@@ -10,6 +10,24 @@
 Pictures/gifs will go in here for visuals
 
 ```
+## **Objective**
+Traverse through 50 levels defeating enemies and collecting powerups.<br/>
+Cannot enter level exit until all enemies are defeated.<br/>
+Blowing up the exit or powerup will spawn more enemies to defeat.
+
+## **Controls**
+### **Keyboard**
++ Arrow keys - Move
++ Z - Place bomb
++ X - Explode bomb (remote)
++ Enter - Start/Pause
+
+### **Controller**
++ Left stick - Move
++ //// - Place bomb
++ //// - Explode bomb (remote)
++ //// - Start/Pause
+
 
 ## **Setup**
 1. Install [SFML 3.x](https://www.sfml-dev.org/download/sfml/3.0.0/) 32-bit.
