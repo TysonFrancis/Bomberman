@@ -485,6 +485,10 @@ void Game::reset()
 
                                         // *** Update submethods *** //
 
+// Handles timing for the game,
+// including game seconds and enemy
+// spawning, and checks for state changes
+// like death and level transition conditions
 void Game::timingAndStateChanges()
 {
     gameTick++;
@@ -531,6 +535,8 @@ void Game::timingAndStateChanges()
     }
 }
 
+// Checks conditions for bonus point
+// spawning based on current stage's preset
 void Game::checkBonusConditions()
 {
     if (!bonusSpawned) //Bonus point spawning logic
@@ -604,7 +610,7 @@ void Game::checkBonusConditions()
                 else
                     goddessSet = false;
             }
-            std::cout << "Start: (" << goddessStart.first << "," << goddessStart.second << ") Node: (" << goddessNode.first << "," << goddessNode.second << ") Target: (" << goddessTarget.first << "," << goddessTarget.second << ")\n";
+            //std::cout << "Start: (" << goddessStart.first << "," << goddessStart.second << ") Node: (" << goddessNode.first << "," << goddessNode.second << ") Target: (" << goddessTarget.first << "," << goddessTarget.second << ")\n";
 
 
 
@@ -660,6 +666,9 @@ void Game::checkBonusConditions()
     }
 }
 
+// Calls each entity's update method,
+// and checks for interactions between
+// entities like collisions and deaths
 void Game::updateEntities()
 {
     bomber.update();
@@ -819,6 +828,8 @@ void Game::updateEntities()
     }
 }
 
+// Updates the information panel based
+// on current powerups and status effects
 void Game::updateUI()
 {
     // Invincibility display
