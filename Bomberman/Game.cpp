@@ -560,61 +560,33 @@ void Game::checkBonusConditions()
                     {
                         goddessSet = true;
                         goddessStart = { bomber.getX(), bomber.getY() };
-                        if ((bomber.getX() == 1 || bomber.getX() == _cols - 2) && (bomber.getY() == 1 || bomber.getY() == _rows - 2)) //if corner
+                        if (bomber.getX() == 1 && bomber.getY() == 1) //If start
                         {
-                            if (bomber.getX() == 1)
-                            {
-                                goddessNode = { bomber.getX() + 1,bomber.getY() };
-                                if (bomber.getY() == 1)
-                                    goddessTarget = { bomber.getX(), bomber.getY() + 1 };
-                                else goddessTarget = { bomber.getX(), bomber.getY() - 1 };
-                            }
-                            else
-                            {
-                                goddessNode = { bomber.getX() - 1,bomber.getY() };
-                                if (bomber.getY() == 1)
-                                    goddessTarget = { bomber.getX(), bomber.getY() + 1 };
-                                else goddessTarget = { bomber.getX(), bomber.getY() - 1 };
-                            }
+                            goddessNode = { bomber.getX() + 1,bomber.getY() };
+                            goddessTarget = { bomber.getX(), bomber.getY() + 1 };
                         }
-                        else
-                            if (bomber.getX() == 1 || bomber.getX() == _cols - 2) // If on left or right edge, make node up or down
-                            {
-                                goddessNode = { bomber.getX(),bomber.getY() + 1 };
-                                goddessTarget = { bomber.getX(),bomber.getY() - 1 };
-                            }
-                            else // If on top or bottom edge, make node directly vertical from start
-                            {
-                                goddessNode = { bomber.getX() + 1,bomber.getY() };
-                                goddessTarget = { bomber.getX() - 1,bomber.getY() };
-                            }
-                    }
 
-                    if (bomber.getX() == goddessNode.first && bomber.getY() == goddessNode.second)
-                        node = true;
-                    if (bomber.getX() == goddessTarget.first && bomber.getY() == goddessTarget.second)
-                        target = true;
+                        if (bomber.getX() == goddessNode.first && bomber.getY() == goddessNode.second)
+                            node = true;
+                        if (bomber.getX() == goddessTarget.first && bomber.getY() == goddessTarget.second)
+                            target = true;
 
-                    if (bomber.getX() == goddessStart.first && bomber.getY() == goddessStart.second)
-                    {
-                        if (node && target)
+                        if (bomber.getX() == goddessStart.first && bomber.getY() == goddessStart.second)
                         {
-                            bonusSpawned = true;
-                            bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Goddess);
+                            if (node && target)
+                            {
+                                bonusSpawned = true;
+                                bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Goddess);
+                            }
+                            node = false;
+                            target = false;
                         }
-                        node = false;
-                        target = false;
-                    }
 
+                    }
+                    else
+                        goddessSet = false;
                 }
-                else
-                    goddessSet = false;
-            }
-            //std::cout << "Start: (" << goddessStart.first << "," << goddessStart.second << ") Node: (" << goddessNode.first << "," << goddessNode.second << ") Target: (" << goddessTarget.first << "," << goddessTarget.second << ")\n";
-
-
-
-            break;
+                break;
 
         case 2:
             if (enemies.size() == 0 && !softDestroyed) //Nakamoto
@@ -662,9 +634,11 @@ void Game::checkBonusConditions()
                 bonusPoints.emplace(animations.getMisc(), getFree(), BonusPoint::Bonus::Dezeniman);
             }
             break;
+            }
         }
     }
 }
+
 
 // Calls each entity's update method,
 // and checks for interactions between
