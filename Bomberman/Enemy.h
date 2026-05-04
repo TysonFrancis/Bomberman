@@ -15,7 +15,7 @@ class Enemy : public Entity
 public:
 	enum class Type { Ballom, Onil, Dahl, Minvo, Doria, Ovape, Pass, Pontan };
 
-	Enemy(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols], Type, Player(&play));
+	Enemy(const sf::Texture&, Pod(&pods)[Constants::_rows][Constants::_cols], int, int, Type, Player(&play));
 
 	void update();
 	void animate();

@@ -6,7 +6,7 @@
 using namespace Constants;
 using std::cout, std::endl;
 
-Enemy::Enemy(const sf::Texture& tex, Pod(&pods)[_rows][_cols], Type input, Player(&play)) :
+Enemy::Enemy(const sf::Texture& tex, Pod(&pods)[_rows][_cols], int x, int y, Type input, Player(&play)) :
 	Entity(tex, pods), play(play),
 	type(input), lastFacing(Facing::Left),
 	moveX(0.f), moveY(0.f),
@@ -24,6 +24,7 @@ Enemy::Enemy(const sf::Texture& tex, Pod(&pods)[_rows][_cols], Type input, Playe
 	case Type::Pontan:	speed = 2.5f * _speedScale;	eratic = 5;		break;
 	}
 
+	setPosition(x, y);
 	setTexture(0, enemyFrameYPos);		// Set texture based on enum Type
 	changeDirection(false);
 }

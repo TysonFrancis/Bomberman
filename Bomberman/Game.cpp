@@ -390,10 +390,9 @@ void Game::level()
         static_cast<PowerUp::Type>(powerupPresets[stage]), x, y));
     cout << "Powerup set at: (" << x << ", " << y << ")\n";
 
-    for (int enemyType = 0; enemyType < 8; enemyType++)                     // Runs the enemy create loop per enemy type,
-        for (int i = 0; i < enemyPresets[stage][enemyType]; i++)           // for how many of each enemy type to spawn
-        {                                                                       // based on the presets for the current stage
-            Enemy enemy(animations.getEntities(), pods, static_cast<Enemy::Type>(enemyType), bomber);
+    for (int enemyType = 0; enemyType < 8; enemyType++)                 // Runs the enemy create loop per enemy type,
+        for (int i = 0; i < enemyPresets[stage][enemyType]; i++)        // for how many of each enemy type to spawn
+        {                                                               // based on the presets for the current stage
             int x, y;
 
             do
@@ -402,8 +401,7 @@ void Game::level()
                 y = rand() % (_rows - 3) + 3;
             } while (pods[y][x].isFilled);
 
-            enemy.setPosition(x, y);
-            enemies.emplace_back(enemy);
+            enemies.emplace_back(animations.getEntities(), pods, x, y, static_cast<Enemy::Type>(enemyType), bomber);
         }
 }
 
@@ -1094,22 +1092,19 @@ void Game::spawnEnemies(Enemy::Type type)
     int copy = std::min(size, 10);      // Number of enemies needed to copy back to vector
     int spawn = 10 - copy;              // Number of new enemies needed to spawn
 
-    if (levelTimerExpired)              // If timer expired for Pontans
+    // Spawning Pontans
+
+    if (levelTimerExpired)
     {
         std::vector<Enemy> newEnemies;
         newEnemies.reserve(10);
 
-        for (int i = 0; i < copy; i++)      // For how ever many enemies are currently
-        {                                   // alive, replace them with a new Pontan
-            Enemy enemy(animations.getEntities(), pods, type, bomber);
-            enemy.setPosition(enemies[i].getX(), enemies[i].getY());
+		for (int i = 0; i < copy; i++)      // Replace current enemies with Pontans
+            newEnemies.emplace_back(animations.getEntities(), pods,
+                enemies[i].getX(), enemies[i].getY(), type, bomber);
 
-            newEnemies.emplace_back(enemy);     // Place new enemy in Pontan vector
-        }
-
-        for (int i = 0; i < spawn; i++)     // For how ever many new enemies to make,
-        {                                   // place them randomly on the map
-            Enemy enemy(animations.getEntities(), pods, type, bomber);
+		for (int i = 0; i < spawn; i++)     // Make more Pontans if needed up to
+        {                                   // 10, place them randomly on the map
             int x, y;
 
             do
@@ -1118,29 +1113,28 @@ void Game::spawnEnemies(Enemy::Type type)
                 y = rand() % (_rows - 1) + 1;
             } while (pods[y][x].isFilled);
 
-            enemy.setPosition(x, y);
-            newEnemies.emplace_back(enemy);     // Place new enemy in Pontan vector
+            newEnemies.emplace_back(animations.getEntities(), pods, x, y, type, bomber);
         }
 
         enemies = std::move(newEnemies);    // Copy over all Pontans back into original enemies vector
+
+        return;
     }
 
-    else                                // Bonus stage or other spawns, just add them to the current vector without removing current enemies
+    // Bonus stage or other spawns, just add them to the
+    // current vector without removing current enemies
+
+    for (int i = 0; i < spawn; i++)
     {
-        for (int i = 0; i < spawn; i++)     // For how ever many new enemies to make,
-        {                                   // place them randomly on the map
-            Enemy enemy(animations.getEntities(), pods, type, bomber);
-            int x, y;
+        int x, y;
 
-            do
-            {
-                x = rand() % (_cols - 1) + 1;
-                y = rand() % (_rows - 1) + 1;
-            } while (pods[y][x].isFilled);
+        do
+        {
+            x = rand() % (_cols - 1) + 1;
+            y = rand() % (_rows - 1) + 1;
+        } while (pods[y][x].isFilled);
 
-            enemy.setPosition(x, y);
-            enemies.emplace_back(enemy);        // Place new enemy in original vector
-        }
+        enemies.emplace_back(animations.getEntities(), pods, x, y, type, bomber);
     }
 }
 
