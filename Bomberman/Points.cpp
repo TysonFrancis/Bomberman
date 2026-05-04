@@ -6,7 +6,8 @@ using namespace Constants;
 Points::Points(const sf::Texture& tex, Pod(&pods)[_rows][_cols], int input,int inX, int inY):
 Entity(tex,pods),value(input), x(inX), y(inY)
 {
-	sprite.setPosition(sf::Vector2f(static_cast<float>(x + (_tileSize / 2)), static_cast<float>(y + (_tileSize / 2))));
+	sprite.setPosition(sf::Vector2f(static_cast<float>(x * _scaledTile + _halfScaled), static_cast<float>(y * _scaledTile + _halfScaled)));
+
 	if (value <= 1000)
 		sprite.setTextureRect(sf::IntRect(sf::Vector2i(116, 8 * static_cast<int>(log2(value / 100)) + 338), _pointsTile));
 	else

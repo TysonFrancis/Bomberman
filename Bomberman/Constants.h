@@ -10,6 +10,7 @@
 	easier to change values in one place if needed.
 */
 
+
 namespace Constants
 {
 	// Array definition
