@@ -114,8 +114,8 @@ void InfoPanel::updatePowerUp(PowerUp::Type type, bool turnOn)
         powerUps[static_cast<int>(type)].setColor(sf::Color::White);
         return;
     }
-
-       powerUps[static_cast<int>(type)].setColor(sf::Color(128, 128, 128));
+    
+    powerUps[static_cast<int>(type)].setColor(sf::Color(128, 128, 128));
 }
 
 // Reset infoPanel to default
@@ -173,7 +173,7 @@ void InfoPanel::setPowerUps()
         sprite.setColor(sf::Color(128, 128, 128));
         sprite.setScale(sf::Vector2f(_scale, _scale));
         sprite.setPosition(sf::Vector2f
-        (static_cast<float>(_infoPanelPowerupStartX + i * _scaledTile), static_cast<float>(_halfScaled)));
+            (static_cast<float>(_infoPanelPowerupStartX + i * _scaledTile), static_cast<float>(_halfScaled)));
     }
 }
 
@@ -189,6 +189,6 @@ void InfoPanel::setLives()
         sprite.setTextureRect(sf::IntRect({ 64, 0 }, _tile));
         sprite.setScale(sf::Vector2f(_scale, _scale));
         sprite.setPosition(sf::Vector2f
-        (static_cast<float>(_infoPanelLivesStartX + i * _scaledTile), static_cast<float>(_halfScaled)));
+            (static_cast<float>(_infoPanelLivesStartX + i * _scaledTile), static_cast<float>(_halfScaled)));
     }
 }

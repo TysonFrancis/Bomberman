@@ -481,7 +481,10 @@ void Game::reset()
     level();
 }
 
+
                                         // *** Update submethods *** //
+
+											// * Playing state methods * //
 
 // Handles timing for the game,
 // including game seconds and enemy
@@ -830,7 +833,6 @@ void Game::updateEntities()
 // on current powerups and status effects
 void Game::updateUI()
 {
-    // Invincibility display
     if (bomber.hasInvinciblity())                           // If bomber is invincible
     {
         if (invincibilePlayerTicks >= _invincibilityTimer)      // If the timer runs out, remove powerup and reset icon
@@ -861,6 +863,8 @@ void Game::updateUI()
 
     panel.update();
 }
+
+                                            // * All other state methods * //
 
 // Stop music and play round start audio,
 // display current level, then wait until audio
