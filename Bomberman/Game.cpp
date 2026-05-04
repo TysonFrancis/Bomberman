@@ -121,7 +121,7 @@ void Game::events()
         if (gameState == GameState::Playing && !enterPressed &&                     // Check for pausing
             (isKeyPressed(Scancode::Enter) || isButtonPressed(0, 7)))
         {
-            pause();
+            paused = !paused;
             enterPressed = true;
         }
 
@@ -208,17 +208,17 @@ void Game::events()
 // with current frame and increments frame counter
 void Game::update()
 {
+    if (paused)
+        return;
+
     switch (gameState)
     {
     case (GameState::Playing):
 
-        if (!paused)
-        {
-            timingAndStateChanges();
-			checkBonusConditions();
-            updateEntities();
-            updateUI();
-        }
+        timingAndStateChanges();
+        checkBonusConditions();
+        updateEntities();
+        updateUI();
 
         break;
 
