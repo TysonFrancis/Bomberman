@@ -51,7 +51,6 @@ private:								// *** Main methods *** //
 	void checkBonusConditions();
 	void updateEntities();
 	void updateUI();
-	void pause() { paused = !paused; };
 
 	void startRoundLogic();
 	void transitionLogic();

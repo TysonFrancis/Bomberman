@@ -87,12 +87,11 @@ Game::Game() : background(animations.getBackground()),              // Load back
 void Game::run()
 {
     while (window.isOpen())
-		while (window.hasFocus())
-        {
-            events();
-            update();
-            render();
-        }
+    {
+        events();
+        update();
+        render();
+    }
 }
 
 
@@ -121,7 +120,7 @@ void Game::events()
         if (gameState == GameState::Playing && !enterPressed &&                     // Check for pausing
             (isKeyPressed(Scancode::Enter) || isButtonPressed(0, 7)))
         {
-            pause();
+            paused = !paused;
             enterPressed = true;
         }
 
@@ -136,6 +135,10 @@ void Game::events()
         if (auto* key = event->getIf<sf::Event::KeyPressed>())                      // Menu navigation with keyboard
             if (key->scancode == Scancode::Left || key->scancode == Scancode::Right)
                 arrowKeyDown = true;
+
+        if (auto* focus = event->getIf<sf::Event::FocusLost>())                     // Pause game if window loses focus
+            if (!paused)
+                paused = true;
     }
 
     // If on title screen
@@ -428,12 +431,15 @@ void Game::clear()
     explosions.clear();
     points.clear();
 	powerUp.reset();
-    textObjects.clear();
+    bonusPoints.reset();
 
     if (bonus)                               // Reset misc values for new level
         s_gameSeconds = _bonusTimer / _fps;
     else
+    {
         s_gameSeconds = _pontanTimer / _fps;
+        textObjects.clear();
+    }
 
 	gameTick = 0;
     invincibilePlayerTicks = 0;
@@ -539,7 +545,7 @@ void Game::timingAndStateChanges()
 // spawning based on current stage's preset
 void Game::checkBonusConditions()
 {
-    if (!bonusSpawned) //Bonus point spawning logic
+    if (!bonusSpawned&& !bonus) //Bonus point spawning logic
     {
         switch (bonusPointPreset[stage])
         {
@@ -697,11 +703,11 @@ void Game::updateEntities()
 
             switch (enemyType)      // Update score when enemy dies
             {
-            case 0: case 1: point = (enemyType + 1) * 100 * combo;  break;
-            case 2: case 3: point = (enemyType - 1) * 200 * combo;  break;
-            case 4: case 5: point = (enemyType - 3) * 1000 * combo; break;
-            case 6: case 7: point = (enemyType - 5) * 2000 * combo; break;
-            }
+			case 0: case 1: point = (enemyType + 1) * 100 * combo;  break;
+			case 2: case 3: point = (enemyType - 1) * 400 * combo;  break;
+            case 4: case 5: point = (enemyType - 3) * 1000 * combo;  break;
+            case 6: case 7: point = (enemyType - 5) * 4000 * combo;  break;
+            }  
 
             s_gameScore += point;
             streak = 20;            // Waits 20 frames to check for other deaths
@@ -899,7 +905,7 @@ void Game::startRoundLogic()
         if (bonus)
             textObjects.emplace_back("bonus stage", _centerScreen);
         else
-            textObjects.emplace_back("stage " + std::to_string(stage + 1), _centerScreen);
+            textObjects.emplace_back("stage " + std::to_string(stage % 50 + 1), _centerScreen);
 
         levelTransition = true;
     }
@@ -942,7 +948,12 @@ void Game::transitionLogic()
     if (!levelTransition)
     {
         audio.playSound("stageClear");
-        textObjects.emplace_back("stage clear", _centerScreen);
+
+        if(stage == 49)
+            textObjects.emplace_back("lmao bugs afoot", _centerScreen);
+        else
+            textObjects.emplace_back("stage clear", _centerScreen);
+
         levelTransition = true;
 
         if (!bonus)
