@@ -5,11 +5,21 @@ Clone of original 1983 Bomberman game made with SFML and Visual Studio.<br/>
 Windows exclusive, compatable with keyboard and Xbox controllers.
 
 ## **Preview**
+<table>
+  <tr>
+    <td align="center">
+      <h3>Chain Reactions</h3>
+      <img src="Gifs/Chain Reaction.gif" width="478"/>
+    </td>
+    <td align="center">
+      <h3>Powerups</h3>
+      <img src="Gifs/Powerups.gif" width="478"/>
+    </td>
+  </tr>
+</table>
 
-```
-Pictures/gifs will go in here for visuals
 
-```
+
 ## **Objective**
 Traverse through 50 levels defeating enemies and collecting powerups.<br/>
 Cannot enter level exit until all enemies are defeated.<br/>
