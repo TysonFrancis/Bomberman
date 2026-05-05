@@ -78,8 +78,6 @@ Game::Game() : background(animations.getBackground()),              // Load back
                 pods[row][col].isHard = true;
             }
         }
-
-    level();
 }
 
 // Holds main game loop, all actions passed
@@ -117,7 +115,7 @@ void Game::events()
             reset();
         }
 
-        if (gameState == GameState::Playing && !enterPressed &&                     // Check for pausing
+        if (gameState != GameState::Title && !enterPressed &&                     // Check for pausing
             (isKeyPressed(Scancode::Enter) || isButtonPressed(0, 7)))
         {
             paused = !paused;
@@ -158,38 +156,69 @@ void Game::events()
                 // it works
                 file >> stage;
                 file >> s_gameScore;
+
                 file >> temp;
                 bomber.setLives(temp);
+				for (int i = 0; i < temp - 1; i++)
+				    panel.updateLives(true);
+
                 file >> temp;
                 while (--temp)
                 {
                     bomber.extraBomb();
+					panel.updatePowerUp(PowerUp::Type::ExtraBomb);
                 }
+
                 file >> temp;
                 while (--temp)
                 {
                     bomber.extraRange();
+					panel.updatePowerUp(PowerUp::Type::ExtraRange);
                 }
+
                 file >> temp;
                 if (temp)
+                {
                     bomber.giveSkate();
+                    panel.updatePowerUp(PowerUp::Type::Skate);
+                }
+
                 file >> temp;
                 if (temp)
+                {
                     bomber.phaseWalls();
+                    panel.updatePowerUp(PowerUp::Type::WallPhase);
+                }
+
                 file >> temp;
                 if (temp)
+                {
                     bomber.giveRemote();
+                    panel.updatePowerUp(PowerUp::Type::Remote);
+                }
+
                 file >> temp;
                 if (temp)
+                {
                     bomber.phaseBombs();
+                    panel.updatePowerUp(PowerUp::Type::BombPhase);
+                }
+
                 file >> temp;
                 if (temp)
+                {
                     bomber.shieldFire();
+                    panel.updatePowerUp(PowerUp::Type::FireShield);
+                }
+
             }
 
+            file.close();
             audio.getMusic(song).stop();
             textObjects.clear();
             gameState = GameState::RoundStart;
+
+            level();
         }
 
         // If left/right pressed, navigate menu
