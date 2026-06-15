@@ -19,7 +19,7 @@ namespace Constants
 	static constexpr int _softPods = 249;
 
 	// Scaling
-	static constexpr float _scale = 3.f;
+	static constexpr float _scale = 6.f;
 	static constexpr float _speedScale = _scale / 3.f;		// 3x is base scale that we are finding speeds at, use that as divisor
 
 	static constexpr int _tileSize = 16;
@@ -99,13 +99,16 @@ namespace Constants
 	static constexpr int _fastBlinkSpeed = _invincibilityTimer - static_cast<int>(1.5 * _fps);
 	static constexpr int _fastBlinkInterval = 4;
 
-	static constexpr sf::Vector2i _spaceCharacter({ 88, 248 });				// Position vectors
+	static constexpr sf::Vector2i _spaceCharacter({ 88, 248 });				// Spritesheet Position vectors
 
-	static constexpr sf::Vector2f _highscoreTitlePosition({ 912, 504 });
-	static constexpr sf::Vector2f _highscoreGameoverPosition({ 888, 624 });
-
-	static constexpr sf::Vector2f _startPointerPosition({ 564, 456 });
-	static constexpr sf::Vector2f _continuePointerPosition({ 756, 456 });
+	static constexpr sf::Vector2f											// Display Position Vectors
+		_highscoreTitlePosition({ 304 * _scale, 168 * _scale });
+	static constexpr sf::Vector2f
+		_highscoreGameoverPosition({ 296 * _scale, 208 * _scale });
+	static constexpr sf::Vector2f
+		_startPointerPosition({ 188 * _scale, 152 * _scale });
+	static constexpr sf::Vector2f
+		_continuePointerPosition({ 252 * _scale, 152 * _scale });
 
 	static constexpr sf::Vector2i _tile({ _tileSize, _tileSize });			// Size vectors
 	static constexpr sf::Vector2i _letterTile({ _halfTile, _halfTile });

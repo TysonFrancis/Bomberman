@@ -38,6 +38,9 @@ void Player::update()
 		joyX += (isKeyPressed(Scan::Right) - isKeyPressed(Scan::Left));
 		joyY += (isKeyPressed(Scan::Down) - isKeyPressed(Scan::Up));
 
+		joyX += (isKeyPressed(Scan::J) - isKeyPressed(Scan::L));
+		joyY += (isKeyPressed(Scan::K) - isKeyPressed(Scan::I));
+
 		joyX += static_cast<int>(std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X)));
 		joyY += static_cast<int>(std::round(sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y)));
 

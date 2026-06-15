@@ -484,7 +484,6 @@ void Game::clear()
     bonusSpawned = false;
     enemiesKilled = false;
     softDestroyed = false;
-
 }
 
 // Called when game over and continuing,
